@@ -1,0 +1,20 @@
+# Xcode
+build/
+DerivedData/
+*.xcuserstate
+**/xcuserdata/
+*.xcscmblueprint
+*.moved-aside
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+# SwiftPM
+.build/
+.swiftpm/
+Package.resolved.bak
+# 환경별 값(dev 토큰 등)
+Config/Secrets*.xcconfig
+!Config/Secrets.example.xcconfig
+GoogleService-Info.plist
+.DS_Store
