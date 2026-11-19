@@ -5,7 +5,7 @@
 원본 변경 따라가기: `../futureETP`에서 API·shared 스키마·화면 동작이 바뀌면 그쪽에서 이 파일의 "원본 변경 반영"에 항목을 적는다
 
 ## 원본 변경 반영
-- (없음)
+- [ ] API 계약 JSON Schema 생성(2026-11-19, futureETP D-142): `../futureETP/packages/shared/contract/`. 3단계 응답 모델은 이 파일을 기준으로 한다(아래 3단계에 반영됨, 확인 뒤 체크)
 
 ## 0. 환경
 - [ ] Xcode 27.2 · Swift 6.4.2 확인됨(2026-11-18). 시뮬레이터 런타임 설치 여부만 확인
@@ -24,7 +24,7 @@
 
 ## 3. 공통 기반
 - [ ] API client: 헤더(Bearer·`X-Device-Id`), 타임아웃 15초, 봉투 디코딩, `AppError`, 재시도 규칙 (D-042, D-072)
-- [ ] 응답 모델: `../futureETP/packages/shared/src/*.ts`와 맞춘 모델 + 실제 dev 서버 응답으로 디코딩 테스트(계약 테스트). futureETP의 JSON Schema 내보내기(TODO 5-12)가 생기면 그 파일로 검증
+- [ ] 응답 모델: `../futureETP/packages/shared/contract/schemas/*.json`과 맞춘 모델(손으로 또는 생성 도구) + 계약 테스트(실제 dev 서버 응답을 저장한 예시를 모델로 디코딩하고, 같은 예시가 JSON Schema를 통과하는지) (D-142)
 - [ ] installation ID(첫 실행 UUID) 생성·보안 저장소 보관 (D-120)
 - [ ] 접근 키 B-b: 붙여넣기·QR(`futureetp-key:v1:` 접두사), `GET /v1/settings`로 확인 뒤 저장, 키 없으면 첫 화면이 B-b, `UNAUTHORIZED`면 어느 화면에서든 B-b + 거절 줄 (D-044, D-077~D-079)
 - [ ] i18n ko/en, 앱 안 언어 설정을 서버 기기 설정과 맞춤 (D-033, D-073, D-137)

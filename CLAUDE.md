@@ -21,7 +21,8 @@ Swift/SwiftUI로 만드는 futureETP 앱(iOS). 기능·화면·동작은 RN 앱(
 | 화면 와이어프레임과 화면별 세부 동작 | `../futureETP/docs/wireframes/screens.md` |
 | API 규약(요청 헤더·응답 봉투·에러 코드·값 형식·freshness·AppError·엔드포인트) | `../futureETP/docs/architecture.md`의 "API 통신 및 에러 처리 규약" 절 |
 | 다른 클라이언트 규칙(계약 공유·앱 ID·`appVersion` 접두사) | `../futureETP/docs/architecture.md`의 "다른 클라이언트" 절 |
-| 응답 필드 정의(zod 스키마, 계약의 원본) | `../futureETP/packages/shared/src/*.ts` |
+| API 계약(엔드포인트·헤더·에러 코드, 응답·본문·쿼리 JSON Schema) | `../futureETP/packages/shared/contract/api.json`, `schemas/*.json` (D-142, 생성 파일) |
+| 응답 필드 정의 원본(zod, refine 규칙·주석은 여기만) | `../futureETP/packages/shared/src/*.ts` |
 | 결정 기록 D-xxx(2천 줄, 통째로 읽지 않음) | `../futureETP/docs/decisions.md`. `grep -n '^## D-' ../futureETP/docs/decisions.md`로 목록을 본 뒤 필요한 항목만 |
 | RN 구현(동작이 문서로 모호할 때 참고) | `../futureETP/apps/mobile/src/` |
 | 운영(서버 주소·접근 키 생성·dev 서버 실행) | `../futureETP/docs/ops.md`, `../futureETP/.claude/rules/server.md`의 명령 |
@@ -55,7 +56,7 @@ Swift/SwiftUI로 만드는 futureETP 앱(iOS). 기능·화면·동작은 RN 앱(
   - 응답은 항상 `{ success: true, data } | { success: false, error: { code, message } }`. 봉투와 `data`를 모델로 디코딩하고 실패는 `SCHEMA_MISMATCH` (D-042)
   - 모든 실패는 `AppError`(서버 코드 `UNAUTHORIZED`·`RATE_LIMITED`·`VALIDATION_FAILED`·`NOT_FOUND`·`INTERNAL` + 앱 코드 `NETWORK`·`TIMEOUT`·`SCHEMA_MISMATCH`). 타임아웃 15초, 재시도는 `NETWORK`·`TIMEOUT`·`INTERNAL`만 최대 2회, 변경 요청은 자동 재시도 없음 (D-072)
   - `UNAUTHORIZED`면 어느 화면에서든 B-b로 보내고 거절 줄을 보인다 (D-079)
-  - 응답 모델은 `../futureETP/packages/shared/src/*.ts`와 필드·nullable·enum 값을 맞춘다
+  - 응답 모델은 `../futureETP/packages/shared/contract/schemas/*.json`과 필드·nullable·enum 값을 맞춘다. 모델 생성 도구를 쓰면 이 파일을 입력으로 한다 (D-142)
 - 접근 키·installation ID는 Keychain(`Security` 프레임워크, 작은 래퍼 하나)에만 둔다. 앱 번들·저장소에 넣지 않는다. 예외는 dev 변형의 `DEV_API_TOKEN`뿐 (D-043, D-044)
 - dev 서버 주소·`DEV_API_TOKEN`은 `Config/Secrets.xcconfig`(커밋 안 함, `Secrets.example.xcconfig`만 커밋) → Info.plist 값으로 넣고, dev configuration에서만 읽는다
 - 변형: Xcode configuration `Debug-Dev`·`Release`(또는 scheme 두 개) + xcconfig. dev는 bundle ID `.dev` (D-043, D-052 대응)
