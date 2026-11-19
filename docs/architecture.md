@@ -29,6 +29,8 @@ docs/                            tech-stack, architecture, decisions
 규칙
 - 화면 → `@Observable` 모델(화면별 Model) → repository → API client 한 방향. 화면은 HTTP·저장소를 직접 부르지 않는다.
 - 화면 전용 코드는 해당 feature 안에, 두 곳 이상에서 쓰면 공용 계층(`core`)으로 옮긴다.
+- import 방향(RN D-041, 2026-11-19 lint로 강제): feature끼리 import하지 않는다(컴포넌트·헬퍼·조회도 다른 feature가 쓰면 `Core`로 옮긴다). `Core`는 features·`App`을 import하지 않고, features는 `App`(라우트)을 import하지 않는다. 2단계에서 검사로 강제한다.
+- RN에서 공용으로 옮긴 것: `SectionHeader`·`SettingsHeaderButton`(공용 UI), 에러 code → 사용자 문구 함수 `errorText`(API의 `AppError` 옆), ETP 정렬 기준 `ETP_SORTS`(util).
 - 월물 심볼은 서버 표준형(`CLZ26`)만 쓴다. 표시 표기(`DEC26`)는 포맷 함수가 만든다.
 
 ## 레이어

@@ -6,6 +6,7 @@
 
 ## 원본 변경 반영
 - [ ] API 계약 JSON Schema 생성(2026-11-19, futureETP D-142): `../futureETP/packages/shared/contract/`. 3단계 응답 모델은 이 파일을 기준으로 한다(아래 3단계에 반영됨, 확인 뒤 체크)
+- [ ] 레이어 import 방향 lint 강제(2026-11-19, futureETP D-041 변경): feature 간 import 금지, 공용 계층 → features·라우트 금지. `docs/architecture.md` "규칙"과 아래 2단계에 반영됨, 확인 뒤 체크
 
 ## 0. 환경
 - [ ] Xcode 27.2 · Swift 6.4.2 확인됨(2026-11-18). 시뮬레이터 런타임 설치 여부만 확인
@@ -19,6 +20,7 @@
 ## 2. 스캐폴딩
 - [ ] 프로젝트 생성, 앱 ID `io.github.seyoon.futureetp`·dev `.dev` 두 변형, 앱 이름·아이콘(RN `apps/mobile/assets` 재사용)
 - [ ] lint·format·test 설정과 검사 명령 하나(`check`), CLAUDE.md Commands를 실제 명령으로 갱신
+  - import 방향 규칙(architecture.md "규칙")을 검사에 넣는다. 후보: feature·Core를 SPM 로컬 패키지 모듈로 나눠 컴파일러가 막게 하거나, 검사 스크립트
 - [ ] dev 변형이 로컬 dev 서버 `GET /v1/health`를 부르는 최소 화면으로 연결 확인
 - [ ] (선택) 원격 저장소·CI(GitHub Actions에서 check)
 
