@@ -9,7 +9,7 @@ Swift/SwiftUI로 만드는 futureETP 앱(iOS). 기능·화면·동작은 RN 앱(
 - 서버는 만들지 않는다. `../futureETP/apps/server`(prod VM, dev는 로컬 Mac)를 함께 쓴다
 - 제품·화면·API 계약의 원본은 `../futureETP`다. 이 저장소는 Swift/SwiftUI 구현과 그 결정만 갖는다 (D-141, IOS-001)
 - 앱 ID는 RN과 같은 `io.github.seyoon.futureetp`(dev `.dev`)라 한 기기에 RN 앱과 함께 설치할 수 없다 (IOS-002)
-- 진행 단계와 남은 항목은 `TODO.md`
+- 진행 단계와 남은 항목은 `TODO.md`. RN 따라잡기는 `TODO.md` "원본 변경 반영" 절의 항목과 "마지막 대조" 커밋 이후 RN 커밋으로 한다
 
 ## 공통 문서 (원본, 읽기만)
 
