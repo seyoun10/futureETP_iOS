@@ -51,7 +51,8 @@
   - 남음: title-bar 아래 1px `barSeparator`(A·C 공통, 아직 없음), C 탭 화면 채우기(아래 항목들), ETP 상세(C-d-a)에서도 기간 유지
 - [ ] C-a 이격도차트: `GET /v1/commodities/:code/disparity`, 기간 버튼 6개(D-102), 롤 음영, 십자선 상세, 가로 모드, 이전 3년 받기 중 화면 터치 차단·5초 시간 초과·실패 Alert (D-086, D-103, D-108, D-139)
   - 1단계 조회 완료(2026-11-24): `DisparityRepository`·`QueryCache.disparityChart`(키 `QueryKeys.disparity`, 설정 값별)
-  - 남음: 차트 계열 모델(밴드·롤·보이는 구간 통계·y축 특수 라벨) → 화면(정보 줄·기간 칩·축) → 십자선 상세 → 이전 3년 받기 연결
+  - 2단계 계열 모델 완료(2026-11-24): `DisparityChartModel`(산출 불가일 제외·rare-level 밴드 순위 색·이평선 위·롤 음영/전환일·보이는 구간 최고·최저와 LC·HC·y축 특수 라벨·월물 구성·꼬리 백분위 표기)
+  - 남음: 화면(정보 줄·기간 칩·축) → 십자선 상세 → 이전 3년 받기 연결
 - [ ] C-c 월물차트: `GET /v1/commodities/:code/contracts`, log y축, 끝값 라벨 (D-092, D-093, D-113, D-118)
 - [ ] C-b 월물커브: `GET /v1/commodities/:code/curve?baseDate`, 기준일 OS 날짜 피커, 이전·다음 기준일, 변화율 라벨 배치, 롤 수익률 (D-090, D-091, D-114~D-123)
 - [ ] C-d ETP 목록(필터·정렬은 앱에서)·C-d-a 상세 (D-017)

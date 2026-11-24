@@ -26,10 +26,13 @@ public struct RareLevels: Sendable, Equatable, Encodable {
 
   /// query 문자열 `1,2.5,5,10,20`. 각 값은 JS 숫자 기본 문자열과 같다(정수는 소수점 없이)
   public var queryValue: String {
-    values.map { level in
-      let tenths = Int((level * 10).rounded())
-      return tenths % 10 == 0 ? "\(tenths / 10)" : "\(tenths / 10).\(tenths % 10)"
-    }.joined(separator: ",")
+    values.map(Self.text).joined(separator: ",")
+  }
+
+  /// 레벨 하나의 문자열(`1`, `2.5`). 소수 첫째 자리로 반올림하고 정수는 소수점 없이 쓴다
+  public static func text(_ level: Double) -> String {
+    let tenths = Int((level * 10).rounded())
+    return tenths % 10 == 0 ? "\(tenths / 10)" : "\(tenths / 10).\(tenths % 10)"
   }
 
   public func encode(to encoder: any Encoder) throws {

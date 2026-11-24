@@ -39,7 +39,7 @@ public enum NumberFormat {
 
   /// JS `Number.prototype.toFixed`와 같은 반올림(정확한 2진 값 기준, 정확히 가운데면 올림).
   /// `0 ≤ value < 1e21`만 쓴다
-  static func toFixed(_ value: Double, decimals: Int) -> String {
+  public static func toFixed(_ value: Double, decimals: Int) -> String {
     // 2진 값의 10진 전개를 넉넉히 받아 직접 반올림한다(printf는 가운데 값을 짝수로 보낸다)
     let exact = String(format: "%.\(decimals + 40)f", value)
     let parts = exact.split(separator: ".")
