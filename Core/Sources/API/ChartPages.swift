@@ -55,6 +55,27 @@ public struct ChartPages<Page: ChartPage>: Sendable {
   }
 }
 
+extension ChartPages where Page == ContractsChart {
+  /// 최근 페이지 값에 이전 페이지의 날짜·가격을 앞에 붙인다. 월물은 최근 페이지 목록을 따르고,
+  /// 이전 페이지에 없는 월물은 그 구간을 nil로 채운다 (RN `mergeContractPages`)
+  public var merged: ContractsChart {
+    guard pages.count > 1 else { return latest }
+    let older = pages.dropFirst().reversed()
+    return ContractsChart(
+      freshness: latest.freshness, priceDecimals: latest.priceDecimals,
+      dates: joined(\.dates), hasMore: hasMore, provisional: latest.provisional,
+      contracts: latest.contracts.map { line in
+        let prices = older.flatMap { page in
+          page.contracts.first { $0.symbol == line.symbol }?.prices
+            ?? Array(repeating: nil, count: page.dates.count)
+        }
+        return ContractLine(
+          symbol: line.symbol, contractMonth: line.contractMonth,
+          lastTradeDate: line.lastTradeDate, isFront: line.isFront, prices: prices + line.prices)
+      })
+  }
+}
+
 /// 페이지 조회와 이전 3년 받기 (RN `useInfiniteQuery`의 `fetchNextPage`)
 @MainActor
 public struct PagedQuery<Page: ChartPage> {

@@ -16,6 +16,10 @@ public enum QueryKeys {
       query.levels.queryValue,
     ]
   }
+
+  public static func contracts(_ code: CommodityCode) -> [String] {
+    commodity(code) + ["contracts"]
+  }
 }
 
 /// 서버 설정 조회와 낙관적 변경 (RN `api/useSettings.ts`, D-082).

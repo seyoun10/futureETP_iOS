@@ -13,6 +13,18 @@ public struct ContractsChart: Codable, Sendable, Equatable {
   /// A와 같은 월물 목록(만기순 5개, 대표월물 안전장치 6번째)
   public let contracts: [ContractLine]
 
+  public init(
+    freshness: Freshness, priceDecimals: Int, dates: [LocalDate], hasMore: Bool,
+    provisional: Bool, contracts: [ContractLine]
+  ) {
+    self.freshness = freshness
+    self.priceDecimals = priceDecimals
+    self.dates = dates
+    self.hasMore = hasMore
+    self.provisional = provisional
+    self.contracts = contracts
+  }
+
   public init(from decoder: any Decoder) throws {
     let container = try decoder.container(keyedBy: CodingKeys.self)
     freshness = try container.decode(Freshness.self, forKey: .freshness)
@@ -39,4 +51,15 @@ public struct ContractLine: Codable, Sendable, Equatable {
   public let isFront: Bool
   /// `ContractsChart.dates`와 같은 길이·순서. 그날 값이 없으면(상장 전 등) nil
   public let prices: [Double?]
+
+  public init(
+    symbol: String, contractMonth: ContractMonth, lastTradeDate: LocalDate, isFront: Bool,
+    prices: [Double?]
+  ) {
+    self.symbol = symbol
+    self.contractMonth = contractMonth
+    self.lastTradeDate = lastTradeDate
+    self.isFront = isFront
+    self.prices = prices
+  }
 }

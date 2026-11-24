@@ -58,3 +58,30 @@ extension QueryCache {
     }
   }
 }
+
+/// C-c 월물차트 `GET /v1/commodities/:code/contracts` (D-092, D-104)
+public protocol ContractsRepository: Sendable {
+  func fetchContracts(_ code: CommodityCode, query: ContractsQuery) async throws -> ContractsChart
+}
+
+extension LiveCommoditiesRepository: ContractsRepository {
+  public func fetchContracts(_ code: CommodityCode, query: ContractsQuery) async throws
+    -> ContractsChart
+  {
+    try await client.send(
+      APIRequest(
+        "/commodities/\(code.rawValue)/contracts", query: query.queryItems,
+        as: ContractsChart.self))
+  }
+}
+
+extension QueryCache {
+  /// C-c 조회 (RN `useContracts`). 전역 설정을 쓰지 않아 원자재마다 하나다
+  public func contractsChart(_ repository: any ContractsRepository, code: CommodityCode)
+    -> PagedQuery<ContractsChart>
+  {
+    pagedQuery(QueryKeys.contracts(code)) { before in
+      try await repository.fetchContracts(code, query: ContractsQuery(before: before))
+    }
+  }
+}
