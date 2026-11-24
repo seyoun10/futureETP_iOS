@@ -21,6 +21,17 @@ mise exec -- tuist generate --no-open >/dev/null
 step "import 방향 (IOS-003)"
 mise exec -- tuist inspect dependencies --only implicit
 
+step "Swift 6 언어 모드"
+# 모든 타깃·configuration의 SWIFT_VERSION이 6.0인지. Tuist 기본값이 xcconfig를 덮어쓰던 회귀 방지
+for config in Debug-Dev Release; do
+  versions=$(xcodebuild -project FutureETP.xcodeproj -alltargets -configuration "$config" \
+    -showBuildSettings 2>/dev/null | awk '$1 == "SWIFT_VERSION" { print $3 }' | sort -u)
+  if [[ "$versions" != "6.0" ]]; then
+    echo "SWIFT_VERSION($config)이 6.0이 아님: ${versions:-없음}" >&2
+    exit 1
+  fi
+done
+
 step "build Release"
 "${XCODEBUILD[@]}" -scheme FutureETP build
 

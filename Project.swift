@@ -9,6 +9,9 @@ let configurations: [Configuration] = [
 let destinations: Destinations = [.iPhone]
 let deploymentTargets: DeploymentTargets = .iOS("18.0")
 
+// Tuist 기본값(SWIFT_VERSION = 5)이 프로젝트·타깃 수준에서 xcconfig의 6.0을 덮어쓰지 않게 뺀다
+let defaultSettings: DefaultSettings = .recommended(excluding: ["SWIFT_VERSION"])
+
 // 화면 코드는 MainActor 기본 격리 (Swift 6 approachable concurrency)
 let mainActorSettings: SettingsDictionary = ["SWIFT_DEFAULT_ACTOR_ISOLATION": "MainActor"]
 
@@ -21,7 +24,7 @@ func feature(_ name: String) -> Target {
     deploymentTargets: deploymentTargets,
     sources: ["Features/\(name)/Sources/**"],
     dependencies: [.target(name: "Core")],
-    settings: .settings(base: mainActorSettings)
+    settings: .settings(base: mainActorSettings, defaultSettings: defaultSettings)
   )
 }
 
@@ -29,7 +32,7 @@ let features = ["CommodityList", "Commodity", "Settings"]
 
 let project = Project(
   name: "FutureETP",
-  settings: .settings(configurations: configurations),
+  settings: .settings(configurations: configurations, defaultSettings: defaultSettings),
   targets: [
     .target(
       name: "FutureETP",
@@ -63,7 +66,8 @@ let project = Project(
         base: mainActorSettings.merging([
           "ASSETCATALOG_COMPILER_APPICON_NAME": "AppIcon",
           "ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME": "",
-        ]) { $1 })
+        ]) { $1 },
+        defaultSettings: defaultSettings)
     ),
     .target(
       name: "Core",
@@ -71,7 +75,8 @@ let project = Project(
       product: .framework,
       bundleId: "io.github.seyoon.futureetp.core",
       deploymentTargets: deploymentTargets,
-      sources: ["Core/Sources/**"]
+      sources: ["Core/Sources/**"],
+      settings: .settings(defaultSettings: defaultSettings)
     ),
     .target(
       name: "CoreTests",
@@ -80,7 +85,8 @@ let project = Project(
       bundleId: "io.github.seyoon.futureetp.coretests",
       deploymentTargets: deploymentTargets,
       sources: ["Core/Tests/**"],
-      dependencies: [.target(name: "Core")]
+      dependencies: [.target(name: "Core")],
+      settings: .settings(defaultSettings: defaultSettings)
     ),
   ] + features.map(feature),
   schemes: [
