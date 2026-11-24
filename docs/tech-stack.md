@@ -8,7 +8,7 @@
 
 | 영역 | 후보 / 선택 | 메모 |
 |---|---|---|
-| 언어 / 툴체인 | Swift 6.4.2 · Xcode 27.2 (로컬 확인 2026-11-18) | 최소 배포 iOS 버전은 1단계에서 정한다(개인 기기 iPhone 14 Pro 기준) |
+| 언어 / 툴체인 | Swift 6.4.4 · Xcode 27.2(27B52) · 시뮬레이터 런타임 iOS 27.2 (로컬 확인 2026-11-24) | 최소 배포 iOS 버전은 1단계에서 정한다(개인 기기 iPhone 14 Pro 기준) |
 | UI | SwiftUI |  |
 | 상태 | Observation(`@Observable`) + 화면별 Model, 앱 전역 `AppSettings` | RN의 TanStack Query 캐시(staleTime·자동 새로고침)는 작은 조회 캐시 계층으로 직접 만든다 |
 | 내비게이션 | `NavigationStack` + `TabView`(C 하단 탭) | A → C 스택, 탭 밖 C-d-a |
