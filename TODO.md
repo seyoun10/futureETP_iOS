@@ -24,7 +24,6 @@
 
 ## 3. 공통 기반
 - [ ] import redundant 검사 켜기: App이 `Commodity`·`Settings`·`Core`를 import한 뒤 `scripts/check.sh`의 `--only implicit`을 지운다 (IOS-003 보충)
-- [ ] installation ID(첫 실행 UUID) 생성·보안 저장소 보관 (D-120)
 - [ ] 접근 키 B-b: 붙여넣기·QR(`futureetp-key:v1:` 접두사), `GET /v1/settings`로 확인 뒤 저장, 키 없으면 첫 화면이 B-b, `UNAUTHORIZED`면 어느 화면에서든 B-b + 거절 줄 (D-044, D-077~D-079)
 - [ ] i18n ko/en, 앱 안 언어 설정을 서버 기기 설정과 맞춤 (D-033, D-073, D-137)
 - [ ] 테마 토큰(다크 전용)·등락 색 설정 저장 (D-031, D-073)
