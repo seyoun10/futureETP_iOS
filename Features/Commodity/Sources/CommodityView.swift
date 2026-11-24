@@ -1,4 +1,5 @@
 import Core
+import Foundation
 import SwiftUI
 
 /// C 원자재 화면: title-bar `[←] 원자재명 (심볼) 🔔 … [⟲] [⚙]`, 탭 콘텐츠, tab-bar, 기준 시각 줄
@@ -15,6 +16,7 @@ public struct CommodityView: View {
   private let alertOff: Bool
   private let onBack: () -> Void
   private let onOpenSettings: () -> Void
+  private let onOpenETP: (UUID) -> Void
   @State private var selection = CommodityTab.initial
   /// 한 번이라도 연 탭. 열린 탭은 숨겨도 남긴다
   @State private var opened: Set<CommodityTab> = [CommodityTab.initial]
@@ -27,10 +29,12 @@ public struct CommodityView: View {
   /// - Parameters:
   ///   - isAlert: 이 기기의 알림 대상 원자재다. 제목 뒤에 🔔
   ///   - alertOff: 알림 대상 원자재가 없다. [⚙]에 빨간 점 (D-124)
+  ///   - onOpenETP: C-d 행을 눌렀다. C-d-a로 간다
   public init(
     code: CommodityCode, settings: SettingsStore, queries: CommodityQueries,
     isAlert: Bool, alertOff: Bool,
-    onBack: @escaping () -> Void, onOpenSettings: @escaping () -> Void
+    onBack: @escaping () -> Void, onOpenSettings: @escaping () -> Void,
+    onOpenETP: @escaping (UUID) -> Void
   ) {
     self.code = code
     self.settings = settings
@@ -39,6 +43,7 @@ public struct CommodityView: View {
     self.alertOff = alertOff
     self.onBack = onBack
     self.onOpenSettings = onOpenSettings
+    self.onOpenETP = onOpenETP
   }
 
   public var body: some View {
@@ -89,9 +94,8 @@ public struct CommodityView: View {
     case .curve:
       CurveTabView(code: code, queries: queries)
         .accessibilityIdentifier("commodityTab-\(tab.rawValue)")
-    default:
-      // 남은 탭 화면은 4단계에서 하나씩 채운다
-      Color.clear
+    case .etps:
+      ETPListTabView(code: code, queries: queries, onOpen: onOpenETP)
         .accessibilityIdentifier("commodityTab-\(tab.rawValue)")
     }
   }

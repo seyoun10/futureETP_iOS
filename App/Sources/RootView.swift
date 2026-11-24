@@ -7,6 +7,8 @@ import SwiftUI
 /// 스택에 올리는 화면
 enum Route: Hashable {
   case commodity(CommodityCode)
+  /// C-d-a ETP 상세
+  case etp(UUID)
   case settings
   case accessKey
   #if DEBUG
@@ -58,8 +60,12 @@ struct RootView: View {
               alertOff: alertOff,
               // 탭 이력과 상관없이 A로 간다 (screens.md C)
               onBack: { path.removeAll() },
-              onOpenSettings: { path.append(.settings) }
+              onOpenSettings: { path.append(.settings) },
+              onOpenETP: { path.append(.etp($0)) }
             )
+          case .etp(let id):
+            ETPDetailView(
+              query: queryCache.etpDetail(LiveCommoditiesRepository(client: client), id: id))
           case .settings: SettingsView()
           case .accessKey: accessKey
           #if DEBUG
@@ -93,7 +99,8 @@ struct RootView: View {
     return CommodityQueries(
       disparity: { queryCache.disparityChart(repository, code: $0, query: $1) },
       contracts: { queryCache.contractsChart(repository, code: $0) },
-      curve: { queryCache.curve(repository, code: $0, baseDate: $1) })
+      curve: { queryCache.curve(repository, code: $0, baseDate: $1) },
+      etps: { queryCache.etpList(repository, code: $0) })
   }
 
   /// 이 기기의 알림 대상 원자재가 없다. 설정을 받기 전이나 조회 실패면 점을 띄우지 않는다 (D-124)

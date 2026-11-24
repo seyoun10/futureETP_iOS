@@ -174,7 +174,7 @@ private final class FakeCurves: CurveRepository, @unchecked Sendable {
     let cache = QueryCache()
     let queries = CommodityQueries(
       disparity: { _, _ in fatalError() }, contracts: { _ in fatalError() },
-      curve: { cache.curve(fake, code: $0, baseDate: $1) })
+      curve: { cache.curve(fake, code: $0, baseDate: $1) }, etps: { _ in fatalError() })
     return CurveScreenModel(code: .cl, queries: queries)
   }
 
