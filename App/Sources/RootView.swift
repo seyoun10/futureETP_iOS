@@ -52,6 +52,8 @@ struct RootView: View {
           case .commodity(let code):
             CommodityView(
               code: code,
+              settings: settings,
+              queries: commodityQueries,
               isAlert: settings.data?.alertCommodity == code,
               alertOff: alertOff,
               // 탭 이력과 상관없이 A로 간다 (screens.md C)
@@ -84,6 +86,12 @@ struct RootView: View {
     } else {
       NavigationStack { accessKey }
     }
+  }
+
+  private var commodityQueries: CommodityQueries {
+    let repository = LiveCommoditiesRepository(client: client)
+    return CommodityQueries(
+      disparity: { queryCache.disparityChart(repository, code: $0, query: $1) })
   }
 
   /// 이 기기의 알림 대상 원자재가 없다. 설정을 받기 전이나 조회 실패면 점을 띄우지 않는다 (D-124)

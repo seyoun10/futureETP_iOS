@@ -9,6 +9,8 @@ import SwiftUI
 /// - 뒤로 가기는 [←]로만 한다. 쓸어서 뒤로 가지 않는다 (D-105)
 public struct CommodityView: View {
   private let code: CommodityCode
+  private let settings: SettingsStore
+  private let queries: CommodityQueries
   private let isAlert: Bool
   private let alertOff: Bool
   private let onBack: () -> Void
@@ -26,10 +28,13 @@ public struct CommodityView: View {
   ///   - isAlert: 이 기기의 알림 대상 원자재다. 제목 뒤에 🔔
   ///   - alertOff: 알림 대상 원자재가 없다. [⚙]에 빨간 점 (D-124)
   public init(
-    code: CommodityCode, isAlert: Bool, alertOff: Bool,
+    code: CommodityCode, settings: SettingsStore, queries: CommodityQueries,
+    isAlert: Bool, alertOff: Bool,
     onBack: @escaping () -> Void, onOpenSettings: @escaping () -> Void
   ) {
     self.code = code
+    self.settings = settings
+    self.queries = queries
     self.isAlert = isAlert
     self.alertOff = alertOff
     self.onBack = onBack
@@ -74,9 +79,15 @@ public struct CommodityView: View {
   }
 
   @ViewBuilder private func content(_ tab: CommodityTab) -> some View {
-    // 탭 화면은 4단계에서 하나씩 채운다
-    Color.clear
-      .accessibilityIdentifier("commodityTab-\(tab.rawValue)")
+    switch tab {
+    case .disparity:
+      DisparityTabView(code: code, settings: settings, queries: queries)
+        .accessibilityIdentifier("commodityTab-\(tab.rawValue)")
+    default:
+      // 남은 탭 화면은 4단계에서 하나씩 채운다
+      Color.clear
+        .accessibilityIdentifier("commodityTab-\(tab.rawValue)")
+    }
   }
 
   private func select(_ tab: CommodityTab) {

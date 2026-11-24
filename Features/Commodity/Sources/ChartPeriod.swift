@@ -1,5 +1,6 @@
 import Foundation
 import Observation
+import SwiftUI
 
 /// C-a·C-c 기간 버튼. 한 줄에 다 들어가게 6개만 둔다. 더 긴 범위는 핀치로 본다 (D-102, RN `charts/chartPeriods.ts`)
 public enum ChartPeriod: String, CaseIterable, Sendable {
@@ -23,6 +24,12 @@ public enum ChartPeriod: String, CaseIterable, Sendable {
     case .m10: 210
     case .m12: 252
     }
+  }
+
+  // 보간한 리터럴은 `%@` 키가 되므로 문자열로 만든 뒤 키로 쓴다
+  var titleKey: LocalizedStringKey {
+    let key = "chart.periods.\(rawValue)"
+    return LocalizedStringKey(key)
   }
 
   /// 보이는 봉 수와 가장 가까운 기간(핀치 뒤 기간 칩 테두리). 비율로 비교한다.
