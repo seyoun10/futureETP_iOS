@@ -21,6 +21,11 @@ FIXTURES=(
   "contractsChart.before /v1/commodities/NG/contracts?before=2018-01-02 yes"
   "curve /v1/commodities/GC/curve yes"
   "curve.baseDate /v1/commodities/CL/curve?baseDate=2020-04-20 yes"
+  "etpList /v1/commodities/GC/etps yes"
+  # ETP id는 dev DB 값이다. DB를 다시 만들면 /v1/commodities/:code/etps에서 같은 조건의 상품으로 바꾼다
+  # KRX ETN 시리즈 2개(총보수·상장일 null), US ETF(기초지수 null)
+  "etpDetail /v1/etps/add5e164-981f-43b4-b751-bf7204602124 yes"
+  "etpDetail.us /v1/etps/6281b11d-ab70-48c7-a9c7-7083c2c56d8e yes"
 )
 
 capture() {

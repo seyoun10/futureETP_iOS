@@ -37,6 +37,19 @@ struct ContractFixtureTests {
     #expect(data.minBaseDate <= data.baseDate && data.baseDate <= data.maxBaseDate)
     #expect(data.baseDate < data.compareDate)
   }
+
+  @Test func etpList() async throws {
+    let data = try await decode("etpList", as: ETPList.self)
+    #expect(data.asOf != nil)
+    #expect(!data.etps.isEmpty)
+    #expect(Set(data.etps.map(\.id)).count == data.etps.count)
+  }
+
+  @Test(arguments: ["etpDetail", "etpDetail.us"])
+  func etpDetail(_ fixture: String) async throws {
+    let data = try await decode(fixture, as: ETPDetail.self)
+    #expect(!data.series.isEmpty)
+  }
 }
 
 /// 예시 파일 하나를 실제 디코딩 경로(봉투·`JSONDecoder.api()`)로 읽는다

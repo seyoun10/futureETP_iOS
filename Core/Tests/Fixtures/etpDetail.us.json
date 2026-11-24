@@ -1,0 +1,31 @@
+{
+  "success": true,
+  "data": {
+    "id": "6281b11d-ab70-48c7-a9c7-7083c2c56d8e",
+    "market": "US",
+    "fxHedge": "NA",
+    "name": "United States 12 Month Oil",
+    "nameLang": "en",
+    "issuer": "USCF",
+    "underlyingIndex": null,
+    "expenseRatio": 0.9,
+    "issuerUrl": "https://www.uscfinvestments.com/",
+    "aum": 47434000,
+    "avgTradingValue": 750308,
+    "commodityCode": "CL",
+    "type": "ETF",
+    "leverage": 1,
+    "tickers": [
+      "USL"
+    ],
+    "listedDate": "2007-12-06",
+    "series": [
+      {
+        "ticker": "USL",
+        "seriesCode": null,
+        "maturityDate": null
+      }
+    ],
+    "collectedAt": "2026-10-28T12:17:47.989Z"
+  }
+}

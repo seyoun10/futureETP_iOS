@@ -1,0 +1,307 @@
+{
+  "success": true,
+  "data": {
+    "asOf": "2026-10-28T12:17:47.989Z",
+    "etps": [
+      {
+        "id": "9d468af9-3a01-4b91-9c08-63a5ee7a511a",
+        "market": "US",
+        "type": "ETF",
+        "leverage": 2,
+        "fxHedge": "NA",
+        "name": "ProShares Ultra Gold",
+        "tickers": [
+          "UGL"
+        ],
+        "aum": 690476000,
+        "avgTradingValue": 115511036
+      },
+      {
+        "id": "9c216024-d57a-4c7f-888a-8b494f1785a0",
+        "market": "US",
+        "type": "ETN",
+        "leverage": -2,
+        "fxHedge": "NA",
+        "name": "PowerShares DB Gold Double Short ETN",
+        "tickers": [
+          "DZZ"
+        ],
+        "aum": 3303000,
+        "avgTradingValue": 5819
+      },
+      {
+        "id": "a9299f35-87f7-404f-b842-f37f6ed58157",
+        "market": "US",
+        "type": "ETF",
+        "leverage": -2,
+        "fxHedge": "NA",
+        "name": "ProShares UltraShort Gold",
+        "tickers": [
+          "GLL"
+        ],
+        "aum": 98138000,
+        "avgTradingValue": 62901850
+      },
+      {
+        "id": "94f8e2ed-e5a2-41c3-8735-84c7a6483746",
+        "market": "US",
+        "type": "ETN",
+        "leverage": 2,
+        "fxHedge": "NA",
+        "name": "PowerShares DB Gold Double Long ETN",
+        "tickers": [
+          "DGP"
+        ],
+        "aum": 205776000,
+        "avgTradingValue": 16083063
+      },
+      {
+        "id": "b85ebf43-fc9d-475d-b540-410204bf292b",
+        "market": "US",
+        "type": "ETN",
+        "leverage": -1,
+        "fxHedge": "NA",
+        "name": "PowerShares DB Gold Short ETN",
+        "tickers": [
+          "DGZ"
+        ],
+        "aum": 1760000,
+        "avgTradingValue": 4382
+      },
+      {
+        "id": "0375de42-90c5-4a7a-b948-48495564fac0",
+        "market": "KRX",
+        "type": "ETF",
+        "leverage": 2,
+        "fxHedge": "HEDGED",
+        "name": "ACE 골드선물 레버리지(합성 H)",
+        "tickers": [
+          "225130"
+        ],
+        "aum": 20064506328,
+        "avgTradingValue": 80400722
+      },
+      {
+        "id": "48dcae42-668b-4024-98ab-4edc8d3667dd",
+        "market": "KRX",
+        "type": "ETN",
+        "leverage": 2,
+        "fxHedge": "UNHEDGED",
+        "name": "KB 솔랙티브 레버리지 금 선물 ETN",
+        "tickers": [
+          "580089"
+        ],
+        "aum": 16395000000,
+        "avgTradingValue": 21018192
+      },
+      {
+        "id": "f2bbd3b2-dd6a-44d6-b0ac-bc9c23bda7fd",
+        "market": "KRX",
+        "type": "ETN",
+        "leverage": -2,
+        "fxHedge": "UNHEDGED",
+        "name": "KB 솔랙티브 인버스 2X 금 선물 ETN",
+        "tickers": [
+          "580090"
+        ],
+        "aum": 17205000000,
+        "avgTradingValue": 15025282
+      },
+      {
+        "id": "abbfaa4c-7d9a-4bfa-85c8-8db4460c66c7",
+        "market": "KRX",
+        "type": "ETN",
+        "leverage": 1,
+        "fxHedge": "HEDGED",
+        "name": "메리츠 솔랙티브 금 선물 ETN(H)",
+        "tickers": [
+          "610102"
+        ],
+        "aum": 9905000000,
+        "avgTradingValue": 78288
+      },
+      {
+        "id": "cb499159-a34f-481c-a9ae-898fb1d4bec1",
+        "market": "KRX",
+        "type": "ETN",
+        "leverage": 2,
+        "fxHedge": "HEDGED",
+        "name": "메리츠 솔랙티브 레버리지 금 선물 ETN(H)",
+        "tickers": [
+          "610103"
+        ],
+        "aum": 19140000000,
+        "avgTradingValue": 25006237
+      },
+      {
+        "id": "ce1e91a7-0447-4638-bbd7-650291aeb53f",
+        "market": "KRX",
+        "type": "ETN",
+        "leverage": -2,
+        "fxHedge": "HEDGED",
+        "name": "메리츠 솔랙티브 인버스 2X 금 선물 ETN(H)",
+        "tickers": [
+          "610104"
+        ],
+        "aum": 20120000000,
+        "avgTradingValue": 61200617
+      },
+      {
+        "id": "a2eb9ba4-40c0-4d83-9e65-8b96f5a80790",
+        "market": "KRX",
+        "type": "ETN",
+        "leverage": 2,
+        "fxHedge": "HEDGED",
+        "name": "삼성 레버리지 금 선물 ETN(H)",
+        "tickers": [
+          "530055"
+        ],
+        "aum": 91435000000,
+        "avgTradingValue": 165317298
+      },
+      {
+        "id": "326e966b-f553-4273-8f58-f9f582c9e53e",
+        "market": "KRX",
+        "type": "ETN",
+        "leverage": -2,
+        "fxHedge": "HEDGED",
+        "name": "삼성 인버스 2X 금 선물 ETN(H)",
+        "tickers": [
+          "530056"
+        ],
+        "aum": 8220000000,
+        "avgTradingValue": 18250217
+      },
+      {
+        "id": "651e7c50-5651-486f-b586-01f4db9344e5",
+        "market": "KRX",
+        "type": "ETN",
+        "leverage": 1,
+        "fxHedge": "UNHEDGED",
+        "name": "신한 금 선물 ETN",
+        "tickers": [
+          "500100"
+        ],
+        "aum": 20710000000,
+        "avgTradingValue": 15636711
+      },
+      {
+        "id": "04f78e47-9196-4e5c-a93d-7d3e8bdc029c",
+        "market": "KRX",
+        "type": "ETN",
+        "leverage": 2,
+        "fxHedge": "UNHEDGED",
+        "name": "신한 레버리지 금 선물 ETN",
+        "tickers": [
+          "500037"
+        ],
+        "aum": 112330000000,
+        "avgTradingValue": 20452634
+      },
+      {
+        "id": "19876645-bd78-4a16-9857-388d7c6c4f64",
+        "market": "KRX",
+        "type": "ETF",
+        "leverage": 1,
+        "fxHedge": "HEDGED",
+        "name": "KODEX 골드선물(H)",
+        "tickers": [
+          "132030"
+        ],
+        "aum": 328161966559,
+        "avgTradingValue": 1709129870
+      },
+      {
+        "id": "37af5400-894c-433d-b62f-e9e20e3ea10c",
+        "market": "KRX",
+        "type": "ETF",
+        "leverage": -1,
+        "fxHedge": "HEDGED",
+        "name": "KODEX 골드선물인버스(H)",
+        "tickers": [
+          "280940"
+        ],
+        "aum": 2626390617,
+        "avgTradingValue": 35717840
+      },
+      {
+        "id": "c3ce2f65-d095-4fdf-988d-d418d630f7f0",
+        "market": "KRX",
+        "type": "ETF",
+        "leverage": 1,
+        "fxHedge": "HEDGED",
+        "name": "TIGER 골드선물(H)",
+        "tickers": [
+          "319640"
+        ],
+        "aum": 84666738273,
+        "avgTradingValue": 2280147963
+      },
+      {
+        "id": "6390c7b1-fa5b-43bb-bf47-1e8f0f507a3f",
+        "market": "KRX",
+        "type": "ETN",
+        "leverage": -2,
+        "fxHedge": "UNHEDGED",
+        "name": "신한 인버스 2X 금 선물 ETN",
+        "tickers": [
+          "500038"
+        ],
+        "aum": 1271000000,
+        "avgTradingValue": 8531234
+      },
+      {
+        "id": "106c3b9c-b313-4188-bb25-20b3e9f0cda5",
+        "market": "KRX",
+        "type": "ETN",
+        "leverage": 1,
+        "fxHedge": "UNHEDGED",
+        "name": "한투 금선물 ETN",
+        "tickers": [
+          "570121"
+        ],
+        "aum": 15190000000,
+        "avgTradingValue": 471534
+      },
+      {
+        "id": "675bb266-b8be-4cc1-8c79-1e9d330bb3ad",
+        "market": "KRX",
+        "type": "ETN",
+        "leverage": 2,
+        "fxHedge": "UNHEDGED",
+        "name": "한투 솔랙티브레버리지금선물 ETN",
+        "tickers": [
+          "570125"
+        ],
+        "aum": 16335000000,
+        "avgTradingValue": 1355706
+      },
+      {
+        "id": "871fa7bd-35c6-4639-aab4-84748a8157a5",
+        "market": "KRX",
+        "type": "ETN",
+        "leverage": -2,
+        "fxHedge": "UNHEDGED",
+        "name": "한투 솔랙티브인버스2X금선물 ETN",
+        "tickers": [
+          "570126"
+        ],
+        "aum": 17255000000,
+        "avgTradingValue": 3979
+      },
+      {
+        "id": "054010aa-1680-4d8a-93e0-1c5524b3a1ab",
+        "market": "KRX",
+        "type": "ETN",
+        "leverage": -1,
+        "fxHedge": "UNHEDGED",
+        "name": "한투 인버스금선물 ETN",
+        "tickers": [
+          "570122"
+        ],
+        "aum": 20940000000,
+        "avgTradingValue": 202024
+      }
+    ]
+  }
+}

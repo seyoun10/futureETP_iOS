@@ -1,0 +1,37 @@
+{
+  "success": true,
+  "data": {
+    "id": "add5e164-981f-43b4-b751-bf7204602124",
+    "market": "KRX",
+    "fxHedge": "UNHEDGED",
+    "name": "삼성 레버리지 WTI원유 선물 ETN",
+    "nameLang": "ko",
+    "issuer": "삼성",
+    "underlyingIndex": "S&P GSCI Crude Oil 2X Leveraged TR Index",
+    "expenseRatio": null,
+    "issuerUrl": "https://www.samsungpop.com/",
+    "aum": 1555015000000,
+    "avgTradingValue": 1198418445,
+    "commodityCode": "CL",
+    "type": "ETN",
+    "leverage": 2,
+    "tickers": [
+      "530031",
+      "530133"
+    ],
+    "listedDate": null,
+    "series": [
+      {
+        "ticker": "530031",
+        "seriesCode": "A",
+        "maturityDate": null
+      },
+      {
+        "ticker": "530133",
+        "seriesCode": "B",
+        "maturityDate": null
+      }
+    ],
+    "collectedAt": "2026-10-28T12:17:47.989Z"
+  }
+}
