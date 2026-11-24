@@ -24,6 +24,21 @@ public struct ETPSummary: Codable, Sendable, Equatable, Identifiable {
   /// 통화는 `market`으로 정해진다(KRX 원, US 달러). 아직 못 받았으면 nil
   public let aum: Double?
   public let avgTradingValue: Double?
+
+  public init(
+    id: UUID, market: ETPMarket, type: ETPType, leverage: Double, fxHedge: FXHedge, name: String,
+    tickers: [String], aum: Double?, avgTradingValue: Double?
+  ) {
+    self.id = id
+    self.market = market
+    self.type = type
+    self.leverage = leverage
+    self.fxHedge = fxHedge
+    self.name = name
+    self.tickers = tickers
+    self.aum = aum
+    self.avgTradingValue = avgTradingValue
+  }
 }
 
 /// `GET /v1/etps/:id` 응답 `data` (계약 `schemas/etpDetail.json`, C-d-a).

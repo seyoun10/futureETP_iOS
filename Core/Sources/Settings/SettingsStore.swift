@@ -25,6 +25,13 @@ public enum QueryKeys {
   public static func curve(_ code: CommodityCode, baseDate: LocalDate?) -> [String] {
     commodity(code) + ["curve", baseDate?.description ?? "latest"]
   }
+
+  public static func etps(_ code: CommodityCode) -> [String] {
+    commodity(code) + ["etps"]
+  }
+
+  /// ETP 상세는 원자재와 상관없이 id 하나다 (RN `queryKeys.etps.detail`)
+  public static func etp(_ id: UUID) -> [String] { ["etps", id.uuidString.lowercased()] }
 }
 
 /// 서버 설정 조회와 낙관적 변경 (RN `api/useSettings.ts`, D-082).

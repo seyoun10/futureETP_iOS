@@ -110,3 +110,31 @@ extension QueryCache {
       fetch: { try await repository.fetchCurve(code, query: CurveQuery(baseDate: baseDate)) })
   }
 }
+
+/// C-d ETP 목록 `GET /v1/commodities/:code/etps`와 C-d-a 상세 `GET /v1/etps/:id` (D-017)
+public protocol ETPRepository: Sendable {
+  func fetchETPs(_ code: CommodityCode) async throws -> ETPList
+  func fetchETP(_ id: UUID) async throws -> ETPDetail
+}
+
+extension LiveCommoditiesRepository: ETPRepository {
+  public func fetchETPs(_ code: CommodityCode) async throws -> ETPList {
+    try await client.send(APIRequest("/commodities/\(code.rawValue)/etps", as: ETPList.self))
+  }
+
+  public func fetchETP(_ id: UUID) async throws -> ETPDetail {
+    try await client.send(APIRequest("/etps/\(id.uuidString.lowercased())", as: ETPDetail.self))
+  }
+}
+
+extension QueryCache {
+  /// C-d 조회 (RN `useEtps`). 필터·정렬은 화면에서 한다. 화면 진입·앱 복귀마다 다시 조회한다
+  public func etpList(_ repository: any ETPRepository, code: CommodityCode) -> Query<ETPList> {
+    query(QueryKeys.etps(code), fetch: { try await repository.fetchETPs(code) })
+  }
+
+  /// C-d-a 조회 (RN `useEtp`)
+  public func etpDetail(_ repository: any ETPRepository, id: UUID) -> Query<ETPDetail> {
+    query(QueryKeys.etp(id), fetch: { try await repository.fetchETP(id) })
+  }
+}
