@@ -15,6 +15,7 @@ struct RootView: View {
   let keys: AccessKeyStore
   let client: APIClient
   let queryCache: QueryCache
+  let settings: SettingsStore
   @State private var path: [Route] = []
 
   var body: some View {
@@ -31,6 +32,8 @@ struct RootView: View {
           }
         }
       }
+      // 기기 시간대·앱 언어를 서버 설정에 맞춘다. 키가 있을 때만 (D-084, D-137)
+      .deviceSettingsSync(settings)
       .onChange(of: keys.isRejected) { _, rejected in
         if rejected, path.last != .accessKey { path.append(.accessKey) }
       }

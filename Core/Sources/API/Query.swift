@@ -42,6 +42,8 @@ public final class Query<Value: Sendable> {
   @ObservationIgnored private let now: @Sendable () -> Date
   @ObservationIgnored private var isInvalidated = false
   @ObservationIgnored private var inFlight: Task<Void, Never>?
+  /// 조회를 시작하거나 끊을 때마다 바뀐다. 끝난 조회가 끊긴 조회면 결과를 버린다
+  @ObservationIgnored private var generation = 0
   @ObservationIgnored private(set) var observerCount = 0
   @ObservationIgnored private(set) var unobservedSince: Date
 
@@ -81,10 +83,28 @@ public final class Query<Value: Sendable> {
   /// 새로 조회한다. 진행 중인 조회가 있으면 취소하지 않고 그 조회를 기다린다 (RN `cancelRefetch: false`)
   public func refetch() async {
     if let inFlight { return await inFlight.value }
-    let task = Task { await run() }
+    generation += 1
+    let current = generation
+    let task = Task { await run(current) }
     inFlight = task
     await task.value
+  }
+
+  /// 진행 중인 조회를 끊고 결과를 버린다(RN `cancelQueries`). 변경 요청이 옛 조회 결과에 덮이지 않게 한다
+  public func cancel() {
+    generation += 1
+    inFlight?.cancel()
     inFlight = nil
+    state.isFetching = false
+  }
+
+  /// 서버가 돌려준 값을 넣는다(RN `setQueryData`). 진행 중인 조회는 끊는다
+  public func setData(_ value: Value) {
+    cancel()
+    state.data = value
+    state.error = nil
+    dataUpdatedAt = now()
+    isInvalidated = false
   }
 
   /// 오래된 값일 때만 조회한다 (화면 진입·앱 복귀)
@@ -113,10 +133,17 @@ public final class Query<Value: Sendable> {
     observerCount == 0 && inFlight == nil && date >= unobservedSince.addingTimeInterval(keepFor)
   }
 
-  private func run() async {
+  private func run(_ current: Int) async {
     state.isFetching = true
+    defer {
+      if generation == current {
+        state.isFetching = false
+        inFlight = nil
+      }
+    }
     do {
       let value = try await fetcher()
+      guard generation == current else { return }
       state.data = value
       state.error = nil
       dataUpdatedAt = now()
@@ -124,9 +151,9 @@ public final class Query<Value: Sendable> {
     } catch is CancellationError {
       // 호출자 취소는 실패로 보이지 않는다
     } catch {
+      guard generation == current else { return }
       state.error = (error as? AppError) ?? AppError(.internal, message: "\(error)")
       errorUpdatedAt = now()
     }
-    state.isFetching = false
   }
 }

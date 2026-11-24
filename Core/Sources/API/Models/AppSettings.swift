@@ -17,6 +17,34 @@ public struct AppSettings: Codable, Sendable, Equatable {
   /// nil = 알림 거부 시간 끄기
   public let quietTime: QuietTime?
 
+  public init(
+    locale: AppLanguage, timezone: String, basis: Basis, maPeriod: MAPeriod,
+    window: DistributionWindow, rareLevels: [Double], alertCommodity: CommodityCode?,
+    quietTime: QuietTime?
+  ) {
+    self.locale = locale
+    self.timezone = timezone
+    self.basis = basis
+    self.maPeriod = maPeriod
+    self.window = window
+    self.rareLevels = rareLevels
+    self.alertCommodity = alertCommodity
+    self.quietTime = quietTime
+  }
+
+  /// `patch`의 필드를 덮은 값. 서버 확인 전 화면에 먼저 보일 때 쓴다(D-082 낙관적 갱신)
+  public func applying(_ patch: SettingsPatch) -> AppSettings {
+    AppSettings(
+      locale: patch.locale ?? locale,
+      timezone: patch.timezone ?? timezone,
+      basis: patch.basis ?? basis,
+      maPeriod: patch.maPeriod ?? maPeriod,
+      window: patch.window ?? window,
+      rareLevels: patch.rareLevels?.values ?? rareLevels,
+      alertCommodity: patch.alertCommodity ?? alertCommodity,
+      quietTime: patch.quietTime ?? quietTime)
+  }
+
   public init(from decoder: any Decoder) throws {
     let container = try decoder.container(keyedBy: CodingKeys.self)
     locale = try container.decode(AppLanguage.self, forKey: .locale)

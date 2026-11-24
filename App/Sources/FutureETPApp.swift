@@ -9,7 +9,8 @@ struct FutureETPApp: App {
   @State private var displaySettings = DisplaySettings()
   private let client: APIClient
   /// 서버 응답 메모리 캐시. 앱 하나에 하나 (D-030)
-  private let queryCache = QueryCache()
+  private let queryCache: QueryCache
+  private let settings: SettingsStore
 
   init() {
     guard let environment = AppEnvironment(infoDictionary: Bundle.main.infoDictionary ?? [:]) else {
@@ -21,21 +22,28 @@ struct FutureETPApp: App {
     let installationID = InstallationID()
     self.environment = environment
     _keys = State(initialValue: keys)
-    client = APIClient(
+    let client = APIClient(
       baseURL: environment.apiBaseURL,
       accessToken: { await keys.key },
       deviceID: { installationID.value },
       onRejected: { await keys.report(AppError(.unauthorized)) }
     )
+    let queryCache = QueryCache()
+    self.client = client
+    self.queryCache = queryCache
+    settings = SettingsStore(repository: LiveSettingsRepository(client: client), cache: queryCache)
   }
 
   var body: some Scene {
     WindowGroup {
-      RootView(environment: environment, keys: keys, client: client, queryCache: queryCache)
-        .environment(displaySettings)
-        // 다크 전용 테마(D-031)
-        .preferredColorScheme(.dark)
-        .background(Theme.Colors.background)
+      RootView(
+        environment: environment, keys: keys, client: client, queryCache: queryCache,
+        settings: settings
+      )
+      .environment(displaySettings)
+      // 다크 전용 테마(D-031)
+      .preferredColorScheme(.dark)
+      .background(Theme.Colors.background)
     }
   }
 }
