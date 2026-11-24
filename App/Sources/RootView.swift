@@ -67,6 +67,8 @@ struct RootView: View {
           }
         #endif
       }
+      // A 당겨서 새로고침 중 title-bar까지 덮는다 (D-138)
+      .touchBlocker()
       // 기기 시간대·앱 언어를 서버 설정에 맞춘다. 키가 있을 때만 (D-084, D-137)
       .deviceSettingsSync(settings)
       .onChange(of: keys.isRejected) { _, rejected in

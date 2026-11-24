@@ -41,8 +41,8 @@ public struct CommodityListView: View {
         settingsButton
       }
     }
-    // 새로고침 중에는 헤더 버튼도 막는다 (D-138)
-    .disabled(refresh.isRefreshing)
+    // 새로고침 중에는 헤더를 포함한 화면 전체 터치를 막는다 (D-138)
+    .blocksTouches(refresh.isRefreshing)
     .sensoryFeedback(.impact(weight: .light), trigger: refresh.pullCount)
     .sensoryFeedback(.selection, trigger: settingsTaps)
     .alert(Text("commodityList.refreshFailedTitle"), isPresented: $refresh.showsFailure) {
