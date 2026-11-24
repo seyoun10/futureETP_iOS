@@ -20,7 +20,7 @@
 | i18n | String Catalog | 앱 안 언어 설정(D-073)이 기기 언어와 다를 수 있어 `Locale`을 환경으로 주입 |
 | 푸시 | APNs 직접(`UNUserNotificationCenter`, 기기 토큰) | Apple 가입 뒤 |
 | 햅틱 | SwiftUI `sensoryFeedback` (IOS-006) | D-109·D-138·D-139. iOS 17+ |
-| 테스트 / lint | Swift Testing · XCUITest / swift-format 6.4.4(Xcode 동봉) | 계약 테스트의 JSON Schema 검증 도구는 TODO 3단계 응답 모델 항목에서 정한다 |
+| 테스트 / lint | Swift Testing · XCUITest / swift-format 6.4.4(Xcode 동봉, 기본 설정·2칸) | 계약 테스트의 JSON Schema 검증 도구는 TODO 3단계 응답 모델 항목에서 정한다 |
 | 외부 패키지 | 없음(SPM으로 꼭 필요할 때만) |  |
 | 프로젝트 생성 | Tuist 4.218.4(`mise.toml` 고정, GitHub 릴리스 2026-11-23) | IOS-003 |
 

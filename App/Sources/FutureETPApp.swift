@@ -3,9 +3,9 @@ import SwiftUI
 
 @main
 struct FutureETPApp: App {
-    var body: some Scene {
-        WindowGroup {
-            CommodityListView()
-        }
+  var body: some Scene {
+    WindowGroup {
+      CommodityListView()
     }
+  }
 }

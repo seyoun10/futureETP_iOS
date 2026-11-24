@@ -70,7 +70,7 @@ Swift/SwiftUI로 만드는 futureETP 앱(iOS). 기능·화면·동작은 RN 앱(
 ## Conventions
 
 - commit message: Conventional Commits(`feat:`, `fix:`, `chore:`, `docs:`). 관련 결정 번호를 끝에 `(D-xxx)`·`(IOS-xxx)`로 붙인다
-- 커밋 전 검사 명령(아래 Commands의 check) 통과. 스캐폴딩 전에는 문서만이라 생략
+- 커밋 전 `./scripts/check.sh` 통과. 문서만 바꾼 커밋은 생략
 - `fix:` 커밋은 회귀 테스트를 함께 넣는다. 시각 조정만 예외로 기기 확인으로 대신한다
 - 이름: 타입 `UpperCamelCase`, 멤버 `lowerCamelCase`, 파일 이름 = 주 타입 이름. Swift API Design Guidelines를 따른다
 - 테스트: Swift Testing(`@Test`), UI는 XCUITest
@@ -84,7 +84,7 @@ Swift/SwiftUI로 만드는 futureETP 앱(iOS). 기능·화면·동작은 RN 앱(
 - `xcodebuild build -workspace FutureETP.xcworkspace -scheme FutureETP-Dev -destination 'platform=iOS Simulator,name=iPhone 18 Pro' -derivedDataPath build/dd`: dev 변형 빌드. prod는 `-scheme FutureETP`(Release)
 - `xcodebuild test -workspace FutureETP.xcworkspace -scheme FutureETP-Dev -destination 'platform=iOS Simulator,name=iPhone 18 Pro' -derivedDataPath build/dd`: 전체 테스트. 단일: `-only-testing:<Target>/<Suite>/<test>`
 - `tuist inspect dependencies --only implicit`: 선언하지 않은 타깃 import 검사(import 방향, IOS-003)
-- `swift format lint --recursive --strict .`: lint(Xcode 동봉 swift-format). 설정은 TODO 2단계에서 정한다
-- `swift format --in-place --recursive .`: 포맷 적용
-- `./scripts/check.sh`: lint → 의존성 검사 → 빌드 → 테스트(TODO 2단계에서 만든다). 커밋 전 통과
+- `swift format lint --recursive --strict App Core Features Project.swift Tuist.swift`: lint(Xcode 동봉 swift-format, `.swift-format`은 기본값 그대로·들여쓰기 2칸). `.`을 주면 `build/`까지 훑으니 경로를 준다
+- `swift format --in-place --recursive App Core Features Project.swift Tuist.swift`: 포맷 적용
+- `./scripts/check.sh`: lint → generate → import 방향 검사 → Release 빌드 → Debug-Dev 테스트. 커밋 전 통과. 기기는 `SIMULATOR=<이름>`으로 바꾼다
 - dev 서버 실행은 `../futureETP`에서 `npm run dev -w apps/server`. iOS 시뮬레이터는 `http://localhost:3000`(기본값), 실기기는 `Config/Secrets.xcconfig`의 `API_BASE_URL`
