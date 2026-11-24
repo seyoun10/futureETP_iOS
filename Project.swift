@@ -29,6 +29,19 @@ func feature(_ name: String) -> Target {
 }
 
 let features = ["CommodityList", "Commodity", "Settings"]
+/// feature 화면 Model 테스트 타깃
+func featureTests(_ name: String) -> Target {
+  .target(
+    name: "\(name)Tests",
+    destinations: destinations,
+    product: .unitTests,
+    bundleId: "io.github.seyoon.futureetp.\(name.lowercased())tests",
+    deploymentTargets: deploymentTargets,
+    sources: ["Features/\(name)/Tests/**"],
+    dependencies: [.target(name: name), .target(name: "Core")],
+    settings: .settings(base: mainActorSettings, defaultSettings: defaultSettings)
+  )
+}
 
 let project = Project(
   name: "FutureETP",
@@ -96,34 +109,13 @@ let project = Project(
       dependencies: [.target(name: "Core")],
       settings: .settings(defaultSettings: defaultSettings)
     ),
-    // 화면 Model 테스트. 테스트가 생긴 feature만 둔다
-    .target(
-      name: "SettingsTests",
-      destinations: destinations,
-      product: .unitTests,
-      bundleId: "io.github.seyoon.futureetp.settingstests",
-      deploymentTargets: deploymentTargets,
-      sources: ["Features/Settings/Tests/**"],
-      dependencies: [.target(name: "Settings"), .target(name: "Core")],
-      settings: .settings(base: mainActorSettings, defaultSettings: defaultSettings)
-    ),
-    .target(
-      name: "CommodityTests",
-      destinations: destinations,
-      product: .unitTests,
-      bundleId: "io.github.seyoon.futureetp.commoditytests",
-      deploymentTargets: deploymentTargets,
-      sources: ["Features/Commodity/Tests/**"],
-      dependencies: [.target(name: "Commodity"), .target(name: "Core")],
-      settings: .settings(base: mainActorSettings, defaultSettings: defaultSettings)
-    ),
-  ] + features.map(feature),
+  ] + features.map(featureTests) + features.map(feature),
   schemes: [
     .scheme(
       name: "FutureETP-Dev",
       buildAction: .buildAction(targets: ["FutureETP"]),
       testAction: .targets(
-        ["CoreTests", "SettingsTests", "CommodityTests"], configuration: "Debug-Dev"),
+        ["CoreTests"] + features.map { "\($0)Tests" }, configuration: "Debug-Dev"),
       runAction: .runAction(configuration: "Debug-Dev"),
       archiveAction: .archiveAction(configuration: "Debug-Dev"),
       profileAction: .profileAction(configuration: "Debug-Dev"),

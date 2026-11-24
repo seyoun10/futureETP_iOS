@@ -6,6 +6,8 @@ import SwiftUI
 
 /// 스택에 올리는 화면
 enum Route: Hashable {
+  case commodity(CommodityCode)
+  case settings
   case accessKey
   #if DEBUG
     /// C-a 차트 스파이크(dev 전용, TODO 4단계)
@@ -40,12 +42,16 @@ struct RootView: View {
     if keys.hasKey {
       NavigationStack(path: $path) {
         CommodityListView(
-          // 서버 연결 줄은 dev 변형만 (2단계 확인용)
-          healthRepository: environment.variant == .development
-            ? LiveHealthRepository(client: client) : nil
+          query: queryCache.commodityList(LiveCommoditiesRepository(client: client)),
+          // 설정을 받기 전이나 조회 실패면 점을 띄우지 않는다 (D-124)
+          alertOff: settings.data.map { $0.alertCommodity == nil } ?? false,
+          onSelect: { path.append(.commodity($0)) },
+          onOpenSettings: { path.append(.settings) }
         )
         .navigationDestination(for: Route.self) { route in
           switch route {
+          case .commodity: CommodityView()
+          case .settings: SettingsView()
           case .accessKey: accessKey
           #if DEBUG
             case .chartSpike: ChartSpikeView()

@@ -1,60 +1,180 @@
 import Core
 import SwiftUI
 
-/// A 원자재 목록. 4단계에서 구현한다
+/// A 원자재 목록(홈) (screens.md A, D-085, RN `CommodityListScreen`).
+/// 원자재와 월물 줄은 서버가 준 순서대로 그린다
 public struct CommodityListView: View {
-  @State private var connection: ServerConnectionModel?
+  private let query: Query<Commodities>
+  private let alertOff: Bool
+  private let onSelect: (CommodityCode) -> Void
+  private let onOpenSettings: () -> Void
+  @State private var refresh = PullRefresh()
+  @State private var settingsTaps = 0
 
-  /// `healthRepository`가 있으면 서버 연결 상태 줄을 보인다(dev 변형만, 2단계 확인용)
-  public init(healthRepository: (any HealthRepository)? = nil) {
-    _connection = State(initialValue: healthRepository.map(ServerConnectionModel.init))
+  /// - Parameters:
+  ///   - alertOff: 이 기기의 알림 대상 원자재가 없다. [⚙]에 빨간 점을 띄운다 (D-124)
+  ///   - onSelect: 원자재 행을 눌렀다. C(C-a 탭)로 간다
+  public init(
+    query: Query<Commodities>, alertOff: Bool,
+    onSelect: @escaping (CommodityCode) -> Void, onOpenSettings: @escaping () -> Void
+  ) {
+    self.query = query
+    self.alertOff = alertOff
+    self.onSelect = onSelect
+    self.onOpenSettings = onOpenSettings
   }
 
   public var body: some View {
-    VStack(spacing: 12) {
-      Text(verbatim: "futureETP")
-      if let connection {
-        // dev 진단 줄이라 i18n 리소스에 넣지 않는다. 4단계 A 화면 구현 때 지운다
-        Text(verbatim: connection.state.label)
-          .font(.footnote.monospaced())
-          .foregroundStyle(.secondary)
-          .accessibilityIdentifier("serverConnection")
-          .task { await connection.check() }
+    QueryStateView(query.state, retry: { Task { await query.refetch() } }) { data in
+      list(data)
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+          FreshnessLine(.market(data.freshness))
+        }
+    }
+    .queryLifecycle(query)
+    .background(Theme.Colors.background)
+    // A는 [←] 없이 제목을 왼쪽 끝에 둔다 (screens.md 공통 title-bar)
+    .navigationTitle(Text(verbatim: "futureETP"))
+    .toolbarTitleDisplayMode(.inlineLarge)
+    .toolbar {
+      ToolbarItem(placement: .topBarTrailing) {
+        settingsButton
       }
     }
+    // 새로고침 중에는 헤더 버튼도 막는다 (D-138)
+    .disabled(refresh.isRefreshing)
+    .sensoryFeedback(.impact(weight: .light), trigger: refresh.pullCount)
+    .sensoryFeedback(.selection, trigger: settingsTaps)
+    .alert(Text("commodityList.refreshFailedTitle"), isPresented: $refresh.showsFailure) {
+      Button("common.confirm", role: .cancel) {}
+    } message: {
+      Text("commodityList.refreshFailedMessage")
+    }
+  }
+
+  private func list(_ data: Commodities) -> some View {
+    ScrollView {
+      LazyVStack(spacing: 0) {
+        ForEach(data.commodities, id: \.code) { commodity in
+          CommodityRow(commodity: commodity) { onSelect(commodity.code) }
+          Rectangle()
+            .fill(Theme.Colors.separator)
+            .frame(height: 1)
+        }
+      }
+    }
+    .accessibilityIdentifier("commodityList")
+    .refreshable {
+      await refresh.refresh {
+        await query.refetch()
+        return query.state.error == nil
+      }
+    }
+  }
+
+  private var settingsButton: some View {
+    Button {
+      settingsTaps += 1
+      onOpenSettings()
+    } label: {
+      Image(systemName: "gearshape")
+        .foregroundStyle(Theme.Colors.text)
+        .overlay(alignment: .topTrailing) {
+          if alertOff {
+            Circle()
+              .fill(Theme.Colors.badge)
+              .frame(width: 8, height: 8)
+              .offset(x: 3, y: -3)
+          }
+        }
+    }
+    .accessibilityLabel(Text("settings.title"))
+    .accessibilityHint(alertOff ? Text("settings.alertOffBadge") : Text(verbatim: ""))
+    .accessibilityIdentifier("openSettings")
   }
 }
 
-/// 서버 `/v1/health` 연결 확인 (2단계 임시)
-@Observable
-final class ServerConnectionModel {
-  enum State: Equatable {
-    case checking
-    case connected(commit: String?)
-    case failed(String)
+/// 원자재 하나: 왼쪽 이름·(심볼)·🔔, 오른쪽 월물 줄
+private struct CommodityRow: View {
+  let commodity: CommoditySummary
+  let action: () -> Void
+  @State private var taps = 0
 
-    var label: String {
-      switch self {
-      case .checking: "server: checking…"
-      case .connected(let commit): "server: ok (\(commit ?? "no commit"))"
-      case .failed(let reason): "server: failed (\(reason))"
+  private var nameKey: String { "commodities.\(commodity.code.rawValue)" }
+
+  var body: some View {
+    Button {
+      taps += 1
+      action()
+    } label: {
+      HStack(spacing: 0) {
+        VStack(spacing: Theme.Spacing.xs) {
+          // 보간한 리터럴은 `%@` 키가 되므로 문자열로 만든 뒤 키로 쓴다
+          Text(LocalizedStringKey(nameKey))
+          Text(verbatim: "(\(commodity.code.rawValue))")
+          if commodity.alert {
+            Text(verbatim: "🔔")
+              .font(.system(size: Theme.FontSize.caption))
+              .accessibilityLabel(Text("commodityList.alert"))
+          }
+        }
+        .font(.system(size: Theme.FontSize.body))
+        .foregroundStyle(Theme.Colors.text)
+        .multilineTextAlignment(.center)
+        .frame(width: 104)
+        VStack(spacing: Theme.Spacing.xs) {
+          ForEach(commodity.contracts, id: \.symbol) { quote in
+            QuoteLine(quote: quote, decimals: commodity.priceDecimals)
+          }
+        }
+        .frame(maxWidth: .infinity)
+      }
+      .padding(Theme.Spacing.lg)
+      .contentShape(.rect)
+    }
+    .buttonStyle(.plain)
+    .sensoryFeedback(.selection, trigger: taps)
+    .accessibilityIdentifier("commodity-\(commodity.code.rawValue)")
+  }
+}
+
+/// 월물 / 현재가 / 전일 대비 / 등락률. 오늘 값이 없으면 마지막 정산가와 "거래 없음"이다
+private struct QuoteLine: View {
+  let quote: ContractQuote
+  let decimals: Int
+  @Environment(DisplaySettings.self) private var display
+
+  var body: some View {
+    HStack(spacing: 0) {
+      Text(verbatim: NumberFormat.contractMonth(quote.contractMonth) + (quote.isFront ? "●" : " "))
+        .foregroundStyle(Theme.Colors.textSecondary)
+        .frame(width: 52)
+      Text(verbatim: quote.price.map { NumberFormat.price($0, decimals: decimals) } ?? "-")
+        .foregroundStyle(Theme.Colors.text)
+        .frame(maxWidth: .infinity)
+      if quote.noTrade {
+        Text("commodityList.noTrade")
+          .foregroundStyle(Theme.Colors.neutral)
+          .frame(width: 124)
+      } else {
+        Group {
+          Text(verbatim: quote.change.map { NumberFormat.change($0, decimals: decimals) } ?? "-")
+            .frame(width: 64)
+          Text(verbatim: quote.changePct.map(NumberFormat.changePct) ?? "-")
+            .frame(width: 60)
+        }
+        .foregroundStyle(color)
       }
     }
+    .font(.system(size: Theme.FontSize.caption).monospacedDigit())
+    .lineLimit(1)
+    .minimumScaleFactor(0.8)
   }
 
-  private(set) var state: State = .checking
-  private let repository: any HealthRepository
-
-  init(repository: any HealthRepository) {
-    self.repository = repository
-  }
-
-  func check() async {
-    state = .checking
-    do {
-      state = .connected(commit: try await repository.fetch().commit)
-    } catch {
-      state = .failed(String(describing: error))
-    }
+  /// 둘 다 0이면 방향 없는 색, 아니면 0이 아닌 쪽 부호 (screens.md 공통 등락 색)
+  private var color: Color {
+    guard let change = quote.change else { return Theme.Colors.neutral }
+    return display.palette.color(
+      change: change, changePct: quote.changePct ?? 0, decimals: decimals)
   }
 }
