@@ -10,6 +10,9 @@ enum Route: Hashable {
   /// C-d-a ETP 상세
   case etp(UUID)
   case settings
+  /// B-a 알림 설정
+  case alertSettings
+  case dataSources
   case accessKey
   #if DEBUG
     /// C-a 차트 스파이크(dev 전용, TODO 4단계)
@@ -66,7 +69,14 @@ struct RootView: View {
           case .etp(let id):
             ETPDetailView(
               query: queryCache.etpDetail(LiveCommoditiesRepository(client: client), id: id))
-          case .settings: SettingsView()
+          case .settings:
+            SettingsView(
+              store: settings, hasKey: keys.hasKey,
+              onOpenAlerts: { path.append(.alertSettings) },
+              onOpenAccessKey: { path.append(.accessKey) },
+              onOpenDataSources: { path.append(.dataSources) })
+          case .alertSettings: AlertSettingsView(store: settings)
+          case .dataSources: DataSourcesView()
           case .accessKey: accessKey
           #if DEBUG
             case .chartSpike: ChartSpikeView()
