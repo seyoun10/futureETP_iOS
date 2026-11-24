@@ -52,7 +52,12 @@ struct RootView: View {
         CommodityListView(
           query: queryCache.commodityList(LiveCommoditiesRepository(client: client)),
           alertOff: alertOff,
-          onSelect: { path.append(.commodity($0)) },
+          onSelect: { code in
+            // 화면 전환 동안 C-a 조회를 먼저 시작한다(기다리지 않음)
+            let queries = commodityQueries
+            Task { await queries.prefetchDisparity(code, settings: settings) }
+            path.append(.commodity(code))
+          },
           onOpenSettings: { path.append(.settings) },
           onOpenCalendar: { path.append(.calendar) }
         )
