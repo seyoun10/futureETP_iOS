@@ -53,7 +53,8 @@
   - 1단계 조회 완료(2026-11-24): `DisparityRepository`·`QueryCache.disparityChart`(키 `QueryKeys.disparity`, 설정 값별)
   - 2단계 계열 모델 완료(2026-11-24): `DisparityChartModel`(산출 불가일 제외·rare-level 밴드 순위 색·이평선 위·롤 음영/전환일·보이는 구간 최고·최저와 LC·HC·y축 특수 라벨·월물 구성·꼬리 백분위 표기)
   - 3단계 화면 뼈대 완료(2026-11-24): `DisparityTabView`(설정 → 조회, 설정 오류·스켈레톤)·`DisparityScreenModel`(같은 데이터면 그대로, 과거 봉이 앞에 붙으면 범위 유지)·`ChartViewState`(기간 홈·드래그/핀치로 벗어남·[↻]·가까운 기간 테두리)·`PeriodChips`·`ChartResetButton`·`ChartSkeleton`. 시뮬레이터에서 dev 서버 차트·드래그·[↻]·칩 확인
-  - 남음: 정보 줄 두 줄(기준값 안내 포함) → y축 라벨·x축 월 눈금·현재가 점선 → 고가·저가 꼬리표·롤 표시 → 십자선 상세 → 이전 3년 받기 연결
+  - 4단계 정보 줄 완료(2026-11-24): `DisparityInfo`(기준값 이름·대체·롤 중·OHLC·안내·이격도 꼬리·LC·HC), 차트 위 반투명 두 줄과 기준값 안내 상자, 봉·선은 정보 줄 높이만큼 비켜 그림(`CanvasCandleChart.insetTop`). 시뮬레이터 확인
+  - 남음: y축 라벨·x축 월 눈금·현재가 점선 → 고가·저가 꼬리표·롤 표시 → 십자선 상세 → 이전 3년 받기 연결
 - [ ] C-c 월물차트: `GET /v1/commodities/:code/contracts`, log y축, 끝값 라벨 (D-092, D-093, D-113, D-118)
 - [ ] C-b 월물커브: `GET /v1/commodities/:code/curve?baseDate`, 기준일 OS 날짜 피커, 이전·다음 기준일, 변화율 라벨 배치, 롤 수익률 (D-090, D-091, D-114~D-123)
 - [ ] C-d ETP 목록(필터·정렬은 앱에서)·C-d-a 상세 (D-017)
