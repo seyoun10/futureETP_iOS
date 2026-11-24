@@ -35,4 +35,9 @@ public struct AppError: Error, Sendable, Equatable {
   public var isRetryable: Bool {
     [.network, .timeout, .internal].contains(code)
   }
+
+  /// 화면에 보일 문구 키 `errors.<code>`. `AppError`가 아니면 `INTERNAL` 문구다 (D-042, RN `errorText`)
+  public static func textKey(for error: any Error) -> String {
+    "errors.\(((error as? AppError)?.code ?? .internal).rawValue)"
+  }
 }
