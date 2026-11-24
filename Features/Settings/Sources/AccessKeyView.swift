@@ -1,0 +1,67 @@
+import Core
+import SwiftUI
+
+/// B-b 접근 키 (screens.md B-b, D-044). 키가 없으면 앱 루트가 첫 화면으로 띄운다([←] 없음).
+/// 키가 있을 때 저장하면 들어온 화면으로 돌아간다. QR 읽기는 3단계에서 붙인다
+public struct AccessKeyView: View {
+  @State private var model: AccessKeyModel
+  @Environment(\.dismiss) private var dismiss
+
+  /// - Parameter onSaved: 저장 뒤 옛 키로 실패한 조회를 다시 불러온다. 기다리지 않는다
+  public init(
+    store: AccessKeyStore, verifier: any AccessKeyVerifier, onSaved: @escaping () -> Void = {}
+  ) {
+    _model = State(initialValue: AccessKeyModel(store: store, verifier: verifier, onSaved: onSaved))
+  }
+
+  public var body: some View {
+    @Bindable var model = model
+    Form {
+      Section {
+        Text("accessKey.guide")
+        SecureField("accessKey.pastePlaceholder", text: $model.input)
+          .textInputAutocapitalization(.never)
+          .autocorrectionDisabled()
+          .disabled(model.isSaving)
+          .onSubmit(submit)
+        Button(action: submit) {
+          if model.isSaving {
+            ProgressView().accessibilityLabel(Text("accessKey.verifying"))
+          } else {
+            Text("accessKey.submit")
+          }
+        }
+        .frame(maxWidth: .infinity)
+        .disabled(!model.canSubmit)
+      }
+      if let message = model.message {
+        Text(message.key)
+          .foregroundStyle(.red)
+          .frame(maxWidth: .infinity)
+          .accessibilityAddTraits(.isStaticText)
+      }
+    }
+    .navigationTitle(Text("settings.accessKey"))
+    .navigationBarBackButtonHidden(!model.canGoBack)
+    .onDisappear { model.leave() }
+  }
+
+  private func submit() {
+    // 저장하면 키가 생기므로 저장 전에 돌아갈 수 있었는지 본다
+    let canGoBack = model.canGoBack
+    Task {
+      if await model.submit(), canGoBack { dismiss() }
+    }
+  }
+}
+
+extension AccessKeyModel.Message {
+  /// i18n 키. String Catalog는 i18n 항목에서 채운다
+  var key: LocalizedStringKey {
+    switch self {
+    case .notice(let notice): LocalizedStringKey("accessKey.\(notice.rawValue)")
+    case .rejected: "accessKey.rejected"
+    case .error(let code): LocalizedStringKey("errors.\(code.rawValue)")
+    }
+  }
+}

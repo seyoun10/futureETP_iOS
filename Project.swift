@@ -90,12 +90,23 @@ let project = Project(
       dependencies: [.target(name: "Core")],
       settings: .settings(defaultSettings: defaultSettings)
     ),
+    // 화면 Model 테스트. 테스트가 생긴 feature만 둔다
+    .target(
+      name: "SettingsTests",
+      destinations: destinations,
+      product: .unitTests,
+      bundleId: "io.github.seyoon.futureetp.settingstests",
+      deploymentTargets: deploymentTargets,
+      sources: ["Features/Settings/Tests/**"],
+      dependencies: [.target(name: "Settings"), .target(name: "Core")],
+      settings: .settings(base: mainActorSettings, defaultSettings: defaultSettings)
+    ),
   ] + features.map(feature),
   schemes: [
     .scheme(
       name: "FutureETP-Dev",
       buildAction: .buildAction(targets: ["FutureETP"]),
-      testAction: .targets(["CoreTests"], configuration: "Debug-Dev"),
+      testAction: .targets(["CoreTests", "SettingsTests"], configuration: "Debug-Dev"),
       runAction: .runAction(configuration: "Debug-Dev"),
       archiveAction: .archiveAction(configuration: "Debug-Dev"),
       profileAction: .profileAction(configuration: "Debug-Dev"),
