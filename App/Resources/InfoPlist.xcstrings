@@ -1,0 +1,24 @@
+{
+  "sourceLanguage" : "ko",
+  "strings" : {
+    "NSCameraUsageDescription" : {
+      "comment" : "B-b 접근 키 QR 읽기 카메라 권한",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The camera is used to scan the server access key QR code."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "서버 접근 키 QR 코드를 읽을 때 카메라를 씁니다."
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

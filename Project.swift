@@ -32,6 +32,8 @@ let features = ["CommodityList", "Commodity", "Settings"]
 
 let project = Project(
   name: "FutureETP",
+  // 문구 기준 언어는 ko, 번역은 en (D-033)
+  options: .options(developmentRegion: "ko"),
   settings: .settings(configurations: configurations, defaultSettings: defaultSettings),
   targets: [
     .target(
@@ -55,6 +57,8 @@ let project = Project(
         ],
         // dev 서버(http://localhost, .local)만 허용
         "NSAppTransportSecurity": ["NSAllowsLocalNetworking": true],
+        // 번역은 App/Resources/InfoPlist.xcstrings (D-033)
+        "NSCameraUsageDescription": "서버 접근 키 QR 코드를 읽을 때 카메라를 씁니다.",
         "AppVariant": "$(APP_VARIANT)",
         "APIBaseURL": "$(API_BASE_URL)",
         "DevAPIToken": "$(DEV_API_TOKEN)",
