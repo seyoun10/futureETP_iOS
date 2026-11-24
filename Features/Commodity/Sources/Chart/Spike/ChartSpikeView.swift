@@ -164,6 +164,10 @@
 
     /// 3년(756봉)과, 이전 3년을 세 번 이어 받은 뒤(약 3,000봉) (D-104)
     static let barCounts = [756, 3_024]
+    /// 가장 과거 봉이 보이면 한 번에 앞에 붙이는 봉(이전 3년)과 그 응답 대기 흉내
+    static let olderBars = 756
+    static let olderDelay = Duration.milliseconds(500)
+    private static let all = SpikeSeries.make(barCount: barCounts.last ?? 756)
     /// 기본 기간(1년)
     static let defaultSpan = 252
 
@@ -171,12 +175,13 @@
     var barCount = 756 {
       didSet { reset() }
     }
-    private(set) var series = SpikeSeries.make(barCount: 756)
+    private(set) var series = all.suffix(756)
     private(set) var interaction = ChartInteraction(
       viewport: .lastBars(defaultSpan, of: 756))
     var detailSize: CGSize?
     private(set) var results: [Result] = []
     private(set) var isBenchmarking = false
+    private var olderTask: Task<Void, Never>?
     let meter = FrameRateMeter()
     let palette = UpDownPalette(.kr)
 
@@ -184,7 +189,8 @@
 
     var viewportLabel: String {
       String(
-        format: "view %.1f–%.1f (%.0f bars)", viewport.lower, viewport.upper, viewport.span)
+        format: "view %.1f–%.1f (%.0f of %d bars)", viewport.lower, viewport.upper,
+        viewport.span, viewport.barCount) + (olderTask == nil ? "" : " loading older…")
     }
 
     static func describe(_ report: FrameRateMeter.Report) -> String {
@@ -205,6 +211,21 @@
       case .pinchEnded: interaction.pinchEnded()
       case .activeChanged(let active):
         if active { meter.begin() } else { meter.end() }
+      }
+      loadOlderIfNeeded()
+    }
+
+    /// 가장 과거 봉이 보이면 이전 3년을 앞에 붙인다. 보던 날짜 범위는 그대로 둔다 (D-104)
+    private func loadOlderIfNeeded() {
+      let count = series.bars.count
+      guard olderTask == nil, viewport.showsFirstBar, count < Self.all.bars.count else { return }
+      olderTask = Task { @MainActor [weak self] in
+        try? await Task.sleep(for: Self.olderDelay)
+        guard let self, !Task.isCancelled else { return }
+        let added = min(Self.olderBars, Self.all.bars.count - count)
+        series = Self.all.suffix(count + added)
+        interaction.dataChanged(barCount: count + added, prepended: added)
+        olderTask = nil
       }
     }
 
@@ -272,8 +293,10 @@
     }
 
     private func reset() {
-      series = SpikeSeries.make(barCount: barCount)
-      interaction.dataChanged(viewport: .lastBars(Self.defaultSpan, of: barCount))
+      olderTask?.cancel()
+      olderTask = nil
+      series = Self.all.suffix(barCount)
+      interaction.reset(viewport: .lastBars(Self.defaultSpan, of: barCount))
     }
   }
 #endif

@@ -26,6 +26,16 @@ struct CandleViewportTests {
     #expect(past.span == 252)
   }
 
+  @Test func rebasedKeepsTheSameBarsWhenOlderBarsArePrepended() {
+    let viewport = CandleViewport(barCount: 756, lower: 0, upper: 252)
+    #expect(viewport.showsFirstBar)
+    let rebased = viewport.rebased(barCount: 1_512, prepended: 756)
+    #expect(rebased == CandleViewport(barCount: 1_512, lower: 756, upper: 1_008))
+    #expect(!rebased.showsFirstBar)
+    // 뒤에 붙은 봉(오늘 봉)은 보던 순번을 그대로 둔다
+    #expect(viewport.rebased(barCount: 757, prepended: 0).lower == 0)
+  }
+
   @Test func zoomKeepsTheAnchorBarUnderTheFingers() {
     let viewport = CandleViewport(barCount: 756, lower: 200, upper: 400)
     // 가운데(0.5)를 2배 확대하면 가운데 봉(300)이 그대로 가운데에 남는다

@@ -43,6 +43,17 @@
     }
   }
 
+  extension CandleSeries {
+    /// 마지막 `count`개 봉(이전 3년 이어 받기 흉내)
+    func suffix(_ count: Int) -> Self {
+      Self(
+        bars: Array(bars.suffix(count)),
+        lines: lines.map {
+          Line(id: $0.id, values: Array($0.values.suffix(count)), color: $0.color, width: $0.width)
+        })
+    }
+  }
+
   /// 시드 고정 난수(SplitMix64)
   private struct SplitMix {
     var state: UInt64

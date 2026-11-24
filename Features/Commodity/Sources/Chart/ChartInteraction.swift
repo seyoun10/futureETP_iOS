@@ -57,8 +57,16 @@ struct ChartInteraction: Equatable {
     pinchStart = nil
   }
 
-  /// 차트 데이터가 바뀌었다(앞에 과거 봉이 붙음·새로고침). 봉 순번이 바뀌므로 십자선을 지운다
-  mutating func dataChanged(viewport: CandleViewport) {
+  /// 차트 데이터가 바뀌었다(앞에 과거 봉 `prepended`개가 붙음·새로고침). 보던 날짜 범위는 그대로 두고,
+  /// 봉 순번이 바뀌므로 십자선을 지운다. 핀치 중이면 시작 범위도 같이 옮겨 화면이 튀지 않게 한다 (D-104)
+  mutating func dataChanged(barCount: Int, prepended: Int) {
+    viewport = viewport.rebased(barCount: barCount, prepended: prepended)
+    pinchStart = pinchStart?.rebased(barCount: barCount, prepended: prepended)
+    crosshairIndex = nil
+  }
+
+  /// 다른 데이터로 바꾸고 범위를 새로 맞춘다(기간 버튼·원자재 전환)
+  mutating func reset(viewport: CandleViewport) {
     self.viewport = viewport
     crosshairIndex = nil
     pinchStart = nil

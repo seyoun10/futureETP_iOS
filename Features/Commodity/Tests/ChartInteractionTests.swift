@@ -71,10 +71,30 @@ struct ChartInteractionTests {
     #expect(interaction.viewport.lower == 35)
   }
 
-  @Test func newDataClearsTheCrosshair() {
+  @Test func prependedBarsKeepTheViewAndClearTheCrosshair() {
+    var interaction = ChartInteraction(
+      viewport: CandleViewport(barCount: 100, lower: 0.5, upper: 20.5))
+    interaction.pressed(atX: 57, width: 200)
+    interaction.dataChanged(barCount: 300, prepended: 200)
+    #expect(interaction.viewport == CandleViewport(barCount: 300, lower: 200.5, upper: 220.5))
+    #expect(interaction.crosshairIndex == nil)
+  }
+
+  @Test func prependedBarsDuringAPinchMoveThePinchStartToo() {
+    var interaction = ChartInteraction(
+      viewport: CandleViewport(barCount: 100, lower: 0, upper: 40))
+    interaction.pinched(scale: 2, startFocalX: 100, focalX: 100, width: 200)
+    #expect(interaction.viewport == CandleViewport(barCount: 100, lower: 10, upper: 30))
+    interaction.dataChanged(barCount: 300, prepended: 200)
+    // 같은 핀치가 이어져도 앞에 붙은 봉만큼 옮긴 시작 범위 기준이라 화면이 그대로다
+    interaction.pinched(scale: 2, startFocalX: 100, focalX: 100, width: 200)
+    #expect(interaction.viewport == CandleViewport(barCount: 300, lower: 210, upper: 230))
+  }
+
+  @Test func resetClearsTheCrosshair() {
     var interaction = make()
     interaction.pressed(atX: 57, width: 200)
-    interaction.dataChanged(viewport: CandleViewport(barCount: 200, lower: 100, upper: 120))
+    interaction.reset(viewport: CandleViewport(barCount: 200, lower: 100, upper: 120))
     #expect(interaction.crosshairIndex == nil)
     #expect(interaction.viewport.barCount == 200)
   }

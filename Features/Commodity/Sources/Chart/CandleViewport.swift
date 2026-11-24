@@ -33,6 +33,16 @@ struct CandleViewport: Equatable, Sendable {
     return first...last
   }
 
+  /// 가장 과거 봉이 보인다(이전 3년을 이어 받을 때, D-104)
+  var showsFirstBar: Bool { barCount > 0 && lower < 1 }
+
+  /// 봉 배열이 `barCount`개로 바뀌었다. 앞에 붙은 봉 `prepended`개만큼 옮겨 보던 봉(날짜) 범위를 그대로 둔다.
+  /// 뒤에 붙은 봉(새로고침으로 오늘 봉)은 순번을 바꾸지 않으니 `prepended`는 0이다 (RN `fitTransform.ts` `shiftedView`)
+  func rebased(barCount newCount: Int, prepended: Int) -> Self {
+    let shift = Double(prepended)
+    return Self(barCount: newCount, lower: lower + shift, upper: upper + shift)
+  }
+
   /// 봉 수만큼 옮긴다. 음수면 과거 쪽
   func panned(byBars delta: Double) -> Self {
     Self(barCount: barCount, lower: lower + delta, upper: upper + delta)
