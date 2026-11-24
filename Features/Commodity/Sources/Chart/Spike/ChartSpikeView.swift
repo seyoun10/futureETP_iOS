@@ -13,12 +13,18 @@
       VStack(spacing: Theme.Spacing.sm) {
         controls
         GeometryReader { geometry in
+          let size = geometry.size
           chart
-            .contentShape(Rectangle())
-            .gesture(gestures(width: geometry.size.width))
+            .overlay {
+              ChartGestureSurface { model.handle($0, width: size.width) }
+                .accessibilityIdentifier("spikeChart")
+            }
+            .overlay(alignment: .topLeading) { detail(size: size) }
         }
         .background(Theme.Colors.background)
-        .accessibilityIdentifier("spikeChart")
+        .sensoryFeedback(.selection, trigger: model.interaction.crosshairIndex) { _, new in
+          new != nil
+        }
         results
       }
       .padding(.horizontal, Theme.Spacing.sm)
@@ -31,7 +37,9 @@
     @ViewBuilder private var chart: some View {
       switch model.renderer {
       case .canvas:
-        CanvasCandleChart(series: model.series, viewport: model.viewport, palette: model.palette)
+        CanvasCandleChart(
+          series: model.series, viewport: model.viewport, palette: model.palette,
+          crosshairIndex: model.interaction.crosshairIndex)
       case .swiftCharts:
         SwiftChartsCandleChart(
           series: model.series, viewport: model.viewport, palette: model.palette)
@@ -89,16 +97,49 @@
       .accessibilityIdentifier("spikeResults")
     }
 
-    private func gestures(width: Double) -> some Gesture {
-      let pinch = MagnifyGesture(minimumScaleDelta: 0)
-        .onChanged { value in
-          model.pinch(scale: value.magnification, startAnchor: value.startAnchor.x)
+    /// 상세 박스. 처음 잰 크기로 귀퉁이를 고르고, 재기 전에는 감춘다(RN `useDetailPlacement`)
+    @ViewBuilder private func detail(size: CGSize) -> some View {
+      if let index = model.interaction.crosshairIndex,
+        let scale = PriceScale(series: model.series, indices: model.viewport.visibleIndices)
+      {
+        let box = DetailBoxContent(rows: model.detailRows(at: index))
+          .onGeometryChange(for: CGSize.self, of: \.size) { model.detailSize = $0 }
+        if let boxSize = model.detailSize {
+          let area = CGRect(origin: .zero, size: size).insetBy(
+            dx: Theme.Spacing.sm, dy: Theme.Spacing.sm)
+          let corner = DetailCorner.leastCovered(
+            area: area, box: boxSize,
+            crosshairX: model.viewport.centerX(ofBar: index, width: size.width)
+          ) { x0, x1 in
+            model.series.markSpans(
+              x0: x0, x1: x1, viewport: model.viewport, scale: scale, size: size)
+          }
+          let rect = corner.rect(in: area, box: boxSize)
+          box.offset(x: rect.minX, y: rect.minY)
+        } else {
+          box.hidden()
         }
-        .onEnded { _ in model.endGesture() }
-      let drag = DragGesture(minimumDistance: 4)
-        .onChanged { value in model.drag(translation: value.translation.width, width: width) }
-        .onEnded { _ in model.endGesture() }
-      return SimultaneousGesture(pinch, drag)
+      }
+    }
+  }
+
+  /// 상세 박스(RN `DetailBox`). 이름은 왼쪽, 값은 오른쪽
+  private struct DetailBoxContent: View {
+    let rows: [(String, String)]
+
+    var body: some View {
+      Grid(alignment: .leading, horizontalSpacing: Theme.Spacing.md, verticalSpacing: 2) {
+        ForEach(rows.indices, id: \.self) { i in
+          GridRow {
+            Text(verbatim: rows[i].0)
+            Text(verbatim: rows[i].1).gridColumnAlignment(.trailing)
+          }
+        }
+      }
+      .font(.caption.monospacedDigit())
+      .padding(Theme.Spacing.sm)
+      .background(Theme.Colors.surface, in: .rect(cornerRadius: Theme.Spacing.xs))
+      .fixedSize()
     }
   }
 
@@ -131,14 +172,15 @@
       didSet { reset() }
     }
     private(set) var series = SpikeSeries.make(barCount: 756)
-    private(set) var viewport = CandleViewport.lastBars(defaultSpan, of: 756)
+    private(set) var interaction = ChartInteraction(
+      viewport: .lastBars(defaultSpan, of: 756))
+    var detailSize: CGSize?
     private(set) var results: [Result] = []
     private(set) var isBenchmarking = false
     let meter = FrameRateMeter()
     let palette = UpDownPalette(.kr)
 
-    private var gestureStart: CandleViewport?
-    private var pinching = false
+    var viewport: CandleViewport { interaction.viewport }
 
     var viewportLabel: String {
       String(
@@ -151,27 +193,34 @@
         report.targetFps, report.worstMs, report.hitches, report.frames)
     }
 
-    func pinch(scale: Double, startAnchor: Double) {
+    func handle(_ event: ChartGestureSurface.Event, width: Double) {
       guard !isBenchmarking else { return }
-      beginGestureIfNeeded()
-      pinching = true
-      guard let start = gestureStart else { return }
-      viewport = start.zoomed(scale: scale, startAnchor: startAnchor, anchor: startAnchor)
+      switch event {
+      case .touchSequenceBegan: interaction.touchSequenceBegan()
+      case .tapped: interaction.tapped()
+      case .pressed(let x): interaction.pressed(atX: x, width: width)
+      case .dragged(let deltaX, let x): interaction.dragged(byX: deltaX, atX: x, width: width)
+      case .pinched(let scale, let startFocalX, let focalX):
+        interaction.pinched(scale: scale, startFocalX: startFocalX, focalX: focalX, width: width)
+      case .pinchEnded: interaction.pinchEnded()
+      case .activeChanged(let active):
+        if active { meter.begin() } else { meter.end() }
+      }
     }
 
-    func drag(translation: Double, width: Double) {
-      guard !isBenchmarking, !pinching, width > 0 else { return }
-      beginGestureIfNeeded()
-      guard let start = gestureStart else { return }
-      viewport = start.panned(byBars: -translation / width * start.span)
+    func detailRows(at index: Int) -> [(String, String)] {
+      let bar = series.bars[index]
+      var rows = [
+        ("#", "\(index)"), ("O", Self.price(bar.open)), ("H", Self.price(bar.high)),
+        ("L", Self.price(bar.low)), ("C", Self.price(bar.close)),
+      ]
+      for line in series.lines {
+        if let value = line.values[index] { rows.append((line.id, Self.price(value))) }
+      }
+      return rows
     }
 
-    func endGesture() {
-      guard gestureStart != nil else { return }
-      gestureStart = nil
-      pinching = false
-      meter.end()
-    }
+    private static func price(_ value: Double) -> String { String(format: "%.2f", value) }
 
     /// 4초 동안 1년 범위로 끝에서 처음까지 옮긴 뒤, 최대 확대에서 전체까지 축소한다
     func runBenchmark(then next: (() -> Void)? = nil) {
@@ -180,7 +229,7 @@
       isBenchmarking = true
       meter.begin(duration: 4) { [weak self] progress in
         guard let self else { return }
-        viewport = Self.scripted(progress: progress, barCount: count)
+        interaction.viewport = Self.scripted(progress: progress, barCount: count)
         if progress >= 1 {
           isBenchmarking = false
           if let report = meter.report {
@@ -222,15 +271,9 @@
       return CandleViewport(barCount: barCount, lower: total - span, upper: total)
     }
 
-    private func beginGestureIfNeeded() {
-      guard gestureStart == nil else { return }
-      gestureStart = viewport
-      meter.begin()
-    }
-
     private func reset() {
       series = SpikeSeries.make(barCount: barCount)
-      viewport = .lastBars(Self.defaultSpan, of: barCount)
+      interaction.dataChanged(viewport: .lastBars(Self.defaultSpan, of: barCount))
     }
   }
 #endif

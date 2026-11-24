@@ -6,6 +6,8 @@ struct CanvasCandleChart: View {
   let series: CandleSeries
   let viewport: CandleViewport
   let palette: UpDownPalette
+  /// 십자선을 붙인 봉. 세로선은 봉 가운데, 가로선은 종가에 긋는다(D-056)
+  var crosshairIndex: Int?
   @Environment(\.displayScale) private var displayScale
 
   var body: some View {
@@ -70,6 +72,20 @@ struct CanvasCandleChart: View {
         context.stroke(
           path, with: .color(line.color),
           style: StrokeStyle(lineWidth: line.width, lineJoin: .round))
+      }
+
+      if let index = crosshairIndex, series.bars.indices.contains(index) {
+        let x = viewport.centerX(ofBar: index, width: width)
+        let y = scale.y(series.bars[index].close, height: height)
+        var cross = Path()
+        cross.move(to: CGPoint(x: x, y: 0))
+        cross.addLine(to: CGPoint(x: x, y: height))
+        cross.move(to: CGPoint(x: 0, y: y))
+        cross.addLine(to: CGPoint(x: width, y: y))
+        // 점선 간격은 RN `GUIDE_DASH`
+        context.stroke(
+          cross, with: .color(Theme.ChartColors.crosshairLine),
+          style: StrokeStyle(lineWidth: 1, dash: [2, 2]))
       }
     }
     .clipped()
