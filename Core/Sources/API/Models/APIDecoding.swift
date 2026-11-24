@@ -27,3 +27,15 @@ enum APIDateTime {
     return (try? withFraction.parse(string)) ?? (try? withoutFraction.parse(string))
   }
 }
+
+extension KeyedDecodingContainer {
+  /// 계약 `integer, minimum: n`(zod `.int().nonnegative()`·`.positive()`). 범위 밖이면 디코딩 실패
+  func decode(_ type: Int.Type, forKey key: Key, atLeast minimum: Int) throws -> Int {
+    let value = try decode(Int.self, forKey: key)
+    guard value >= minimum else {
+      throw DecodingError.dataCorruptedError(
+        forKey: key, in: self, debugDescription: "\(value) < \(minimum)")
+    }
+    return value
+  }
+}

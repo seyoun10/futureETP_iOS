@@ -15,6 +15,28 @@ struct ContractFixtureTests {
     #expect(!data.commodities.isEmpty)
     #expect(data.commodities.allSatisfy { !$0.contracts.isEmpty })
   }
+
+  @Test(arguments: ["disparityChart", "disparityChart.before"])
+  func disparityChart(_ fixture: String) async throws {
+    let data = try await decode(fixture, as: DisparityChart.self)
+    #expect(!data.bars.isEmpty)
+    #expect(zip(data.bars, data.bars.dropFirst()).allSatisfy { $0.tradeDate < $1.tradeDate })
+    #expect(data.distribution == nil || !data.rareLevels.isEmpty)
+  }
+
+  @Test(arguments: ["contractsChart", "contractsChart.before"])
+  func contractsChart(_ fixture: String) async throws {
+    let data = try await decode(fixture, as: ContractsChart.self)
+    #expect(!data.dates.isEmpty)
+    #expect(!data.contracts.isEmpty)
+  }
+
+  @Test(arguments: ["curve", "curve.baseDate"])
+  func curve(_ fixture: String) async throws {
+    let data = try await decode(fixture, as: Curve.self)
+    #expect(data.minBaseDate <= data.baseDate && data.baseDate <= data.maxBaseDate)
+    #expect(data.baseDate < data.compareDate)
+  }
 }
 
 /// 예시 파일 하나를 실제 디코딩 경로(봉투·`JSONDecoder.api()`)로 읽는다

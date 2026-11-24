@@ -38,4 +38,25 @@ struct ModelDecodingTests {
   @Test func unknownEnumValueFails() {
     #expect(throws: DecodingError.self) { try decode([MarketState].self, #"["HALTED"]"#) }
   }
+
+  @Test func contractsChartRejectsPricesLengthMismatch() throws {
+    let json = """
+      {"freshness":{"asOf":"2026-11-24T03:46:00Z","tradeDate":"2026-11-23","delayed":false,
+      "marketState":"OPEN","nextUpdateAt":null},"priceDecimals":1,"dates":["2026-11-20","2026-11-23"],
+      "hasMore":false,"provisional":false,"contracts":[{"symbol":"GCZ26","contractMonth":"2026-12",
+      "lastTradeDate":"2026-12-29","isFront":true,"prices":[1.0]}]}
+      """
+    #expect(throws: DecodingError.self) { try decode(ContractsChart.self, json) }
+  }
+
+  @Test(arguments: [-1, 0])
+  func curveRejectsNonPositiveBaseOffset(_ offset: Int) throws {
+    let json = """
+      {"freshness":{"asOf":"2026-11-24T03:46:00Z","tradeDate":"2026-11-23","delayed":false,
+      "marketState":"OPEN","nextUpdateAt":null},"priceDecimals":1,"baseDate":"2026-11-20",
+      "baseOffset":\(offset),"prevBaseDate":null,"nextBaseDate":null,"minBaseDate":"2010-01-04",
+      "maxBaseDate":"2026-11-20","compareDate":"2026-11-23","points":[],"current":null,"base":null}
+      """
+    #expect(throws: DecodingError.self) { try decode(Curve.self, json) }
+  }
 }

@@ -17,11 +17,7 @@ public struct CommoditySummary: Codable, Sendable, Equatable {
   public init(from decoder: any Decoder) throws {
     let container = try decoder.container(keyedBy: CodingKeys.self)
     code = try container.decode(CommodityCode.self, forKey: .code)
-    priceDecimals = try container.decode(Int.self, forKey: .priceDecimals)
-    guard priceDecimals >= 0 else {
-      throw DecodingError.dataCorruptedError(
-        forKey: .priceDecimals, in: container, debugDescription: "negative priceDecimals")
-    }
+    priceDecimals = try container.decode(Int.self, forKey: .priceDecimals, atLeast: 0)
     alert = try container.decode(Bool.self, forKey: .alert)
     contracts = try container.decode([ContractQuote].self, forKey: .contracts)
   }

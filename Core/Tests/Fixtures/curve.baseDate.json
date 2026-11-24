@@ -1,0 +1,120 @@
+{
+  "success": true,
+  "data": {
+    "freshness": {
+      "asOf": "2026-11-24T04:05:37.044Z",
+      "tradeDate": "2026-11-23",
+      "delayed": false,
+      "marketState": "SETTLEMENT_PENDING",
+      "nextUpdateAt": "2026-11-24T04:16:00.000Z"
+    },
+    "priceDecimals": 2,
+    "baseDate": "2020-04-20",
+    "baseOffset": 1658,
+    "prevBaseDate": "2020-04-17",
+    "nextBaseDate": "2020-04-21",
+    "minBaseDate": "2010-06-07",
+    "maxBaseDate": "2026-11-20",
+    "compareDate": "2020-04-21",
+    "points": [
+      {
+        "symbol": "CLK20",
+        "contractMonth": "2020-05",
+        "basePrice": -37.63,
+        "currentPrice": 10.01,
+        "changePct": null
+      },
+      {
+        "symbol": "CLM20",
+        "contractMonth": "2020-06",
+        "basePrice": 20.43,
+        "currentPrice": 11.57,
+        "changePct": -43.36759667156143
+      },
+      {
+        "symbol": "CLN20",
+        "contractMonth": "2020-07",
+        "basePrice": 26.28,
+        "currentPrice": 18.69,
+        "changePct": -28.881278538812783
+      },
+      {
+        "symbol": "CLQ20",
+        "contractMonth": "2020-08",
+        "basePrice": 28.51,
+        "currentPrice": 21.61,
+        "changePct": -24.202034373903903
+      },
+      {
+        "symbol": "CLU20",
+        "contractMonth": "2020-09",
+        "basePrice": 29.84,
+        "currentPrice": 23.43,
+        "changePct": -21.481233243967836
+      },
+      {
+        "symbol": "CLV20",
+        "contractMonth": "2020-10",
+        "basePrice": 30.81,
+        "currentPrice": 24.73,
+        "changePct": -19.733852645245044
+      },
+      {
+        "symbol": "CLX20",
+        "contractMonth": "2020-11",
+        "basePrice": 31.66,
+        "currentPrice": 25.86,
+        "changePct": -18.319646241313958
+      },
+      {
+        "symbol": "CLZ20",
+        "contractMonth": "2020-12",
+        "basePrice": 32.41,
+        "currentPrice": 26.86,
+        "changePct": -17.12434433816723
+      },
+      {
+        "symbol": "CLF21",
+        "contractMonth": "2021-01",
+        "basePrice": 33.02,
+        "currentPrice": 27.67,
+        "changePct": -16.202301635372507
+      },
+      {
+        "symbol": "CLG21",
+        "contractMonth": "2021-02",
+        "basePrice": 33.53,
+        "currentPrice": 28.39,
+        "changePct": -15.329555621831192
+      },
+      {
+        "symbol": "CLH21",
+        "contractMonth": "2021-03",
+        "basePrice": 33.98,
+        "currentPrice": 29.05,
+        "changePct": -14.508534432018827
+      },
+      {
+        "symbol": "CLJ21",
+        "contractMonth": "2021-04",
+        "basePrice": 34.35,
+        "currentPrice": 29.63,
+        "changePct": -13.740902474526939
+      }
+    ],
+    "current": {
+      "m1ContractMonth": "2020-06",
+      "m2ContractMonth": "2020-07",
+      "state": "CONTANGO",
+      "spreadPct": 61.53846153846154,
+      "rollYieldPct": -408.96358543417364
+    },
+    "base": {
+      "m1ContractMonth": "2020-06",
+      "m2ContractMonth": "2020-07",
+      "state": "CONTANGO",
+      "spreadPct": 28.634361233480178,
+      "rollYieldPct": -238.97058823529412
+    }
+  }
+}

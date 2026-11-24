@@ -15,6 +15,12 @@ DEVICE_ID=00000000-0000-4000-8000-000000000001
 FIXTURES=(
   "health /v1/health no"
   "commodities /v1/commodities yes"
+  "disparityChart /v1/commodities/GC/disparity?basis=FRONT&ma=20&window=Y3&levels=1,2.5,5,10,20 yes"
+  "disparityChart.before /v1/commodities/CL/disparity?basis=KR&ma=200&window=ALL&levels=1,2,5,10,20&before=2018-01-02 yes"
+  "contractsChart /v1/commodities/GC/contracts yes"
+  "contractsChart.before /v1/commodities/NG/contracts?before=2018-01-02 yes"
+  "curve /v1/commodities/GC/curve yes"
+  "curve.baseDate /v1/commodities/CL/curve?baseDate=2020-04-20 yes"
 )
 
 capture() {
