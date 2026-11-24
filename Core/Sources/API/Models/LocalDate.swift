@@ -34,6 +34,19 @@ public struct LocalDate: Hashable, Comparable, Sendable, CustomStringConvertible
     (lhs.year, lhs.month, lhs.day) < (rhs.year, rhs.month, rhs.day)
   }
 
+  /// `self`에서 `other`까지 달력 일수(`other`가 이르면 음수). 롤 수익률 만기 간격에 쓴다
+  public func days(to other: LocalDate) -> Int {
+    other.dayNumber - dayNumber
+  }
+
+  /// 그레고리력 일 번호(Julian Day Number). 두 날짜의 차이만 쓴다
+  private var dayNumber: Int {
+    let a = (14 - month) / 12
+    let y = year + 4800 - a
+    let m = month + 12 * a - 3
+    return day + (153 * m + 2) / 5 + 365 * y + y / 4 - y / 100 + y / 400 - 32045
+  }
+
   static func daysInMonth(year: Int, month: Int) -> Int {
     switch month {
     case 2: (year % 4 == 0 && year % 100 != 0) || year % 400 == 0 ? 29 : 28
