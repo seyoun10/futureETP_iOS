@@ -1,20 +1,21 @@
 # Architecture
 
 > Swift/SwiftUI 앱의 구조. API 규약·화면 동작은 원본(`../futureETP/docs/architecture.md`·`wireframes/screens.md`)을 따르고, 여기에는 이 앱의 구조와 대응만 적는다.
-> 디렉터리는 초안이다. 스캐폴딩(TODO 2단계) 때 실제 구조로 고친다.
+> 디렉터리는 2단계 스캐폴딩으로 만든 골격이다. 아직 없는 폴더는 해당 단계에서 만든다.
 
-## 디렉터리 구조 (초안)
+## 디렉터리 구조
 
 ```
-Project.swift / Tuist/          Tuist 프로젝트 정의(타깃·configuration·의존성, IOS-003). 생성물은 커밋 안 함
+Project.swift / Tuist.swift     Tuist 프로젝트 정의(타깃·configuration·scheme·의존성, IOS-003). 생성물은 커밋 안 함
 mise.toml                       Tuist 버전 고정
-Config/                         *.xcconfig(Debug-Dev·Release, Secrets.example)
-App/                            타깃 FutureETP: @main, 루트 내비게이션, 환경(설정·Locale) 주입. features·Core에 의존
+Config/                         Base·Debug-Dev·Release.xcconfig, Secrets.example(→ Secrets.xcconfig, 커밋 안 함)
+App/Sources, App/Resources      타깃 FutureETP: @main, 루트 내비게이션, 환경(설정·Locale) 주입, Assets(AppIcon·LaunchBackground). features·Core에 의존
 Features/                       feature마다 framework 타깃 하나. Core에만 의존
 ├─ CommodityList/               A
 ├─ Settings/                    B, B-a, B-b, 데이터 출처
 └─ Commodity/                   C: DisparityChart(C-a)·ContractChart(C-c)·Curve(C-b)·ETP(C-d, C-d-a)
 Core/                           framework 타깃 Core. 다른 타깃에 의존하지 않음
+├─ AppEnvironment.swift         변형·서버 주소·dev 토큰(Info.plist ← xcconfig)
 ├─ API/                         APIClient, AppError, 엔드포인트, Codable 모델, 조회 캐시
 ├─ Charts/                      차트·뷰포트
 ├─ UI/                          공용 View(ScreenHeader, FreshnessLine, QueryStateView, SegmentedControl)
@@ -31,7 +32,7 @@ docs/                           tech-stack, architecture, decisions
 규칙
 - 화면 → `@Observable` 모델(화면별 Model) → repository → API client 한 방향. 화면은 HTTP·저장소를 직접 부르지 않는다.
 - 화면 전용 코드는 해당 feature 안에, 두 곳 이상에서 쓰면 공용 계층(`core`)으로 옮긴다.
-- import 방향(RN D-041, 2026-11-19 lint로 강제): feature끼리 import하지 않는다(컴포넌트·헬퍼·조회도 다른 feature가 쓰면 `Core`로 옮긴다). `Core`는 features·`App`을 import하지 않고, features는 `App`(라우트)을 import하지 않는다. Tuist 타깃 의존성(App → features → Core)으로 컴파일러가 막는다(IOS-003).
+- import 방향(RN D-041, 2026-11-19 lint로 강제): feature끼리 import하지 않는다(컴포넌트·헬퍼·조회도 다른 feature가 쓰면 `Core`로 옮긴다). `Core`는 features·`App`을 import하지 않고, features는 `App`(라우트)을 import하지 않는다. Tuist 타깃 의존성(App → features → Core)만 선언하고, 선언 밖 import는 `tuist inspect dependencies --only implicit`가 실패로 잡는다(컴파일러는 같은 빌드 폴더의 framework를 막지 못한다, IOS-003).
 - RN에서 공용으로 옮긴 것: `SectionHeader`·`SettingsHeaderButton`(공용 UI), 에러 code → 사용자 문구 함수 `errorText`(API의 `AppError` 옆), ETP 정렬 기준 `ETP_SORTS`(util).
 - 월물 심볼은 서버 표준형(`CLZ26`)만 쓴다. 표시 표기(`DEC26`)는 포맷 함수가 만든다.
 

@@ -59,7 +59,7 @@ Swift/SwiftUI로 만드는 futureETP 앱(iOS). 기능·화면·동작은 RN 앱(
   - 응답 모델은 `../futureETP/packages/shared/contract/schemas/*.json`과 필드·nullable·enum 값을 맞춘다. 모델 생성 도구를 쓰면 이 파일을 입력으로 한다 (D-142)
 - 접근 키·installation ID는 Keychain(`Security` 프레임워크, 작은 래퍼 하나)에만 둔다. 앱 번들·저장소에 넣지 않는다. 예외는 dev 변형의 `DEV_API_TOKEN`뿐 (D-043, D-044)
 - dev 서버 주소·`DEV_API_TOKEN`은 `Config/Secrets.xcconfig`(커밋 안 함, `Secrets.example.xcconfig`만 커밋) → Info.plist 값으로 넣고, dev configuration에서만 읽는다
-- 프로젝트는 Tuist(`Project.swift`, 버전은 `mise.toml`)로 생성하고 생성물은 커밋하지 않는다. 타깃 App → features → Core 의존성으로 import 방향을 강제한다 (IOS-003)
+- 프로젝트는 Tuist(`Project.swift`, 버전은 `mise.toml`)로 생성하고 생성물은 커밋하지 않는다. 타깃 App → features → Core 의존성만 선언하고, 선언 밖 import는 `tuist inspect dependencies --only implicit`로 막는다 (IOS-003)
 - 변형: Tuist configuration `Debug-Dev`·`Release` + xcconfig. dev는 bundle ID `.dev` (D-043, D-052 대응)
 - 사용자에게 보이는 문구는 i18n 리소스로만 쓴다(ko 기준, en). String Catalog(`Localizable.xcstrings`, ko 기준·en). 권한 문구는 `InfoPlist.xcstrings` (D-033, D-073)
 - 시세 숫자·월물 표기(`2,405.1`·`+0.51%`·`DEC26`)는 언어와 상관없이 RN `../futureETP/apps/mobile/src/lib/formatNumber.ts` 규칙과 같게 만든다
@@ -78,12 +78,13 @@ Swift/SwiftUI로 만드는 futureETP 앱(iOS). 기능·화면·동작은 RN 앱(
 
 ## Commands
 
-스캐폴딩(TODO 2단계) 전이라 예정 명령이다. 프로젝트를 만든 뒤 실제 명령으로 고친다.
+`mise install`로 Tuist를 받은 뒤 `mise exec -- tuist …`(또는 mise activate한 셸에서 `tuist …`)로 쓴다. 시뮬레이터 기기는 `iPhone 18 Pro`(iOS 27.2).
 
-- `tuist generate`: 프로젝트 생성(빌드·테스트 전 먼저)
-- `xcodebuild -scheme FutureETP-Dev -destination 'platform=iOS Simulator,name=<기기>' build`: dev 변형 빌드
-- `xcodebuild test -scheme FutureETP-Dev -destination 'platform=iOS Simulator,name=<기기>'`: 전체 테스트. 단일: `-only-testing:<Target>/<Suite>/<test>`
-- `swift format lint --recursive --strict .`: lint(Xcode 동봉 swift-format)
+- `tuist generate --no-open`: 프로젝트 생성(빌드·테스트 전, `Project.swift` 변경 뒤 먼저)
+- `xcodebuild build -workspace FutureETP.xcworkspace -scheme FutureETP-Dev -destination 'platform=iOS Simulator,name=iPhone 18 Pro' -derivedDataPath build/dd`: dev 변형 빌드. prod는 `-scheme FutureETP`(Release)
+- `xcodebuild test -workspace FutureETP.xcworkspace -scheme FutureETP-Dev -destination 'platform=iOS Simulator,name=iPhone 18 Pro' -derivedDataPath build/dd`: 전체 테스트. 단일: `-only-testing:<Target>/<Suite>/<test>`
+- `tuist inspect dependencies --only implicit`: 선언하지 않은 타깃 import 검사(import 방향, IOS-003)
+- `swift format lint --recursive --strict .`: lint(Xcode 동봉 swift-format). 설정은 TODO 2단계에서 정한다
 - `swift format --in-place --recursive .`: 포맷 적용
-- `./scripts/check.sh`: lint → 빌드 → 테스트(스캐폴딩 때 만든다). 커밋 전 통과
-- dev 서버 실행은 `../futureETP`에서 `npm run dev -w apps/server`. 에뮬레이터는 `http://10.0.2.2:<port>`, iOS 시뮬레이터는 `http://localhost:<port>`
+- `./scripts/check.sh`: lint → 의존성 검사 → 빌드 → 테스트(TODO 2단계에서 만든다). 커밋 전 통과
+- dev 서버 실행은 `../futureETP`에서 `npm run dev -w apps/server`. iOS 시뮬레이터는 `http://localhost:3000`(기본값), 실기기는 `Config/Secrets.xcconfig`의 `API_BASE_URL`

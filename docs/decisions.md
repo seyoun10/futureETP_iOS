@@ -41,6 +41,7 @@
   - 변형: configuration `Debug-Dev`·`Release` + `Config/*.xcconfig`. dev bundle ID `.dev`.
   - 생성물(`*.xcodeproj`·`*.xcworkspace`·`Derived/`)은 커밋하지 않고 `tuist generate`로 만든다.
 - 근거: 프로젝트 정의가 Swift 코드라 편집·리뷰가 쉽고, 모듈 경계를 선언 한 곳에서 관리한다. 사용자가 (a) 추천 대신 (c)를 골랐다.
+- 보충(2026-11-24, 스캐폴딩): 같은 빌드 폴더에 framework가 모두 생겨 선언하지 않은 타깃도 import하면 컴파일된다(`CommodityList`에서 `import Settings`가 빌드 성공으로 확인). 그래서 import 방향은 컴파일러가 아니라 `tuist inspect dependencies --only implicit`(선언 밖 import를 찾으면 실패)로 막고, 검사 명령(`check`)에 넣는다. 화면 코드 타깃은 `SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor`, `Core`는 기본(nonisolated)이다. 경고는 모두 오류로 한다(D-128 대응).
 - 영향: 빌드·테스트 전에 `tuist generate`(또는 `tuist test`)가 필요하다. 2단계에서 CLAUDE.md Commands를 실제 명령으로 고친다. Tuist 버전을 올릴 때는 `mise.toml`만 바꾼다.
 
 ## IOS-004: 최소 배포 버전은 iOS 18이다

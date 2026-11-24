@@ -1,0 +1,11 @@
+// dev 변형 (D-043). dev 서버 주소·토큰은 Secrets.xcconfig(커밋 안 함)에서 덮어쓴다
+#include "Base.xcconfig"
+
+APP_BUNDLE_ID = io.github.seyoon.futureetp.dev
+APP_DISPLAY_NAME = futureETP Dev
+APP_VARIANT = development
+// xcconfig는 //를 주석으로 읽어 $()로 끊는다. 시뮬레이터는 Mac의 localhost에 닿는다
+API_BASE_URL = http:/$()/localhost:3000
+DEV_API_TOKEN =
+
+#include? "Secrets.xcconfig"

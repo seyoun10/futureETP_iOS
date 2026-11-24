@@ -22,9 +22,9 @@
 - [ ] 차트 방식은 2단계 뒤 C-a 스파이크(아래 4단계 첫 항목)로 정한다
 
 ## 2. 스캐폴딩
-- [ ] `brew install mise` → `mise install`(Tuist), `Project.swift`로 프로젝트 생성, 앱 ID `io.github.seyoon.futureetp`·dev `.dev` 두 변형, 앱 이름·아이콘(RN `apps/mobile/assets` 재사용)
 - [ ] lint·format·test 설정과 검사 명령 하나(`check`), CLAUDE.md Commands를 실제 명령으로 갱신
-  - import 방향 규칙(architecture.md "규칙")은 Tuist 타깃(App → features → Core) 의존성으로 컴파일러가 막는다 (IOS-003)
+  - import 방향 규칙(architecture.md "규칙")은 `tuist inspect dependencies --only implicit`로 검사한다. 컴파일러는 막지 못한다 (IOS-003 보충). redundant 검사는 App이 모든 feature를 import한 뒤 켠다
+  - swift-format 설정(`.swift-format`, 들여쓰기 폭 등). 지금 소스는 4칸이라 기본 설정(2칸)으로는 lint가 실패한다
 - [ ] dev 변형이 로컬 dev 서버 `GET /v1/health`를 부르는 최소 화면으로 연결 확인
 - [ ] (선택) 원격 저장소·CI(GitHub Actions에서 check)
 
