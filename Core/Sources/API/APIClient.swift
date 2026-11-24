@@ -149,7 +149,7 @@ public struct APIClient: Sendable {
   private func decode<Response: Decodable>(
     _ type: Response.Type, from data: Data, status: Int?, path: String
   ) throws -> Response {
-    let decoder = JSONDecoder()
+    let decoder = JSONDecoder.api()
     guard let head = try? decoder.decode(EnvelopeHead.self, from: data) else {
       // 프록시 오류(502 HTML 등)처럼 봉투가 아닌 응답은 HTTP 상태로 나눈다 (D-042)
       throw AppError(

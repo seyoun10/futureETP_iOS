@@ -85,6 +85,8 @@ let project = Project(
       bundleId: "io.github.seyoon.futureetp.coretests",
       deploymentTargets: deploymentTargets,
       sources: ["Core/Tests/**"],
+      // 계약 테스트 예시(dev 서버 응답, scripts/capture-fixtures.sh)
+      resources: ["Core/Tests/Fixtures/**"],
       dependencies: [.target(name: "Core")],
       settings: .settings(defaultSettings: defaultSettings)
     ),

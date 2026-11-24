@@ -69,3 +69,12 @@
 - 결정: SwiftUI, Observation, `NavigationStack`+`TabView`, `URLSession`+`Codable`, Keychain(`Security`), `UserDefaults`, String Catalog, APNs 직접, Swift Testing·XCUITest, swift-format(Xcode 동봉)은 후보대로. QR은 VisionKit `DataScannerViewController`, 햅틱은 SwiftUI `sensoryFeedback`. 외부 패키지는 쓰지 않는다. 차트는 C-a 스파이크 뒤 정한다.
 - 근거: QR은 `DataScannerViewController`가 카메라 세션·권한 화면·인식 영역을 맡아 AVFoundation 직접 구현보다 코드가 적고, iOS 16+·A12+라 iOS 18 대상(IOS-004)과 iPhone 14 Pro에서 된다. `sensoryFeedback`은 iOS 17+ SwiftUI 수정자라 UIKit 생성기를 감쌀 필요가 없다.
 - 영향: 시뮬레이터에는 카메라가 없어 QR은 실기기에서만 시험하고, 시뮬레이터에서는 붙여넣기로 B-b를 시험한다. `DataScannerViewController.isSupported`가 false면 붙여넣기만 보인다.
+
+## IOS-007: 응답 모델은 손으로 쓴 `Codable`이고 계약 예시는 원본 zod 스키마로 검증한다
+- 날짜: 2026-11-24
+- 상태: 확정
+- 맥락: TODO 3단계 응답 모델(D-142). 계약 `schemas/*.json`과 맞춘 모델과, 저장한 dev 서버 응답이 모델로 디코딩되고 스키마도 통과하는지 보는 계약 테스트가 필요하다.
+- 선택지: 모델 (a) 손으로 쓴 `Codable` (b) quicktype 등 생성 도구. 스키마 검증 (a) futureETP의 원본 zod 스키마를 Node로 실행 (b) Swift JSON Schema 패키지를 테스트 타깃에 추가 (c) ajv(futureETP에는 draft 2020-12를 못 읽는 6.x만 있음)
+- 결정: 모델은 (a). `Core/Sources/API/Models/`에 계약 이름별 파일로 두고, enum 문자열은 Swift enum, `date-time`은 `Date`(`JSONDecoder.api()`, `Z` UTC만), `date`는 `LocalDate`, `YYYY-MM`은 `ContractMonth`로 받는다. 검증은 (a). `scripts/capture-fixtures.sh`가 dev 서버 응답 봉투를 `Core/Tests/Fixtures/<스키마>[.<변형>].json`으로 저장하고, `scripts/validate-fixtures.mjs`(check.sh)가 원본 zod로, `ContractFixtureTests`가 `APIClient` 디코딩으로 같은 파일을 본다.
+- 근거: 스키마가 17개로 적고 생성 도구는 이름·enum·날짜 타입을 다시 손봐야 한다. JSON Schema는 zod에서 생성되므로 zod로 검증하면 같은 규칙에 refine까지 함께 보고, 외부 패키지를 쓰지 않는다(IOS-006).
+- 영향: check.sh가 `../futureETP`(`node_modules` 설치됨)와 Node를 필요로 한다(`FUTUREETP_DIR`로 위치 변경). nullable 필드는 synthesized `Decodable`이라 키가 빠져도 nil로 받는다(zod는 거절). 서버는 항상 키를 보내므로 런타임 디코딩은 이대로 두고, 키 누락은 예시 검증이 잡는다. 계약에 정수 범위(`minimum` 등)가 있으면 `init(from:)`에서 확인한다.

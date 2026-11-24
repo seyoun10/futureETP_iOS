@@ -16,7 +16,8 @@ Features/                       feature마다 framework 타깃 하나. Core에�
 └─ Commodity/                   C: DisparityChart(C-a)·ContractChart(C-c)·Curve(C-b)·ETP(C-d, C-d-a)
 Core/                           framework 타깃 Core. 다른 타깃에 의존하지 않음
 ├─ AppEnvironment.swift         변형·서버 주소·dev 토큰(Info.plist ← xcconfig)
-├─ API/                         APIClient, AppError, 엔드포인트, Codable 모델, 조회 캐시
+├─ API/                         APIClient, AppError, 엔드포인트, 조회 캐시
+│  └─ Models/                   계약 스키마별 Codable 모델, 도메인 enum, LocalDate·ContractMonth, JSONDecoder.api() (IOS-007)
 ├─ Charts/                      차트·뷰포트
 ├─ UI/                          공용 View(ScreenHeader, FreshnessLine, QueryStateView, SegmentedControl)
 ├─ Settings/                    기기 UI 설정(언어·등락 색)
@@ -24,7 +25,7 @@ Core/                           framework 타깃 Core. 다른 타깃에 의존�
 ├─ Push/                        APNs 등록, 알림 탭 이동
 ├─ Util/                        숫자·날짜 포맷, Keychain, 햅틱
 └─ Resources/                   Localizable.xcstrings, Assets(앱 타깃은 InfoPlist.xcstrings)
-*/Tests/                        타깃별 Swift Testing 테스트 타깃
+*/Tests/                        타깃별 Swift Testing 테스트 타깃. Core/Tests/Fixtures는 계약 예시(dev 서버 응답, IOS-007)
 FutureETPUITests/               XCUITest
 docs/                           tech-stack, architecture, decisions
 ```

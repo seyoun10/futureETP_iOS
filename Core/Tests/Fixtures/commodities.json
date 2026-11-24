@@ -1,0 +1,222 @@
+{
+  "success": true,
+  "data": {
+    "freshness": {
+      "asOf": "2026-11-02T10:05:27.328Z",
+      "tradeDate": "2026-11-23",
+      "delayed": false,
+      "marketState": "SETTLEMENT_PENDING",
+      "nextUpdateAt": "2026-11-24T03:46:00.000Z"
+    },
+    "commodities": [
+      {
+        "code": "GC",
+        "priceDecimals": 1,
+        "alert": false,
+        "contracts": [
+          {
+            "symbol": "GCZ26",
+            "contractMonth": "2026-12",
+            "price": 3898.9,
+            "change": null,
+            "changePct": null,
+            "noTrade": true,
+            "isFront": true
+          },
+          {
+            "symbol": "GCG27",
+            "contractMonth": "2027-02",
+            "price": 3930.9,
+            "change": null,
+            "changePct": null,
+            "noTrade": true,
+            "isFront": false
+          },
+          {
+            "symbol": "GCJ27",
+            "contractMonth": "2027-04",
+            "price": 3961.7,
+            "change": null,
+            "changePct": null,
+            "noTrade": true,
+            "isFront": false
+          },
+          {
+            "symbol": "GCM27",
+            "contractMonth": "2027-06",
+            "price": 3994.9,
+            "change": null,
+            "changePct": null,
+            "noTrade": true,
+            "isFront": false
+          },
+          {
+            "symbol": "GCQ27",
+            "contractMonth": "2027-08",
+            "price": 4167.1,
+            "change": null,
+            "changePct": null,
+            "noTrade": true,
+            "isFront": false
+          }
+        ]
+      },
+      {
+        "code": "SI",
+        "priceDecimals": 3,
+        "alert": false,
+        "contracts": [
+          {
+            "symbol": "SIZ26",
+            "contractMonth": "2026-12",
+            "price": 49.276,
+            "change": null,
+            "changePct": null,
+            "noTrade": true,
+            "isFront": true
+          },
+          {
+            "symbol": "SIH27",
+            "contractMonth": "2027-03",
+            "price": 49.883,
+            "change": null,
+            "changePct": null,
+            "noTrade": true,
+            "isFront": false
+          },
+          {
+            "symbol": "SIK27",
+            "contractMonth": "2027-05",
+            "price": 50.317,
+            "change": null,
+            "changePct": null,
+            "noTrade": true,
+            "isFront": false
+          },
+          {
+            "symbol": "SIN27",
+            "contractMonth": "2027-07",
+            "price": 50.743,
+            "change": null,
+            "changePct": null,
+            "noTrade": true,
+            "isFront": false
+          },
+          {
+            "symbol": "SIU27",
+            "contractMonth": "2027-09",
+            "price": 51.194,
+            "change": null,
+            "changePct": null,
+            "noTrade": true,
+            "isFront": false
+          }
+        ]
+      },
+      {
+        "code": "CL",
+        "priceDecimals": 2,
+        "alert": false,
+        "contracts": [
+          {
+            "symbol": "CLF27",
+            "contractMonth": "2027-01",
+            "price": 102.21,
+            "change": null,
+            "changePct": null,
+            "noTrade": true,
+            "isFront": false
+          },
+          {
+            "symbol": "CLG27",
+            "contractMonth": "2027-02",
+            "price": 99.94,
+            "change": null,
+            "changePct": null,
+            "noTrade": true,
+            "isFront": false
+          },
+          {
+            "symbol": "CLH27",
+            "contractMonth": "2027-03",
+            "price": 97.49,
+            "change": null,
+            "changePct": null,
+            "noTrade": true,
+            "isFront": false
+          },
+          {
+            "symbol": "CLJ27",
+            "contractMonth": "2027-04",
+            "price": 95.12,
+            "change": null,
+            "changePct": null,
+            "noTrade": true,
+            "isFront": false
+          },
+          {
+            "symbol": "CLK27",
+            "contractMonth": "2027-05",
+            "price": 92.96,
+            "change": null,
+            "changePct": null,
+            "noTrade": true,
+            "isFront": false
+          }
+        ]
+      },
+      {
+        "code": "NG",
+        "priceDecimals": 3,
+        "alert": false,
+        "contracts": [
+          {
+            "symbol": "NGZ26",
+            "contractMonth": "2026-12",
+            "price": 2.898,
+            "change": null,
+            "changePct": null,
+            "noTrade": true,
+            "isFront": true
+          },
+          {
+            "symbol": "NGF27",
+            "contractMonth": "2027-01",
+            "price": 3.371,
+            "change": null,
+            "changePct": null,
+            "noTrade": true,
+            "isFront": false
+          },
+          {
+            "symbol": "NGG27",
+            "contractMonth": "2027-02",
+            "price": 3.031,
+            "change": null,
+            "changePct": null,
+            "noTrade": true,
+            "isFront": false
+          },
+          {
+            "symbol": "NGH27",
+            "contractMonth": "2027-03",
+            "price": 2.405,
+            "change": null,
+            "changePct": null,
+            "noTrade": true,
+            "isFront": false
+          },
+          {
+            "symbol": "NGJ27",
+            "contractMonth": "2027-04",
+            "price": 2.358,
+            "change": null,
+            "changePct": null,
+            "noTrade": true,
+            "isFront": false
+          }
+        ]
+      }
+    ]
+  }
+}
