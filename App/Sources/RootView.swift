@@ -14,6 +14,7 @@ struct RootView: View {
   let environment: AppEnvironment
   let keys: AccessKeyStore
   let client: APIClient
+  let queryCache: QueryCache
   @State private var path: [Route] = []
 
   var body: some View {
@@ -38,8 +39,10 @@ struct RootView: View {
     }
   }
 
-  // 저장 뒤 옛 키로 실패한 조회 다시 불러오기는 repository 캐시가 생기면 onSaved로 넣는다
+  // 저장 뒤 옛 키로 실패한 조회를 다시 불러온다. 보이는 화면만 바로, 나머지는 다음 진입 때 (D-044)
   private var accessKey: some View {
-    AccessKeyView(store: keys, verifier: LiveAccessKeyVerifier(client: client))
+    AccessKeyView(
+      store: keys, verifier: LiveAccessKeyVerifier(client: client),
+      onSaved: { queryCache.invalidate() })
   }
 }

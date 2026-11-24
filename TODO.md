@@ -29,7 +29,8 @@
 - [ ] i18n ko/en, 앱 안 언어 설정을 서버 기기 설정과 맞춤 (D-033, D-073, D-137)
   - 문구 카탈로그는 RN 리소스에서 생성(`scripts/gen-strings.mjs`, 2026-11-24), `{{name}}` 자리 표시자 helper `L10n`(2026-11-24). 남음: 앱 안 언어 선택을 화면 문구에 적용(루트에 `\.locale` 주입, `L10n`은 `\.locale`을 받는다)(값 저장은 `DisplaySettings.language`, 2026-11-24)·서버 기기 설정과 맞춤
 - [ ] 공용 조회 UI: 기준 시각 줄(freshness)·로딩/오류/빈 상태 분기·`nextUpdateAt` + 1분 자동 새로고침·앱 복귀 재조회·접근 키 저장 뒤 전체 재조회(`AccessKeyView` `onSaved`, 기다리지 않음) (D-048, D-075, D-044)
-  - View 완료(2026-11-24): `FooterLine`·`FreshnessLine`(`FooterTime`)·`QueryStateView`(`QueryState.phase`)·`LoadingView`·`CenterSpinner`·`ErrorView`. 남음: 조회 캐시(repository가 `QueryState`를 만든다)·자동 새로고침·앱 복귀 재조회·키 저장 뒤 재조회, 기준 시각 줄을 홈 인디케이터 여백에 겹치는 배치(RN `FooterLine`, 화면이 생기면 기기 확인)
+  - View 완료(2026-11-24): `FooterLine`·`FreshnessLine`(`FooterTime`)·`QueryStateView`(`QueryState.phase`)·`LoadingView`·`CenterSpinner`·`ErrorView`
+  - 조회 캐시 완료(2026-11-24): `QueryCache`(키 접두사 무효화·`keepFor` 5분/차트 1시간)·`Query`(진행 중 조회 합류·`StalePolicy.untilNextUpdate`)·`.queryLifecycle`(진입·앱 복귀 재조회·`nextUpdateAt` + 1분 자동 새로고침)·키 저장 뒤 전체 무효화. 남음: 무한 조회(`before`, C-a·C-c에서), 기준 시각 줄을 홈 인디케이터 여백에 겹치는 배치·화면에서 기기 확인(A 화면에서)
 - [ ] 앱 실행 때 시간대 PATCH (D-084), 세로 잠금·[⟲] 가로 전환 (D-076)
 
 ## 4. 화면 수직 슬라이스 (RN 순서)

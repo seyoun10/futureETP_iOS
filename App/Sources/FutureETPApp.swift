@@ -8,6 +8,8 @@ struct FutureETPApp: App {
   @State private var keys: AccessKeyStore
   @State private var displaySettings = DisplaySettings()
   private let client: APIClient
+  /// 서버 응답 메모리 캐시. 앱 하나에 하나 (D-030)
+  private let queryCache = QueryCache()
 
   init() {
     guard let environment = AppEnvironment(infoDictionary: Bundle.main.infoDictionary ?? [:]) else {
@@ -29,7 +31,7 @@ struct FutureETPApp: App {
 
   var body: some Scene {
     WindowGroup {
-      RootView(environment: environment, keys: keys, client: client)
+      RootView(environment: environment, keys: keys, client: client, queryCache: queryCache)
         .environment(displaySettings)
         // 다크 전용 테마(D-031)
         .preferredColorScheme(.dark)

@@ -50,6 +50,7 @@ MVVM + repository (IOS-005). Clean Architecture의 UseCase·Entity 계층은 두
 | API client | 헤더, 타임아웃, 봉투 디코딩, `AppError`, 재시도 | 캐시 |
 
 - 캐시 규칙은 RN과 같다: C 차트 조회는 `staleTime`을 `nextUpdateAt`까지, `gcTime` 1시간. C-a·C-c는 3년(756거래일) 단위로 받고 가장 과거 봉이 보이면 이전 3년을 더 받는다(D-104). 커브는 캐시하지 않는다(D-046).
+- 구현: `Core/API/QueryCache`가 키(`[String]`)마다 `Query`를 하나 둔다. repository가 `cache.query(key, stalePolicy:, fetch:)`로 `Query`를 내주고, 화면 Model은 `query.state`(`QueryState`)를 읽고, 화면은 `.queryLifecycle(query)`로 진입·앱 복귀 재조회와 자동 새로고침을 건다. 재시도·`UNAUTHORIZED` 처리는 `APIClient` 몫이다
 
 ## RN 구조 대응
 
