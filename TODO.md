@@ -67,6 +67,7 @@
   - 선형 축 화면 확인 완료(2026-11-24): C-c는 지금 월물 5개만 그려 CLK20 음수(2020-04)는 나오지 않는다. 대신 CLH27·CLJ27·CLK27의 2018-11-05 정산가 0이 든 페이지를 받으면 받은 전체 값 기준으로 선형 축(0~60)이 된다(RN `LinesChart`와 같다). 같이 고침: 상세 박스를 범례·정보 줄·최신 버튼 위에 그린다(C-a·C-c, RN 순서)
 - [ ] C-b 월물커브: `GET /v1/commodities/:code/curve?baseDate`, 기준일 OS 날짜 피커, 이전·다음 기준일, 변화율 라벨 배치, 롤 수익률 (D-090, D-091, D-114~D-123)
   - 1단계 조회 완료(2026-11-24): `CurveRepository`·`QueryCache.curve`(키 `QueryKeys.curve`, 기준일마다, nil은 `"latest"`, 차트 캐시 1시간·`nextUpdateAt`까지 새것)·`CommodityQueries.curve`. 기준일을 옮기는 동안 이전 커브 유지(RN `keepPreviousData`)는 화면 모델에서
+  - 2단계 좌표·표기 완료(2026-11-24): `CurveLayout`(월물 라벨 간격·가까운 칸·변화율 라벨 겹침 없이 배치·선 피하기, RN `curveLayout.ts`)·`CurveFormat`(기준일 `YYYY/MM/DD`·범례 날짜·요일·변화율 소수 첫째 자리·롤 수익률 줄). 눈금은 `AxisTicks.linear`(RN `niceTicks`와 같은 값)
 - [ ] C-d ETP 목록(필터·정렬은 앱에서)·C-d-a 상세 (D-017)
 - [ ] B 설정·B-a 알림 설정: 낙관적 PATCH, rare-level 입력 검증, 알림 대상 없음 빨간 점 (D-081~D-083, D-124)
 - [ ] 화면별 세부 동작은 `../futureETP/docs/wireframes/screens.md`와 하나씩 대조
