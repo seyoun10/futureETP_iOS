@@ -46,12 +46,14 @@ private let deviceID = "00000000-0000-4000-8000-000000000001"
 private let ok = #"{"success":true,"data":{"price":1.5}}"#
 
 private func client(
-  _ transport: FakeTransport, token: String? = "dev-token", timeout: Duration = .seconds(15)
+  _ transport: FakeTransport, token: String? = "dev-token", timeout: Duration = .seconds(15),
+  onRejected: @escaping @Sendable () async -> Void = {}
 ) -> APIClient {
   APIClient(
     baseURL: URL(string: "http://api.test")!,
     accessToken: { token },
     deviceID: { deviceID },
+    onRejected: onRejected,
     transport: { try await transport.handle($0) },
     timeout: timeout,
     retryDelay: { _ in .zero }
@@ -67,7 +69,40 @@ private func appError(_ body: () async throws -> Void) async -> AppError? {
   }
 }
 
+/// `onRejected` 호출 횟수
+private actor Counter {
+  private(set) var value = 0
+  func increment() { value += 1 }
+}
+
+private let unauthorized = #"{"success":false,"error":{"code":"UNAUTHORIZED","message":"bad"}}"#
+
 struct APIClientTests {
+  @Test func storedKeyRejectionIsReported() async {
+    let counter = Counter()
+    let transport = FakeTransport([.body(401, unauthorized)])
+    let error = await appError {
+      _ = try await client(transport, onRejected: { await counter.increment() })
+        .send(APIRequest("/settings", as: Price.self))
+    }
+    #expect(error?.code == .unauthorized)
+    #expect(await counter.value == 1)
+  }
+
+  @Test func newKeyCheckAndMissingKeyAreNotReported() async {
+    let counter = Counter()
+    let transport = FakeTransport([.body(401, unauthorized)])
+    _ = await appError {
+      _ = try await client(transport, onRejected: { await counter.increment() })
+        .send(APIRequest("/settings", token: "new", as: Price.self))
+    }
+    _ = await appError {
+      _ = try await client(transport, token: nil, onRejected: { await counter.increment() })
+        .send(APIRequest("/settings", as: Price.self))
+    }
+    #expect(await counter.value == 0)
+  }
+
   @Test func returnsDataWithHeadersAndQuery() async throws {
     let transport = FakeTransport([.body(200, ok)])
     let price = try await client(transport).send(

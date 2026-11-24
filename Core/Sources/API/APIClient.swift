@@ -46,6 +46,7 @@ public struct APIClient: Sendable {
   private let baseURL: URL
   private let accessToken: @Sendable () async -> String?
   private let deviceID: @Sendable () async -> String
+  private let onRejected: @Sendable () async -> Void
   private let transport: Transport
   private let timeout: Duration
   private let retryDelay: @Sendable (_ attempt: Int) -> Duration
@@ -53,12 +54,15 @@ public struct APIClient: Sendable {
   /// - Parameters:
   ///   - accessToken: 저장된 접근 키. 없으면 nil
   ///   - deviceID: installation ID (D-120)
+  ///   - onRejected: 저장된 키로 보낸 요청을 서버가 `UNAUTHORIZED`로 거절함. 앱 루트가 B-b로 보낸다 (D-079).
+  ///     `APIRequest.token`으로 보낸 새 키 확인은 알리지 않는다(B-b 안의 오류 줄로만 보인다)
   ///   - timeout: 요청 하나의 전체 시간 제한. 기본 15초
   ///   - retryDelay: n번째 재시도 전 대기. 기본은 TanStack Query와 같이 1초, 2초
   public init(
     baseURL: URL,
     accessToken: @escaping @Sendable () async -> String?,
     deviceID: @escaping @Sendable () async -> String,
+    onRejected: @escaping @Sendable () async -> Void = {},
     transport: @escaping Transport = { try await URLSession.shared.data(for: $0) },
     timeout: Duration = .seconds(15),
     retryDelay: @escaping @Sendable (_ attempt: Int) -> Duration = {
@@ -68,6 +72,7 @@ public struct APIClient: Sendable {
     self.baseURL = baseURL
     self.accessToken = accessToken
     self.deviceID = deviceID
+    self.onRejected = onRejected
     self.transport = transport
     self.timeout = timeout
     self.retryDelay = retryDelay
@@ -80,6 +85,12 @@ public struct APIClient: Sendable {
     while true {
       do {
         return try await sendOnce(request)
+      } catch let error as AppError
+        where error.code == .unauthorized && error.status != nil && request.token == nil
+      {
+        // 키가 없어 보내지 않은 요청(status nil)은 거절이 아니다
+        await onRejected()
+        throw error
       } catch let error as AppError where error.isRetryable && attempt < maxRetries {
         attempt += 1
         try await Task.sleep(for: retryDelay(attempt))
