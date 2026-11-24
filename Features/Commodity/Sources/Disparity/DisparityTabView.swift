@@ -101,13 +101,6 @@ private struct DisparityChartView: View {
             )
             ChartGestureSurface { model.handle($0, width: plotWidth) }
               .accessibilityIdentifier("disparityChart")
-            if let index = view.crosshairIndex {
-              detail(
-                index: index, viewport: view.viewport,
-                plot: CGSize(
-                  width: plotWidth,
-                  height: max(geometry.size.height - ChartLayout.xLabelHeight, 1)))
-            }
             DisparityInfoLines(
               code: code, requestedBasis: requestedBasis, data: data, chart: chart,
               visible: view.viewport.visibleIndices, onHeight: { infoHeight = $0 }
@@ -116,6 +109,14 @@ private struct DisparityChartView: View {
             if view.showsReset {
               ChartResetButton { model.view?.resetView() }
                 .padding(.bottom, ChartLayout.xLabelHeight + Theme.Spacing.xs)
+            }
+            // 상세 박스는 정보 줄·최신 버튼 위에 그린다(RN `CandleChart` 순서)
+            if let index = view.crosshairIndex {
+              detail(
+                index: index, viewport: view.viewport,
+                plot: CGSize(
+                  width: plotWidth,
+                  height: max(geometry.size.height - ChartLayout.xLabelHeight, 1)))
             }
             if model.older.isLoading {
               OlderDataIndicator()

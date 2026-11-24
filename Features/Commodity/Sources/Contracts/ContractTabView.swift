@@ -60,19 +60,20 @@ private struct ContractChartView: View {
             )
             ChartGestureSurface { model.handle($0, width: plotWidth) }
               .accessibilityIdentifier("contractChart")
-            if let index = view.crosshairIndex {
-              detail(
-                index: index, viewport: view.viewport,
-                plot: CGSize(
-                  width: plotWidth,
-                  height: max(geometry.size.height - ChartLayout.xLabelHeight, 1)))
-            }
             ContractLegend(chart: chart)
               .onGeometryChange(for: CGFloat.self, of: \.size.height) { legendHeight = $0 }
               .frame(maxHeight: .infinity, alignment: .top)
             if view.showsReset {
               ChartResetButton { model.view?.resetView() }
                 .padding(.bottom, ChartLayout.xLabelHeight + Theme.Spacing.xs)
+            }
+            // 상세 박스는 범례·최신 버튼 위에 그린다(RN `LinesChart` 순서)
+            if let index = view.crosshairIndex {
+              detail(
+                index: index, viewport: view.viewport,
+                plot: CGSize(
+                  width: plotWidth,
+                  height: max(geometry.size.height - ChartLayout.xLabelHeight, 1)))
             }
             if model.older.isLoading {
               OlderDataIndicator()

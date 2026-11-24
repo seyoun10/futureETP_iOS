@@ -64,7 +64,7 @@
   - 2단계 계열 모델 완료(2026-11-24): `ContractChartModel`(만기순 선 색·날짜별 위·아래 끝·너비용 라벨·범례 ●·보이는 범위 끝값 라벨 D-093·양끝 월물 연환산 롤 수익률), `LocalDate.days(to:)`
   - 3단계 선 차트·탭 화면 완료(2026-11-24): `CandleSeries(lines:high:low:)`(봉 없는 선 계열, 십자선 가격은 그날 값이 있는 첫 선)·`PriceScale` 선형 축(0 이하 값, D-113)을 `CanvasCandleChart`로 그림, `ContractTabView`·`ContractScreenModel`(기간 C-a와 따로·이전 3년 받기·과거 날짜가 앞에 붙으면 범위 유지), 범례 오버레이(`LegendLine`·`CenteredFlowLayout`, 대표월물 ● 회색), y축 끝값 라벨(보이는 범위 끝값, 선 색). 시뮬레이터에서 NG 선·범례·끝값·십자선 확인
   - 4단계 십자선 상세 박스 완료(2026-11-24): `ContractDetail`(날짜·마지막 날 잠정·값이 있는 월물별 가격 선 색·대표월물 ●·양끝 롤 수익률 `/년`), `DetailRow.Cell.mark`(이름 뒤 회색 표식), `PlacedDetailBox`로 범례 아래 덜 가리는 귀퉁이. 시뮬레이터에서 NG 상세 박스 확인
-  - 남음: 0 이하 값(CL 2020-04) 선형 축 화면 확인
+  - 선형 축 화면 확인 완료(2026-11-24): C-c는 지금 월물 5개만 그려 CLK20 음수(2020-04)는 나오지 않는다. 대신 CLH27·CLJ27·CLK27의 2018-11-05 정산가 0이 든 페이지를 받으면 받은 전체 값 기준으로 선형 축(0~60)이 된다(RN `LinesChart`와 같다). 같이 고침: 상세 박스를 범례·정보 줄·최신 버튼 위에 그린다(C-a·C-c, RN 순서)
 - [ ] C-b 월물커브: `GET /v1/commodities/:code/curve?baseDate`, 기준일 OS 날짜 피커, 이전·다음 기준일, 변화율 라벨 배치, 롤 수익률 (D-090, D-091, D-114~D-123)
 - [ ] C-d ETP 목록(필터·정렬은 앱에서)·C-d-a 상세 (D-017)
 - [ ] B 설정·B-a 알림 설정: 낙관적 PATCH, rare-level 입력 검증, 알림 대상 없음 빨간 점 (D-081~D-083, D-124)
