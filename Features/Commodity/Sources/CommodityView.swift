@@ -86,6 +86,9 @@ public struct CommodityView: View {
     case .contracts:
       ContractTabView(code: code, queries: queries)
         .accessibilityIdentifier("commodityTab-\(tab.rawValue)")
+    case .curve:
+      CurveTabView(code: code, queries: queries)
+        .accessibilityIdentifier("commodityTab-\(tab.rawValue)")
     default:
       // 남은 탭 화면은 4단계에서 하나씩 채운다
       Color.clear

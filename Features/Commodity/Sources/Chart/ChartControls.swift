@@ -67,6 +67,8 @@ struct PeriodChips: View {
 /// 차트 하단 가운데 [↻] 되돌리기(restore 모양, 새로고침과 구분). 드래그·핀치로 바꾼 범위를 고른 기간의 최근 위치로
 /// 되돌린다 (screens.md C-a 기간과 제스처, RN `charts/ChartResetButton.tsx`)
 struct ChartResetButton: View {
+  /// C-b는 기준일을 최근 거래일로 되돌린다
+  var label: LocalizedStringKey = "chart.resetView"
   let action: () -> Void
   @State private var taps = 0
 
@@ -85,7 +87,7 @@ struct ChartResetButton: View {
         .contentShape(.circle.inset(by: -Theme.Spacing.sm))
     }
     .buttonStyle(.plain)
-    .accessibilityLabel(Text("chart.resetView"))
+    .accessibilityLabel(Text(label))
     .accessibilityIdentifier("chartReset")
     .sensoryFeedback(.selection, trigger: taps)
   }
