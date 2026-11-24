@@ -4,6 +4,7 @@ import SwiftUI
 
 @main
 struct FutureETPApp: App {
+  @UIApplicationDelegateAdaptor private var appDelegate: AppDelegate
   private let environment: AppEnvironment
   @State private var keys: AccessKeyStore
   @State private var displaySettings = DisplaySettings()
@@ -41,6 +42,8 @@ struct FutureETPApp: App {
         settings: settings
       )
       .environment(displaySettings)
+      // 가로 레이아웃은 잠금 상태가 아니라 창 모양으로 정한다 (D-076)
+      .providesIsLandscape()
       // 앱 안 언어 설정을 화면 문구에 적용한다 (D-033, D-073)
       .environment(\.locale, displaySettings.locale)
       // 다크 전용 테마(D-031)
