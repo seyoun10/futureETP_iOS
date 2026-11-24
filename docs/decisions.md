@@ -42,3 +42,12 @@
   - 생성물(`*.xcodeproj`·`*.xcworkspace`·`Derived/`)은 커밋하지 않고 `tuist generate`로 만든다.
 - 근거: 프로젝트 정의가 Swift 코드라 편집·리뷰가 쉽고, 모듈 경계를 선언 한 곳에서 관리한다. 사용자가 (a) 추천 대신 (c)를 골랐다.
 - 영향: 빌드·테스트 전에 `tuist generate`(또는 `tuist test`)가 필요하다. 2단계에서 CLAUDE.md Commands를 실제 명령으로 고친다. Tuist 버전을 올릴 때는 `mise.toml`만 바꾼다.
+
+## IOS-004: 최소 배포 버전은 iOS 18이다
+- 날짜: 2026-11-24
+- 상태: 확정 (사용자 선택)
+- 맥락: 최신은 iOS 27(2026-09 출시)이고 개인 기기 iPhone 14 Pro도 iOS 27을 지원한다(Apple, 2026-06-08 발표).
+- 선택지: (a) iOS 27(N) (b) iOS 26(N-1) (c) iOS 18(N-2)
+- 결정: (c) iOS 18. 테스트는 설치된 iOS 27.2 시뮬레이터로 하고, iOS 18 런타임은 필요해질 때 설치한다.
+- 근거: 사용자가 보편적인 하위 호환 범위를 골랐다. 반대 의견: 사용자 1명·기기 1대라 하위 호환 이점이 작고, iOS 26·27 전용 API를 쓰려면 `#available` 분기가 생긴다(추천은 (a)였다).
+- 영향: `@Observable`(17+)·`sensoryFeedback`(17+)·Swift Charts·VisionKit `DataScannerViewController`(16+)는 분기 없이 쓴다. iOS 26 이상 전용 API(Liquid Glass 계열 등)는 iOS 18 대안을 먼저 쓰고, 꼭 필요하면 `#available`로 감싼다. 18에서 동작은 실기기·18 런타임으로 확인하지 않는 한 보장하지 않는다.
