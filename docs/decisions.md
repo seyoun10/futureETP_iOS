@@ -51,3 +51,12 @@
 - 결정: (c) iOS 18. 테스트는 설치된 iOS 27.2 시뮬레이터로 하고, iOS 18 런타임은 필요해질 때 설치한다.
 - 근거: 사용자가 보편적인 하위 호환 범위를 골랐다. 반대 의견: 사용자 1명·기기 1대라 하위 호환 이점이 작고, iOS 26·27 전용 API를 쓰려면 `#available` 분기가 생긴다(추천은 (a)였다).
 - 영향: `@Observable`(17+)·`sensoryFeedback`(17+)·Swift Charts·VisionKit `DataScannerViewController`(16+)는 분기 없이 쓴다. iOS 26 이상 전용 API(Liquid Glass 계열 등)는 iOS 18 대안을 먼저 쓰고, 꼭 필요하면 `#available`로 감싼다. 18에서 동작은 실기기·18 런타임으로 확인하지 않는 한 보장하지 않는다.
+
+## IOS-005: 아키텍처는 MVVM + repository이고 Clean Architecture 계층은 두지 않는다
+- 날짜: 2026-11-24
+- 상태: 확정 (사용자 선택)
+- 맥락: MVVM·Clean Architecture 적용 여부. 기존 설계는 View → `@Observable` 화면 Model → repository → API client였다.
+- 선택지: (a) MVVM + repository (b) Clean Architecture 전체(Presentation·Domain(Entity·UseCase·Repository protocol)·Data(DTO·구현)) (c) MVVM + Domain 모듈만 분리
+- 결정: (a). 화면 `@Observable` 타입이 ViewModel 역할이고 이름은 `<Screen>Model`(예: `CommodityListModel`)로 쓴다. repository는 protocol과 구현으로 나눠 테스트에서 가짜로 바꾼다. 응답 `Codable` 모델을 화면까지 그대로 쓰고 Entity로 다시 매핑하지 않는다.
+- 근거: 앱은 계산하지 않고 서버 값을 표시만 해서 UseCase는 대부분 값을 넘기기만 하고 DTO↔Entity 매핑만 늘어난다. RN 구조(D-041: 화면 → 훅 → 조회 → API)와 1:1로 대응해 원본 변경을 따라가기 쉽다. 의존 방향은 Tuist 타깃(IOS-003)이 강제한다.
+- 영향: 로직이 있는 곳(낙관적 PATCH, rare 레벨 입력 검증, 무한 조회)은 화면 Model 또는 repository에 둔다. 한 로직을 두 화면 이상이 쓰면 `Core`로 옮긴다.

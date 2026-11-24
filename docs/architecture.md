@@ -37,10 +37,12 @@ docs/                           tech-stack, architecture, decisions
 
 ## 레이어
 
+MVVM + repository (IOS-005). Clean Architecture의 UseCase·Entity 계층은 두지 않는다.
+
 | 계층 | 맡는 것 | 하지 않는 것 |
 |---|---|---|
 | 화면(SwiftUI View) | 그리기, 사용자 입력, 상태 구독 | HTTP, 저장소, 계산 |
-| 상태(`@Observable` 모델(화면별 Model)) | 화면 상태(로딩·데이터·오류), 사용자 동작 처리, 자동 새로고침 타이머 | HTTP 세부 |
+| 상태(`@Observable` 화면 Model = ViewModel, `<Screen>Model`) | 화면 상태(로딩·데이터·오류), 사용자 동작 처리, 자동 새로고침 타이머 | HTTP 세부 |
 | repository | 조회 캐시(staleTime·gcTime), 무한 조회(`before`·`hasMore`), 낙관적 PATCH | 화면 문구 |
 | API client | 헤더, 타임아웃, 봉투 디코딩, `AppError`, 재시도 | 캐시 |
 

@@ -49,7 +49,7 @@ Swift/SwiftUI로 만드는 futureETP 앱(iOS). 기능·화면·동작은 RN 앱(
 상세는 `docs/architecture.md`, 스택은 `docs/tech-stack.md`.
 
 - 언어: Swift 6(strict concurrency)
-- 레이어: SwiftUI View → `@Observable` 모델(화면별 Model) → repository(조회·캐시) → API client. 화면에서 HTTP를 직접 부르지 않는다 (D-041 대응)
+- 레이어(MVVM + repository, IOS-005): SwiftUI View → `@Observable` 화면 Model(ViewModel, `<Screen>Model`) → repository(protocol, 조회·캐시) → API client. UseCase·Entity 계층은 두지 않는다. 화면에서 HTTP를 직접 부르지 않는다 (D-041 대응)
 - 앱은 계산하지 않는다. 서버 값을 표시만 한다(포맷·반올림 표시는 예외)
 - API
   - 기본 경로 `<서버>/v1`. `/v1/health` 밖 모든 요청에 `Authorization: Bearer <접근 키>`와 `X-Device-Id: <installation ID>` (D-036, D-120)
