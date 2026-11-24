@@ -50,6 +50,29 @@ struct ContractFixtureTests {
     let data = try await decode(fixture, as: ETPDetail.self)
     #expect(!data.series.isEmpty)
   }
+
+  @Test func calendar() async throws {
+    let data = try await decode("calendar", as: MarketCalendar.self)
+    #expect(data.missing.isEmpty)
+    #expect(Set(data.exceptions.map(\.kind)) == Set(CalendarExceptionKind.allCases))
+    #expect(data.exceptions.allSatisfy { data.from <= $0.date && $0.date <= data.to })
+    #expect(data.exceptions.allSatisfy { ($0.kind == .closed) == ($0.at == nil) })
+  }
+
+  @Test func calendarMissing() async throws {
+    let data = try await decode("calendar.missing", as: MarketCalendar.self)
+    #expect(!data.missing.isEmpty)
+  }
+
+  @Test func settings() async throws {
+    let data = try await decode("settings", as: AppSettings.self)
+    #expect(data.rareLevels == data.rareLevels.sorted())
+  }
+
+  @Test func device() async throws {
+    let data = try await decode("device", as: Device.self)
+    #expect(data.id == UUID(uuidString: "00000000-0000-4000-8000-000000000001"))
+  }
 }
 
 /// 예시 파일 하나를 실제 디코딩 경로(봉투·`JSONDecoder.api()`)로 읽는다

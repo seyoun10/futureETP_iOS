@@ -29,7 +29,8 @@
   - [x] 장치: 도메인 enum·`Freshness`·`LocalDate`·`ContractMonth`·`JSONDecoder.api()`, 예시 저장 `scripts/capture-fixtures.sh`·zod 검증 `scripts/validate-fixtures.mjs`(check.sh)·`ContractFixtureTests`, `health`·`commodities`(2026-11-24)
   - [x] `disparityChart`·`contractsChart`·`curve`(`before`·`baseDate` 변형 예시 포함, 2026-11-24)
   - [x] `etpList`·`etpDetail`(KRX ETN·US ETF 예시, 2026-11-24)
-  - [ ] `calendar`·`settings`·`device`, 요청 본문·query(`settingsPatch`·`deviceRegistration`·`*Query`) 인코딩
+  - [x] `calendar`·`settings`·`device`(missing 빈·찬 달력, 2026-11-24)
+  - [ ] 요청 본문·query(`settingsPatch`·`deviceRegistration`·`*Query`) 인코딩
 - [ ] installation ID(첫 실행 UUID) 생성·보안 저장소 보관 (D-120)
 - [ ] 접근 키 B-b: 붙여넣기·QR(`futureetp-key:v1:` 접두사), `GET /v1/settings`로 확인 뒤 저장, 키 없으면 첫 화면이 B-b, `UNAUTHORIZED`면 어느 화면에서든 B-b + 거절 줄 (D-044, D-077~D-079)
 - [ ] i18n ko/en, 앱 안 언어 설정을 서버 기기 설정과 맞춤 (D-033, D-073, D-137)

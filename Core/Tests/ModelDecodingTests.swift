@@ -59,4 +59,31 @@ struct ModelDecodingTests {
       """
     #expect(throws: DecodingError.self) { try decode(Curve.self, json) }
   }
+
+  private func settingsJSON(rareLevels: String, quietTime: String) -> String {
+    """
+    {"locale":"en","timezone":"America/Chicago","basis":"US","maPeriod":20,"window":"ALL",
+    "rareLevels":\(rareLevels),"alertCommodity":"CL","quietTime":\(quietTime)}
+    """
+  }
+
+  @Test func settingsDecodesQuietTimeAcrossMidnight() throws {
+    let json = settingsJSON(
+      rareLevels: "[0.5,1,2.5,8,49.9]", quietTime: #"{"startMin":1380,"endMin":420}"#)
+    let settings = try decode(AppSettings.self, json)
+    #expect(settings.quietTime == QuietTime(startMin: 1380, endMin: 420))
+    #expect(settings.alertCommodity == .cl)
+  }
+
+  @Test(arguments: ["[1,2,4,8]", "[1,2,4,8,16,32]"])
+  func settingsRejectsRareLevelCount(_ levels: String) throws {
+    let json = settingsJSON(rareLevels: levels, quietTime: "null")
+    #expect(throws: DecodingError.self) { try decode(AppSettings.self, json) }
+  }
+
+  @Test(arguments: ["9:00", "09:00:00", "0900"])
+  func calendarExceptionRejectsMalformedTime(_ at: String) throws {
+    let json = #"{"market":"KRX","date":"2026-11-19","kind":"LATE_OPEN","at":"\#(at)","note":"수능"}"#
+    #expect(throws: DecodingError.self) { try decode(CalendarException.self, json) }
+  }
 }

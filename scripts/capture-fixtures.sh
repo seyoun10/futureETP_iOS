@@ -11,7 +11,7 @@ OUT=Core/Tests/Fixtures
 TOKEN=$(grep '^API_TOKEN=' "$FUTUREETP_DIR/apps/server/.env" | cut -d= -f2-)
 DEVICE_ID=00000000-0000-4000-8000-000000000001
 
-# 파일 이름(스키마[.변형]) 경로 인증
+# 파일 이름(스키마[.변형]) 경로 인증 [PUT 본문(공백 없는 JSON)]
 FIXTURES=(
   "health /v1/health no"
   "commodities /v1/commodities yes"
@@ -26,11 +26,20 @@ FIXTURES=(
   # KRX ETN 시리즈 2개(총보수·상장일 null), US ETF(기초지수 null)
   "etpDetail /v1/etps/add5e164-981f-43b4-b751-bf7204602124 yes"
   "etpDetail.us /v1/etps/6281b11d-ab70-48c7-a9c7-7083c2c56d8e yes"
+  # 2026년은 네 종류 예외가 모두 있고, 2028년은 아직 입력 전이라 missing이 찬다
+  "calendar /v1/calendar?from=2026-01-01&to=2026-12-31 yes"
+  "calendar.missing /v1/calendar?from=2027-06-01&to=2028-05-31 yes"
+  "settings /v1/settings yes"
+  # 고정 DEVICE_ID 행에 쓴다(dev DB). 토큰 없이 등록한다
+  'device /v1/devices yes {"pushToken":null,"platform":"IOS","appVersion":"ios-0.1.0"}'
 )
 
 capture() {
-  local name=$1 path=$2 auth=$3
+  local name=$1 path=$2 auth=$3 body=${4:-}
   local args=(-sS -m 30 --fail-with-body)
+  if [[ -n $body ]]; then
+    args+=(-X PUT -H "Content-Type: application/json" -d "$body")
+  fi
   if [[ $auth == yes ]]; then
     args+=(-H "Authorization: Bearer $TOKEN" -H "X-Device-Id: $DEVICE_ID")
   fi
@@ -39,8 +48,8 @@ capture() {
 }
 
 for entry in "${FIXTURES[@]}"; do
-  read -r name path auth <<<"$entry"
+  read -r name path auth body <<<"$entry"
   if [[ $# -eq 0 ]] || [[ " $* " == *" $name "* ]]; then
-    capture "$name" "$path" "$auth"
+    capture "$name" "$path" "$auth" "$body"
   fi
 done

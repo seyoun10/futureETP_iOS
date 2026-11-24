@@ -1,0 +1,19 @@
+{
+  "success": true,
+  "data": {
+    "locale": "ko",
+    "timezone": "Asia/Seoul",
+    "basis": "FRONT",
+    "maPeriod": 100,
+    "window": "Y10",
+    "rareLevels": [
+      1,
+      2,
+      4,
+      8,
+      16
+    ],
+    "alertCommodity": null,
+    "quietTime": null
+  }
+}
