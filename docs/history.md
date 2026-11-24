@@ -28,3 +28,4 @@ TODO.md에서 끝난 항목을 같은 절 이름 아래로 옮겨 둔다.
   - [x] `calendar`·`settings`·`device`(missing 빈·찬 달력, 2026-11-24)
   - [x] 요청 본문·query(`settingsPatch`·`deviceRegistration`·`*Query`) 인코딩: `SettingsPatch`(끄기는 `null`)·`DeviceRegistration`(`ios-<버전>`)·`RareLevels`(검증·`levels` 직렬화)·`*Query`, 예시 `Fixtures/Requests/`를 Swift 인코딩과 zod 양쪽으로 검증(2026-11-24)
 - [x] installation ID: `Core/Util` `InstallationID`(UUID v4 소문자, 저장값이 형식 밖이면 새로 만듦, 저장 실패해도 이번 실행은 만든 값, RN `deviceId.ts`와 같은 규칙)·Keychain 래퍼 `Keychain`(`SecureStore` protocol, `AfterFirstUnlockThisDeviceOnly`), 앱의 `X-Device-Id`에 연결(2026-11-24, D-120)
+- [x] 숫자·날짜 포맷: `Core/Util` `NumberFormat`(가격·변화량·등락률·월물 `DEC26`·`2612`, JS `toFixed`와 같은 반올림)·`AmountFormat`(억·만, T·B·M·K)·`DateTimeFormat`(`MM/DD HH:mm`·거래일 `MM/DD`), RN `lib/format*.test.ts`와 같은 기대값 + 반올림 경계 테스트(2026-11-24)
