@@ -77,6 +77,13 @@ struct PriceScale: Equatable, Sendable {
     return pad + (logHigh - Foundation.log(price)) / span * (height - 2 * pad)
   }
 
+  /// 높이 `height`에서 y(위가 0)에 있는 가격. `y(_:height:)`의 역함수
+  func price(atY y: Double, height: Double) -> Double {
+    let pad = height * Self.padding
+    let span = max(logHigh - logLow, 1e-9)
+    return Foundation.exp(logHigh - (y - pad) / max(height - 2 * pad, 1e-9) * span)
+  }
+
   /// 여백까지 넣은 가격 범위(Swift Charts 축 도메인용)
   var paddedDomain: ClosedRange<Double> {
     let span = max(logHigh - logLow, 1e-9)

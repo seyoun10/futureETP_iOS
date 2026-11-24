@@ -82,6 +82,7 @@ private struct DisparityChartView: View {
   @Environment(ChartPeriods.self) private var periods
   @Environment(DisplaySettings.self) private var display
   @Environment(\.isLandscape) private var isLandscape
+  @Environment(\.locale) private var locale
   /// 정보 줄 높이. 봉·선을 이만큼 비켜 그린다
   @State private var infoHeight: CGFloat = 0
 
@@ -89,17 +90,16 @@ private struct DisparityChartView: View {
     let view = model.view
     VStack(spacing: 0) {
       GeometryReader { geometry in
-        let width = geometry.size.width
-        let plotHeight = max(geometry.size.height - ChartLayout.xLabelHeight, 0)
         if let view {
+          let axes = axes(visible: view.viewport.visibleIndices)
+          // 제스처는 y축 자리를 뺀 그림 영역 폭으로 봉을 센다
+          let plotWidth = max(geometry.size.width - axes.yLabelWidth, 1)
           ZStack(alignment: .bottom) {
             CanvasCandleChart(
               series: chart.series, viewport: view.viewport, palette: display.palette,
-              crosshairIndex: view.crosshairIndex, insetTop: infoHeight
+              crosshairIndex: view.crosshairIndex, insetTop: infoHeight, axes: axes
             )
-            .frame(width: width, height: plotHeight)
-            .frame(maxHeight: .infinity, alignment: .top)
-            ChartGestureSurface { model.view?.handle($0, width: width) }
+            ChartGestureSurface { model.view?.handle($0, width: plotWidth) }
               .accessibilityIdentifier("disparityChart")
             DisparityInfoLines(
               code: code, requestedBasis: requestedBasis, data: data, chart: chart,
@@ -122,6 +122,23 @@ private struct DisparityChartView: View {
       }
     }
     .background(Theme.Colors.background)
+  }
+
+  /// 축 입력. y축 라벨·점선은 보이는 마지막 봉 값이다 (RN `DisparityChartView` `labelIndex`)
+  private func axes(visible: ClosedRange<Int>?) -> CandleAxes {
+    let index = min(visible?.upperBound ?? chart.bars.count - 1, chart.bars.count - 1)
+    let guides: [(price: Double, color: Color)] =
+      chart.bars.indices.contains(index) && !chart.bars.isEmpty
+      ? [
+        (chart.bars[index].close, Theme.ChartColors.currentPrice),
+        // 마지막 봉이 보이면 두 점선이 겹치므로 흰색을 위에 그린다
+        (chart.bars[chart.bars.count - 1].close, Theme.ChartColors.lastPrice),
+      ] : []
+    return CandleAxes(
+      dates: chart.dates, priceDecimals: data.priceDecimals,
+      labels: chart.priceLabels(at: index), guides: guides,
+      yLabelWidth: chart.yLabelWidth(decimals: data.priceDecimals),
+      monthLabelWidth: ChartText.widestMonthLabel(locale: locale), locale: locale)
   }
 }
 

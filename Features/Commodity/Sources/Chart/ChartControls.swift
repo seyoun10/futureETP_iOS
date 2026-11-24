@@ -5,6 +5,14 @@ import SwiftUI
 enum ChartLayout {
   /// 차트 아래 x축 라벨 자리
   static let xLabelHeight: CGFloat = 20
+  /// y축 라벨 자리 = 가장 넓은 라벨 폭 + 이 여백(C-a·C-b·C-c 공용)
+  static let yLabelPad: CGFloat = 10
+  /// 축·십자선 라벨 글자 크기
+  static let fontSize: CGFloat = 11
+  /// 십자선 라벨 상자 안 여백
+  static let labelPad: CGFloat = 3
+  /// 가이드 점선(십자선·현재가·대표월물 전환일)의 선·빈칸 길이
+  static let guideDash: [CGFloat] = [2, 2]
   /// 기간 칩·기준일 버튼 줄 높이(세 차트 탭이 같다, D-117)
   static let footerHeight = Theme.Size.touchTarget
 }

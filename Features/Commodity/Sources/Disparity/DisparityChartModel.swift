@@ -43,12 +43,7 @@ struct DisparityChartModel {
     var switches: [Int] = []
   }
 
-  /// y축 특수 라벨
-  struct PriceLabel: Equatable, Sendable {
-    let id: String
-    let price: Double
-    let color: Color
-  }
+  typealias PriceLabel = ChartPriceLabel
 
   /// 보이는 봉의 최고가·최저가 봉과 현재가 기준 저점대비(LC)·고점대비(HC) %
   struct VisibleStats: Equatable, Sendable {
@@ -65,6 +60,10 @@ struct DisparityChartModel {
   let bars: [Bar]
   /// 밴드 다음 이평선 순서(이평선이 위에 그려진다). `lineLabels`와 같은 순서
   let series: CandleSeries
+  /// 봉 순번별 거래일(x축 월 눈금·십자선 날짜)
+  let dates: [LocalDate]
+  /// 봉·선 전체의 가장 큰 값(y축 자리 폭)
+  let maxPrice: Double
   let lineLabels: [LineLabel]
   let roll: RollMarks
   /// 대표월물 전환일 봉 순번 → 새 월물명(십자선 상세용)
@@ -90,6 +89,8 @@ struct DisparityChartModel {
     series = CandleSeries(
       bars: bars.map { .init(open: $0.open, high: $0.high, low: $0.low, close: $0.close) },
       lines: lines)
+    dates = bars.map(\.tradeDate)
+    maxPrice = series.high.max() ?? 1
     // 실제로 그린 기준값의 롤 정보만
     if basis == .front {
       let switches = Self.frontSwitches(bars)
@@ -159,6 +160,11 @@ struct DisparityChartModel {
   }
 
   // MARK: - 화면 값
+
+  /// 우측 y축 라벨 자리
+  func yLabelWidth(decimals: Int) -> Double {
+    CandleAxes.yLabelWidth(maxPrice: maxPrice, decimals: decimals)
+  }
 
   /// 보이는 봉 `indices`의 최고가·최저가 봉과 현재가(마지막 봉 종가) 대비 % (screens.md C-a)
   func visibleStats(_ indices: ClosedRange<Int>) -> VisibleStats? {
