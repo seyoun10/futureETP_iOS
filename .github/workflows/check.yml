@@ -1,6 +1,6 @@
 # 커밋 전 검사(scripts/check.sh)를 push·PR마다 다시 돌린다.
 # 계약 예시·문구 카탈로그 검사가 원본 저장소를 읽으므로 futureETP main을 함께 받는다.
-# 로컬에서 ../futureETP 최신을 보는 것과 같아서, 원본이 바뀌어 여기가 실패하면 "원본 변경 반영" 대상이다.
+# 로컬에서 ../futureETP_ReactNative 최신을 보는 것과 같아서, 원본이 바뀌어 여기가 실패하면 "원본 변경 반영" 대상이다.
 name: check
 
 on:
@@ -27,7 +27,7 @@ jobs:
           path: ios
       - uses: actions/checkout@v7
         with:
-          repository: seyoun10/futureETP
+          repository: seyoun10/futureETP_ReactNative
           path: futureETP
       - uses: actions/setup-node@v7
         with:

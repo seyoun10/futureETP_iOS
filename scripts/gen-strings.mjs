@@ -2,13 +2,13 @@
 // 키는 RN과 같은 점 경로(`accessKey.guide`), 값의 자리 표시자 `{{name}}`은 그대로 둔다(Swift가 이름으로 바꾼다).
 // 실행: node scripts/gen-strings.mjs            파일을 다시 쓴다
 //       node scripts/gen-strings.mjs --check    파일이 최신인지, Swift가 쓰는 키가 모두 있는지 본다(check.sh)
-// futureETP 위치는 FUTUREETP_DIR, 기본 ../futureETP
+// futureETP 위치는 FUTUREETP_DIR, 기본 ../futureETP_ReactNative
 import { readdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const futureETP = path.resolve(root, process.env.FUTUREETP_DIR ?? '../futureETP');
+const futureETP = path.resolve(root, process.env.FUTUREETP_DIR ?? '../futureETP_ReactNative');
 const output = path.join(root, 'App/Resources/Localizable.xcstrings');
 const locale = async (lang) => {
   const file = path.join(futureETP, 'apps/mobile/src/i18n/locales', `${lang}.ts`);

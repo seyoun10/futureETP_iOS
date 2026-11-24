@@ -1,6 +1,6 @@
 # 결정 기록 (Decision Log)
 
-> Swift/SwiftUI 앱의 결정과 근거를 시간순으로 추가한다. 번호는 `IOS-xxx`이고 공통 결정 D-xxx(`../futureETP/docs/decisions.md`)와 겹치지 않는다.
+> Swift/SwiftUI 앱의 결정과 근거를 시간순으로 추가한다. 번호는 `IOS-xxx`이고 공통 결정 D-xxx(`../futureETP_ReactNative/docs/decisions.md`)와 겹치지 않는다.
 > 번복 시 기존 항목은 지우지 말고 상태를 `대체됨`으로 바꾼다. 공통으로 바뀌어야 할 결정(제품·API·화면 동작)은 여기가 아니라 futureETP에 D-xxx로 적는다.
 
 <!--
@@ -19,7 +19,7 @@
 - 상태: 확정 (사용자 요청, D-141)
 - 맥락: 같은 서버로 RN·Flutter·Swift·Kotlin 앱 네 개를 만든다. 제품·화면·API 계약 문서를 저장소마다 둘지 정해야 했다.
 - 선택지: (a) futureETP 원본 + 상대경로 참조 (b) 저장소마다 복사 (c) 상위 공통 폴더로 이동
-- 결정: (a). 이 저장소는 `CLAUDE.md`·`TODO.md`·`docs/tech-stack.md`·`architecture.md`·`decisions.md`만 갖고, 나머지는 `../futureETP/...`를 읽는다. 두 저장소는 같은 상위 폴더(`_project/`)에 나란히 있어야 한다.
+- 결정: (a). 이 저장소는 `CLAUDE.md`·`TODO.md`·`docs/tech-stack.md`·`architecture.md`·`decisions.md`만 갖고, 나머지는 `../futureETP_ReactNative/...`를 읽는다. 두 저장소는 같은 상위 폴더(`_project/futureETP/`)에 나란히 있어야 한다.
 - 근거: 복사하면 제품 결정이 바뀔 때 네 곳을 고쳐야 해 어긋난다. 원본 변경은 futureETP가 이 저장소 `TODO.md`의 "원본 변경 반영"에 적는다.
 - 영향: `CLAUDE.md` "공통 문서", `TODO.md` "원본 변경 반영".
 
@@ -77,7 +77,7 @@
 - 선택지: 모델 (a) 손으로 쓴 `Codable` (b) quicktype 등 생성 도구. 스키마 검증 (a) futureETP의 원본 zod 스키마를 Node로 실행 (b) Swift JSON Schema 패키지를 테스트 타깃에 추가 (c) ajv(futureETP에는 draft 2020-12를 못 읽는 6.x만 있음)
 - 결정: 모델은 (a). `Core/Sources/API/Models/`에 계약 이름별 파일로 두고, enum 문자열은 Swift enum, `date-time`은 `Date`(`JSONDecoder.api()`, `Z` UTC만), `date`는 `LocalDate`, `YYYY-MM`은 `ContractMonth`로 받는다. 검증은 (a). `scripts/capture-fixtures.sh`가 dev 서버 응답 봉투를 `Core/Tests/Fixtures/<스키마>[.<변형>].json`으로 저장하고, `scripts/validate-fixtures.mjs`(check.sh)가 원본 zod로, `ContractFixtureTests`가 `APIClient` 디코딩으로 같은 파일을 본다.
 - 근거: 스키마가 17개로 적고 생성 도구는 이름·enum·날짜 타입을 다시 손봐야 한다. JSON Schema는 zod에서 생성되므로 zod로 검증하면 같은 규칙에 refine까지 함께 보고, 외부 패키지를 쓰지 않는다(IOS-006).
-- 영향: check.sh가 `../futureETP`(`node_modules` 설치됨)와 Node를 필요로 한다(`FUTUREETP_DIR`로 위치 변경). nullable 필드는 synthesized `Decodable`이라 키가 빠져도 nil로 받는다(zod는 거절). 서버는 항상 키를 보내므로 런타임 디코딩은 이대로 두고, 키 누락은 예시 검증이 잡는다. 계약에 정수 범위(`minimum` 등)가 있으면 `init(from:)`에서 확인한다.
+- 영향: check.sh가 `../futureETP_ReactNative`(`node_modules` 설치됨)와 Node를 필요로 한다(`FUTUREETP_DIR`로 위치 변경). nullable 필드는 synthesized `Decodable`이라 키가 빠져도 nil로 받는다(zod는 거절). 서버는 항상 키를 보내므로 런타임 디코딩은 이대로 두고, 키 누락은 예시 검증이 잡는다. 계약에 정수 범위(`minimum` 등)가 있으면 `init(from:)`에서 확인한다.
 
 ## IOS-008: 차트는 SwiftUI `Canvas`로 직접 그린다
 - 날짜: 2026-11-24

@@ -1,6 +1,6 @@
 # Architecture
 
-> Swift/SwiftUI 앱의 구조. API 규약·화면 동작은 원본(`../futureETP/docs/architecture.md`·`wireframes/screens.md`)을 따르고, 여기에는 이 앱의 구조와 대응만 적는다.
+> Swift/SwiftUI 앱의 구조. API 규약·화면 동작은 원본(`../futureETP_ReactNative/docs/architecture.md`·`wireframes/screens.md`)을 따르고, 여기에는 이 앱의 구조와 대응만 적는다.
 > 디렉터리는 2단계 스캐폴딩으로 만든 골격이다. 아직 없는 폴더는 해당 단계에서 만든다.
 
 ## 디렉터리 구조
@@ -55,7 +55,7 @@ MVVM + repository (IOS-005). Clean Architecture의 UseCase·Entity 계층은 두
 
 ## RN 구조 대응
 
-| RN(`../futureETP/apps/mobile/src`) | 이 앱 |
+| RN(`../futureETP_ReactNative/apps/mobile/src`) | 이 앱 |
 |---|---|
 | `src/app/`(Expo Router) | `App/` + `NavigationStack`·`TabView` |
 | `src/features/*` | `Features/*` |
@@ -69,7 +69,7 @@ MVVM + repository (IOS-005). Clean Architecture의 UseCase·Entity 계층은 두
 
 ## D-번호 적용
 
-공통 결정은 `../futureETP/docs/decisions.md`. 이 앱에 어떻게 적용하는지만 나눈다.
+공통 결정은 `../futureETP_ReactNative/docs/decisions.md`. 이 앱에 어떻게 적용하는지만 나눈다.
 
 - 그대로 적용: 제품·화면·API·UX 결정. 예) D-001~D-026(제품), D-036·D-042·D-044·D-048·D-072(API·에러·접근 키·자동 새로고침), D-075~D-086, D-090~D-093, D-102~D-125, D-137~D-139(화면 동작)
 - 플랫폼 수단으로 바꿔 적용: D-030(상태·패칭), D-031(스타일·테마), D-033(i18n), D-041(레이어), D-043·D-052(변형), D-073(표시 설정 저장), D-087(차트 부품), D-128(deprecated API 금지 → 이 언어의 deprecated 경고를 오류로)

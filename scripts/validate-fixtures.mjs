@@ -1,13 +1,13 @@
 // 계약 테스트의 스키마 쪽: Core/Tests/Fixtures/<스키마>[.<변형>].json(성공 봉투)과
 // Core/Tests/Fixtures/Requests/<스키마>[.<변형>].json(요청 본문·query 객체)이 원본 zod 스키마를 통과하는지 (D-142, IOS-007).
 // JSON Schema 파일은 이 zod 스키마에서 생성되므로 zod로 보면 refine 규칙까지 함께 본다.
-// 실행: node scripts/validate-fixtures.mjs (futureETP 위치는 FUTUREETP_DIR, 기본 ../futureETP)
+// 실행: node scripts/validate-fixtures.mjs (futureETP 위치는 FUTUREETP_DIR, 기본 ../futureETP_ReactNative)
 import { readdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const futureETP = path.resolve(root, process.env.FUTUREETP_DIR ?? '../futureETP');
+const futureETP = path.resolve(root, process.env.FUTUREETP_DIR ?? '../futureETP_ReactNative');
 const shared = (file) => import(pathToFileURL(path.join(futureETP, 'packages/shared/src', file)).href);
 
 // 계약 스키마 이름 → [원본 파일, export 이름] (futureETP packages/shared/src/contract.ts의 SCHEMAS)

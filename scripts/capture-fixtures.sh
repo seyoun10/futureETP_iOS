@@ -5,7 +5,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-FUTUREETP_DIR="${FUTUREETP_DIR:-../futureETP}"
+FUTUREETP_DIR="${FUTUREETP_DIR:-../futureETP_ReactNative}"
 BASE_URL="${BASE_URL:-http://localhost:3000}"
 OUT=Core/Tests/Fixtures
 TOKEN=$(grep '^API_TOKEN=' "$FUTUREETP_DIR/apps/server/.env" | cut -d= -f2-)
