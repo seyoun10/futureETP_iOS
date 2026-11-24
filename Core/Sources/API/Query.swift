@@ -36,12 +36,13 @@ public final class Query<Value: Sendable> {
 
   @ObservationIgnored let key: [String]
   @ObservationIgnored let keepFor: TimeInterval
-  @ObservationIgnored private let fetcher: @Sendable () async throws -> Value
+  /// 지금 값(없으면 nil)을 받아 새 값을 만든다. 페이지 조회는 받아 둔 페이지 수만큼 다시 받는다
+  @ObservationIgnored private let fetcher: @Sendable (Value?) async throws -> Value
   @ObservationIgnored private let stalePolicy: StalePolicy
   @ObservationIgnored private let freshness: @Sendable (Value) -> Freshness?
   @ObservationIgnored private let now: @Sendable () -> Date
   @ObservationIgnored private var isInvalidated = false
-  @ObservationIgnored private var inFlight: Task<Void, Never>?
+  @ObservationIgnored private var inFlight: Task<AppError?, Never>?
   /// 조회를 시작하거나 끊을 때마다 바뀐다. 끝난 조회가 끊긴 조회면 결과를 버린다
   @ObservationIgnored private var generation = 0
   @ObservationIgnored private(set) var observerCount = 0
@@ -51,7 +52,7 @@ public final class Query<Value: Sendable> {
     key: [String], keepFor: TimeInterval, stalePolicy: StalePolicy,
     freshness: @escaping @Sendable (Value) -> Freshness?,
     now: @escaping @Sendable () -> Date,
-    fetch: @escaping @Sendable () async throws -> Value
+    fetch: @escaping @Sendable (Value?) async throws -> Value
   ) {
     self.key = key
     self.keepFor = keepFor
@@ -82,12 +83,33 @@ public final class Query<Value: Sendable> {
 
   /// 새로 조회한다. 진행 중인 조회가 있으면 취소하지 않고 그 조회를 기다린다 (RN `cancelRefetch: false`)
   public func refetch() async {
-    if let inFlight { return await inFlight.value }
+    if let inFlight {
+      _ = await inFlight.value
+      return
+    }
     generation += 1
     let current = generation
-    let task = Task { await run(current) }
+    let previous = state.data
+    let fetcher = fetcher
+    let task = Task { await run(current, recordsError: true) { try await fetcher(previous) } }
     inFlight = task
-    await task.value
+    _ = await task.value
+  }
+
+  /// 지금 값에 이어 받는다(RN `fetchNextPage`, 이전 3년 받기). 데이터가 없으면 하지 않는다.
+  /// 진행 중인 조회는 끊는다(RN `cancelRefetch`). 실패는 `state.error`에 넣지 않고 돌려준다(데이터는 그대로, 화면은 Alert).
+  /// 호출자가 기다리기를 그만둬도(시간 초과) 조회는 계속하고, 늦게 온 값도 넣는다 (D-139)
+  @discardableResult
+  public func fetchMore(_ step: @escaping @Sendable (Value) async throws -> Value) async
+    -> AppError?
+  {
+    guard let data = state.data else { return nil }
+    cancel()
+    generation += 1
+    let current = generation
+    let task = Task { await run(current, recordsError: false) { try await step(data) } }
+    inFlight = task
+    return await task.value
   }
 
   /// 진행 중인 조회를 끊고 결과를 버린다(RN `cancelQueries`). 변경 요청이 옛 조회 결과에 덮이지 않게 한다
@@ -133,7 +155,10 @@ public final class Query<Value: Sendable> {
     observerCount == 0 && inFlight == nil && date >= unobservedSince.addingTimeInterval(keepFor)
   }
 
-  private func run(_ current: Int) async {
+  /// - Parameter recordsError: 실패를 `state.error`에 넣는다. 아니면 돌려주기만 한다
+  private func run(
+    _ current: Int, recordsError: Bool, _ work: @Sendable () async throws -> Value
+  ) async -> AppError? {
     state.isFetching = true
     defer {
       if generation == current {
@@ -142,18 +167,22 @@ public final class Query<Value: Sendable> {
       }
     }
     do {
-      let value = try await fetcher()
-      guard generation == current else { return }
+      let value = try await work()
+      guard generation == current else { return nil }
       state.data = value
       state.error = nil
       dataUpdatedAt = now()
       isInvalidated = false
+      return nil
     } catch is CancellationError {
       // 호출자 취소는 실패로 보이지 않는다
+      return nil
     } catch {
-      guard generation == current else { return }
-      state.error = (error as? AppError) ?? AppError(.internal, message: "\(error)")
+      guard generation == current else { return nil }
+      let appError = (error as? AppError) ?? AppError(.internal, message: "\(error)")
+      if recordsError { state.error = appError }
       errorUpdatedAt = now()
+      return appError
     }
   }
 }

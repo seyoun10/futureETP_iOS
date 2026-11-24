@@ -6,6 +6,16 @@ public enum QueryKeys {
   public static let settings = ["settings"]
   public static let commodities = ["commodities"]
   public static let commodityList = commodities + ["list"]
+
+  /// 원자재 단위로 무효화할 수 있게 `["commodities", code, …]`로 시작한다
+  public static func commodity(_ code: CommodityCode) -> [String] { commodities + [code.rawValue] }
+
+  public static func disparity(_ code: CommodityCode, query: DisparityQuery) -> [String] {
+    commodity(code) + [
+      "disparity", query.basis.rawValue, String(query.maPeriod.rawValue), query.window.rawValue,
+      query.levels.queryValue,
+    ]
+  }
 }
 
 /// 서버 설정 조회와 낙관적 변경 (RN `api/useSettings.ts`, D-082).

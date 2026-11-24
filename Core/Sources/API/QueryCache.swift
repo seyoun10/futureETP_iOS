@@ -26,10 +26,33 @@ public final class QueryCache {
   ) -> Query<Value> {
     removeExpired()
     if let query = entries[key] as? Query<Value> { return query }
-    let query = Query(
-      key: key, keepFor: keepFor, stalePolicy: stalePolicy, freshness: freshness, now: now,
-      fetch: fetch)
-    entries[key] = query
+    return insert(
+      Query(
+        key: key, keepFor: keepFor, stalePolicy: stalePolicy, freshness: freshness, now: now,
+        fetch: { _ in try await fetch() }))
+  }
+
+  /// 3년씩 이어 받는 C 차트 조회(RN `useInfiniteQuery` + `chartCacheOptions`, D-104).
+  /// 다시 조회하면 받아 둔 페이지 수만큼 최근부터 다시 받는다. 화면을 떠나도 1시간 두고, `nextUpdateAt`까지 새것으로 본다
+  public func pagedQuery<Page: ChartPage>(
+    _ key: [String], fetchPage: @escaping @Sendable (_ before: LocalDate?) async throws -> Page
+  ) -> PagedQuery<Page> {
+    removeExpired()
+    if let query = entries[key] as? Query<ChartPages<Page>> {
+      return PagedQuery(query: query, fetchPage: fetchPage)
+    }
+    let query = insert(
+      Query<ChartPages<Page>>(
+        key: key, keepFor: Self.chartKeepFor, stalePolicy: .untilNextUpdate,
+        freshness: { $0.latest.freshness }, now: now,
+        fetch: { previous in
+          try await ChartPages.refetch(pageCount: previous?.pages.count ?? 1, fetchPage: fetchPage)
+        }))
+    return PagedQuery(query: query, fetchPage: fetchPage)
+  }
+
+  private func insert<Value>(_ query: Query<Value>) -> Query<Value> {
+    entries[query.key] = query
     return query
   }
 
