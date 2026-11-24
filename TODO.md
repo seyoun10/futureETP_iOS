@@ -25,9 +25,10 @@
 ## 3. 공통 기반
 - [ ] import redundant 검사 켜기: App이 `Commodity`·`Settings`·`Core`를 import한 뒤 `scripts/check.sh`의 `--only implicit`을 지운다 (IOS-003 보충)
 - [ ] 접근 키 B-b: 붙여넣기·QR(`futureetp-key:v1:` 접두사), `GET /v1/settings`로 확인 뒤 저장, 키 없으면 첫 화면이 B-b, `UNAUTHORIZED`면 어느 화면에서든 B-b + 거절 줄 (D-044, D-077~D-079)
+  - 코드 완료(a4da4d4~ba01dfd). 남은 확인: dev 서버 키로 시뮬레이터에서 실제 Keychain 저장·재실행 유지·키 교체 뒤 거절 시 B-b 이동, 실기기 QR 스캔. 확인되면 이 항목을 `docs/history.md`로 옮긴다
 - [ ] i18n ko/en, 앱 안 언어 설정을 서버 기기 설정과 맞춤 (D-033, D-073, D-137)
 - [ ] 테마 토큰(다크 전용)·등락 색 설정 저장 (D-031, D-073)
-- [ ] 공용 조회 UI: 기준 시각 줄(freshness)·로딩/오류/빈 상태 분기·`nextUpdateAt` + 1분 자동 새로고침·앱 복귀 재조회 (D-048, D-075)
+- [ ] 공용 조회 UI: 기준 시각 줄(freshness)·로딩/오류/빈 상태 분기·`nextUpdateAt` + 1분 자동 새로고침·앱 복귀 재조회·접근 키 저장 뒤 전체 재조회(`AccessKeyView` `onSaved`, 기다리지 않음) (D-048, D-075, D-044)
 - [ ] 앱 실행 때 시간대 PATCH (D-084), 세로 잠금·[⟲] 가로 전환 (D-076)
 - [ ] 숫자·날짜 포맷(RN `formatNumber`·`formatDateTime`과 같은 결과) 단위 테스트
 
