@@ -101,6 +101,13 @@ private struct DisparityChartView: View {
             )
             ChartGestureSurface { model.view?.handle($0, width: plotWidth) }
               .accessibilityIdentifier("disparityChart")
+            if let index = view.crosshairIndex {
+              detail(
+                index: index, viewport: view.viewport,
+                plot: CGSize(
+                  width: plotWidth,
+                  height: max(geometry.size.height - ChartLayout.xLabelHeight, 1)))
+            }
             DisparityInfoLines(
               code: code, requestedBasis: requestedBasis, data: data, chart: chart,
               visible: view.viewport.visibleIndices, onHeight: { infoHeight = $0 }
@@ -122,6 +129,19 @@ private struct DisparityChartView: View {
       }
     }
     .background(Theme.Colors.background)
+  }
+
+  /// 십자선 상세 박스. 정보 줄 아래, 봉·선을 가장 적게 가리는 귀퉁이에 둔다. 터치는 차트로 흘려보낸다
+  private func detail(index: Int, viewport: CandleViewport, plot: CGSize) -> some View {
+    PlacedDetailBox(
+      rows: DisparityDetail.rows(
+        chart, index: index, data: data, palette: display.palette,
+        t: { L10n.string($0, $1, locale: locale) }),
+      index: index, series: chart.series, viewport: viewport, plot: plot, insetTop: infoHeight
+    )
+    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+    .allowsHitTesting(false)
+    .accessibilityIdentifier("disparityDetail")
   }
 
   /// 축 입력. y축 라벨·점선은 보이는 마지막 봉 값이다 (RN `DisparityChartView` `labelIndex`)

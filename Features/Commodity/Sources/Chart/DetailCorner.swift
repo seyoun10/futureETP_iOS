@@ -47,21 +47,25 @@ struct DetailCorner: Equatable {
 }
 
 extension CandleSeries {
-  /// 화면 x 구간 `[x0, x1]`에 그려진 봉(고가~저가)과 선(굵기만큼)의 세로 구간. 상세 박스 귀퉁이 고르기용
+  /// 화면 x 구간 `[x0, x1]`에 그려진 봉(고가~저가)과 선(굵기만큼)의 세로 구간. 상세 박스 귀퉁이 고르기용.
+  /// `size`는 봉을 그리는 영역이고, 봉·선은 그 위쪽 `insetTop`을 비켜 그린다(`CanvasCandleChart`와 같음)
   func markSpans(
-    x0: Double, x1: Double, viewport: CandleViewport, scale: PriceScale, size: CGSize
+    x0: Double, x1: Double, viewport: CandleViewport, scale: PriceScale, size: CGSize,
+    insetTop: Double = 0
   ) -> [ClosedRange<Double>] {
     guard let first = viewport.barIndex(atX: x0, width: size.width),
       let last = viewport.barIndex(atX: x1, width: size.width)
     else { return [] }
+    let height = max(size.height - insetTop, 1)
+    let y = { (price: Double) in insetTop + scale.y(price, height: height) }
     var spans: [ClosedRange<Double>] = []
     for i in first...last {
       let bar = bars[i]
-      spans.append(scale.y(bar.high, height: size.height)...scale.y(bar.low, height: size.height))
+      spans.append(y(bar.high)...y(bar.low))
       for line in lines {
         guard let value = line.values[i], value > 0 else { continue }
-        let y = scale.y(value, height: size.height)
-        spans.append((y - line.width / 2)...(y + line.width / 2))
+        let lineY = y(value)
+        spans.append((lineY - line.width / 2)...(lineY + line.width / 2))
       }
     }
     return spans
