@@ -4,8 +4,6 @@ import Foundation
 /// SwiftUI `Settings` scene과 겹치지 않게 서버 테이블 이름(`app_settings`)을 따른다.
 /// 기기별 전역 설정이다
 public struct AppSettings: Codable, Sendable, Equatable {
-  public static let rareLevelCount = 5
-
   public let locale: AppLanguage
   /// IANA 시간대
   public let timezone: String
@@ -29,10 +27,10 @@ public struct AppSettings: Codable, Sendable, Equatable {
     rareLevels = try container.decode([Double].self, forKey: .rareLevels)
     alertCommodity = try container.decodeIfPresent(CommodityCode.self, forKey: .alertCommodity)
     quietTime = try container.decodeIfPresent(QuietTime.self, forKey: .quietTime)
-    guard rareLevels.count == Self.rareLevelCount else {
+    guard rareLevels.count == RareLevels.count else {
       throw DecodingError.dataCorruptedError(
         forKey: .rareLevels, in: container,
-        debugDescription: "\(rareLevels.count) levels, expected \(Self.rareLevelCount)")
+        debugDescription: "\(rareLevels.count) levels, expected \(RareLevels.count)")
     }
   }
 }
