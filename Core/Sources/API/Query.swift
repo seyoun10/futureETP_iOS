@@ -2,11 +2,13 @@ import Foundation
 import Observation
 
 /// 캐시한 값을 언제까지 새것으로 볼지 (RN `staleTime`)
-public enum StalePolicy: Sendable {
+public enum StalePolicy<Value: Sendable>: Sendable {
   /// 바로 오래된 값. 화면에 들어오거나 앱에 돌아올 때마다 다시 조회한다 (TanStack Query 기본값 0)
   case immediately
   /// `freshness.nextUpdateAt`까지 새것. 값이 배치 때만 바뀌는 C 차트용. nil이거나 지났으면 바로 오래된 값 (RN `chartCache`)
   case untilNextUpdate
+  /// 받은 때부터 값마다 정한 시간 동안 새것 (RN `staleTime` 함수). 휴장 달력은 미입력 여부로 고른다
+  case after(@Sendable (Value) -> TimeInterval)
 }
 
 /// `nextUpdateAt` 뒤 자동 새로고침 시각 (D-042, D-048, D-075, RN `useAutoRefresh`)
@@ -38,7 +40,7 @@ public final class Query<Value: Sendable> {
   @ObservationIgnored let keepFor: TimeInterval
   /// 지금 값(없으면 nil)을 받아 새 값을 만든다. 페이지 조회는 받아 둔 페이지 수만큼 다시 받는다
   @ObservationIgnored private let fetcher: @Sendable (Value?) async throws -> Value
-  @ObservationIgnored private let stalePolicy: StalePolicy
+  @ObservationIgnored private let stalePolicy: StalePolicy<Value>
   @ObservationIgnored private let freshness: @Sendable (Value) -> Freshness?
   @ObservationIgnored private let now: @Sendable () -> Date
   @ObservationIgnored private var isInvalidated = false
@@ -49,7 +51,7 @@ public final class Query<Value: Sendable> {
   @ObservationIgnored private(set) var unobservedSince: Date
 
   init(
-    key: [String], keepFor: TimeInterval, stalePolicy: StalePolicy,
+    key: [String], keepFor: TimeInterval, stalePolicy: StalePolicy<Value>,
     freshness: @escaping @Sendable (Value) -> Freshness?,
     now: @escaping @Sendable () -> Date,
     fetch: @escaping @Sendable (Value?) async throws -> Value
@@ -71,6 +73,9 @@ public final class Query<Value: Sendable> {
     case .untilNextUpdate:
       guard let nextUpdateAt = freshness(data)?.nextUpdateAt else { return true }
       return nextUpdateAt <= now()
+    case .after(let staleTime):
+      guard let dataUpdatedAt else { return true }
+      return dataUpdatedAt.addingTimeInterval(staleTime(data)) <= now()
     }
   }
 

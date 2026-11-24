@@ -32,6 +32,11 @@ public enum QueryKeys {
 
   /// ETP 상세는 원자재와 상관없이 id 하나다 (RN `queryKeys.etps.detail`)
   public static func etp(_ id: UUID) -> [String] { ["etps", id.uuidString.lowercased()] }
+
+  /// 휴장 달력은 조회 범위마다 하나다 (RN `queryKeys.calendar`)
+  public static func calendar(_ query: CalendarQuery) -> [String] {
+    ["calendar", query.from.description, query.to.description]
+  }
 }
 
 /// 서버 설정 조회와 낙관적 변경 (RN `api/useSettings.ts`, D-082).

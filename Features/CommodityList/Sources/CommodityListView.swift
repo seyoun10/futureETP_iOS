@@ -8,19 +8,23 @@ public struct CommodityListView: View {
   private let alertOff: Bool
   private let onSelect: (CommodityCode) -> Void
   private let onOpenSettings: () -> Void
+  private let onOpenCalendar: () -> Void
   @State private var refresh = PullRefresh()
 
   /// - Parameters:
   ///   - alertOff: 이 기기의 알림 대상 원자재가 없다. [⚙]에 빨간 점을 띄운다 (D-124)
   ///   - onSelect: 원자재 행을 눌렀다. C(C-a 탭)로 간다
+  ///   - onOpenCalendar: [📅]을 눌렀다. A-a 휴장 달력으로 간다 (D-143)
   public init(
     query: Query<Commodities>, alertOff: Bool,
-    onSelect: @escaping (CommodityCode) -> Void, onOpenSettings: @escaping () -> Void
+    onSelect: @escaping (CommodityCode) -> Void, onOpenSettings: @escaping () -> Void,
+    onOpenCalendar: @escaping () -> Void
   ) {
     self.query = query
     self.alertOff = alertOff
     self.onSelect = onSelect
     self.onOpenSettings = onOpenSettings
+    self.onOpenCalendar = onOpenCalendar
   }
 
   public var body: some View {
@@ -36,7 +40,9 @@ public struct CommodityListView: View {
     .navigationTitle(Text(verbatim: "futureETP"))
     .toolbarTitleDisplayMode(.inlineLarge)
     .toolbar {
-      ToolbarItem(placement: .topBarTrailing) {
+      // [📅]은 [⚙] 바로 왼쪽이다 (screens.md A)
+      ToolbarItemGroup(placement: .topBarTrailing) {
+        CalendarButton(action: onOpenCalendar)
         SettingsButton(alertOff: alertOff, action: onOpenSettings)
       }
     }

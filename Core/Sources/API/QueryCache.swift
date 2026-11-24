@@ -20,7 +20,7 @@ public final class QueryCache {
   public func query<Value: Sendable>(
     _ key: [String],
     keepFor: TimeInterval = defaultKeepFor,
-    stalePolicy: StalePolicy = .immediately,
+    stalePolicy: StalePolicy<Value> = .immediately,
     freshness: @escaping @Sendable (Value) -> Freshness? = { _ in nil },
     fetch: @escaping @Sendable () async throws -> Value
   ) -> Query<Value> {

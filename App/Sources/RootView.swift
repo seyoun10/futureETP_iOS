@@ -1,6 +1,7 @@
 import Commodity
 import CommodityList
 import Core
+import HolidayCalendar
 import Settings
 import SwiftUI
 
@@ -9,6 +10,8 @@ enum Route: Hashable {
   case commodity(CommodityCode)
   /// C-d-a ETP 상세
   case etp(UUID)
+  /// A-a 휴장 달력
+  case calendar
   case settings
   /// B-a 알림 설정
   case alertSettings
@@ -50,7 +53,8 @@ struct RootView: View {
           query: queryCache.commodityList(LiveCommoditiesRepository(client: client)),
           alertOff: alertOff,
           onSelect: { path.append(.commodity($0)) },
-          onOpenSettings: { path.append(.settings) }
+          onOpenSettings: { path.append(.settings) },
+          onOpenCalendar: { path.append(.calendar) }
         )
         .navigationDestination(for: Route.self) { route in
           switch route {
@@ -69,6 +73,11 @@ struct RootView: View {
           case .etp(let id):
             ETPDetailView(
               query: queryCache.etpDetail(LiveCommoditiesRepository(client: client), id: id))
+          case .calendar:
+            CalendarView(
+              model: CalendarScreenModel(query: {
+                queryCache.marketCalendar(LiveCalendarRepository(client: client), query: $0)
+              }))
           case .settings:
             SettingsView(
               store: settings, hasKey: keys.hasKey,

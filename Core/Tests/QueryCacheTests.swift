@@ -34,7 +34,7 @@ private struct Payload: Sendable, Equatable {
 @MainActor
 private func makeQuery(
   _ fixture: Fixture, cache: QueryCache? = nil, key: [String] = ["a"],
-  stalePolicy: StalePolicy = .immediately, delay: Duration = .zero,
+  stalePolicy: StalePolicy<Payload> = .immediately, delay: Duration = .zero,
   result: @escaping @Sendable (Int) throws -> Payload = { Payload(value: $0) }
 ) -> Query<Payload> {
   let cache = cache ?? QueryCache(now: { fixture.now })
@@ -138,6 +138,27 @@ private func waitUntil(_ condition: () -> Bool) async {
     fixture.now = base + 15 * minute
     await query.fetchIfStale()
     #expect(fixture.calls == 2)
+  }
+
+  @Test func staysFreshForValueDependentTime() async {
+    let fixture = Fixture()
+    // 짝수 값은 5분, 홀수 값은 12시간
+    let query = makeQuery(
+      fixture, stalePolicy: .after { $0.value.isMultiple(of: 2) ? 5 * minute : 720 * minute })
+    await query.refetch()
+    fixture.now = base + 719 * minute
+    await query.fetchIfStale()
+    #expect(fixture.calls == 1)
+
+    fixture.now = base + 720 * minute
+    await query.fetchIfStale()
+    #expect(fixture.calls == 2)
+    fixture.now = base + 724 * minute
+    await query.fetchIfStale()
+    #expect(fixture.calls == 2)
+    fixture.now = base + 725 * minute
+    await query.fetchIfStale()
+    #expect(fixture.calls == 3)
   }
 
   @Test func chartWithoutNextUpdateIsStale() async {

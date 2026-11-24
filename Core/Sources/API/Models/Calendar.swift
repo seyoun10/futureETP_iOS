@@ -36,7 +36,7 @@ public struct CalendarException: Codable, Sendable, Equatable {
 }
 
 /// 휴장 일정이 없는 (시장, 연도)
-public struct CalendarMissingYear: Codable, Sendable, Equatable {
+public struct CalendarMissingYear: Codable, Sendable, Hashable {
   public let market: CalendarMarket
   public let year: Int
 }

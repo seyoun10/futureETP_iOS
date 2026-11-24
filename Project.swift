@@ -28,7 +28,7 @@ func feature(_ name: String) -> Target {
   )
 }
 
-let features = ["CommodityList", "Commodity", "Settings"]
+let features = ["CommodityList", "Commodity", "HolidayCalendar", "Settings"]
 /// feature 화면 Model 테스트 타깃
 func featureTests(_ name: String) -> Target {
   .target(
