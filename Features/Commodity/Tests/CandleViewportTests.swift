@@ -93,8 +93,8 @@ struct PriceScaleTests {
 
   @Test func fitsVisibleBarsOnALogScaleWithPadding() throws {
     let scale = try #require(PriceScale(series: series, indices: 0...1))
-    #expect(scale.logHigh == log(200))
-    #expect(scale.logLow == log(80))
+    #expect(scale.upper == log(200))
+    #expect(scale.lower == log(80))
     // 끝 가격은 위·아래 6% 여백 자리에 온다
     #expect(abs(scale.y(200, height: 100) - 6) < 1e-9)
     #expect(abs(scale.y(80, height: 100) - 94) < 1e-9)
@@ -111,6 +111,40 @@ struct PriceScaleTests {
 
   @Test func noScaleWithoutBars() {
     #expect(PriceScale(series: series, indices: nil) == nil)
+  }
+}
+
+struct LineSeriesTests {
+  private let line = { (id: String, values: [Double?]) in
+    CandleSeries.Line(id: id, values: values, color: .red, width: 1)
+  }
+
+  @Test func crosshairFollowsFirstLineWithValue() {
+    let series = CandleSeries(
+      lines: [line("a", [nil, 3, nil]), line("b", [2, 4, nil])],
+      high: [2, 4, -.infinity], low: [2, 3, .infinity])
+    #expect(series.bars.isEmpty)
+    #expect(series.count == 3)
+    #expect(series.crosshairPrices == [2, 3, .infinity])
+    #expect(series.isLog)
+  }
+
+  @Test func nonPositiveValueUsesLinearScale() throws {
+    let series = CandleSeries(
+      lines: [line("a", [10, -30, nil])], high: [10, -30, -.infinity], low: [10, -30, .infinity])
+    #expect(!series.isLog)
+    let scale = try #require(PriceScale(series: series, indices: 0...2))
+    #expect(scale == PriceScale(linearLow: -30, linearHigh: 10))
+    // 선형 축: 산술평균이 가운데
+    #expect(abs(scale.y(-10, height: 100) - 50) < 1e-9)
+    #expect(abs(scale.price(atY: scale.y(-25, height: 300), height: 300) + 25) < 1e-9)
+    #expect(scale.ticks(from: -30, to: 10) == Array(stride(from: -30.0, through: 10, by: 5)))
+  }
+
+  @Test func noScaleWhenVisibleRangeHasNoValue() {
+    let series = CandleSeries(
+      lines: [line("a", [nil, 1])], high: [-.infinity, 1], low: [.infinity, 1])
+    #expect(PriceScale(series: series, indices: 0...0) == nil)
   }
 }
 

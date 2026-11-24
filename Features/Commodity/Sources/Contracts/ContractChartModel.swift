@@ -27,6 +27,8 @@ struct ContractChartModel {
   /// 선마다 글자가 가장 긴 값의 라벨. 이동해도 우측 라벨 자리가 바뀌지 않게 너비만 잰다
   let widestLabels: [PriceLabel]
   let legend: [LegendItem]
+  /// 차트 입력(선만 있음). 0 이하 값이 있으면 선형 y축(D-113)
+  let series: CandleSeries
 
   init(_ chart: ContractsChart) {
     self.chart = chart
@@ -45,6 +47,7 @@ struct ContractChartModel {
     }
     self.high = high
     self.low = low
+    series = CandleSeries(lines: lines, high: high, low: low)
     widestLabels = chart.contracts.enumerated().compactMap { i, c in
       let values = c.prices.compactMap(\.self)
       guard let min = values.min(), let max = values.max() else { return nil }
@@ -56,6 +59,14 @@ struct ContractChartModel {
         id: c.symbol, color: Self.lineColor(i),
         label: NumberFormat.contractMonth(c.contractMonth), isFront: c.isFront)
     }
+  }
+
+  /// 우측 y축 자리: 가장 긴 끝값 라벨(없으면 `0`) + 여백 (RN `LinesChart` `yLabelWidth`)
+  var yLabelWidth: Double {
+    let widths = widestLabels.map {
+      ChartText.width(NumberFormat.price($0.price, decimals: chart.priceDecimals))
+    }
+    return max(ChartText.width("0"), widths.max() ?? 0) + Double(ChartLayout.yLabelPad)
   }
 
   /// 6번째 이후 선은 마지막 색을 같이 쓴다

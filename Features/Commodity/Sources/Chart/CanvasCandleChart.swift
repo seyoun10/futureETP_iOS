@@ -34,12 +34,12 @@ struct CandleAxes {
   }
 }
 
-/// SwiftUI `Canvas`로 봉·선·축을 직접 그리는 캔들 차트(IOS-008)
+/// SwiftUI `Canvas`로 봉·선·축을 직접 그리는 차트(IOS-008). C-a 캔들과 C-c 겹친 선(봉 없음)에 쓴다
 struct CanvasCandleChart: View {
   let series: CandleSeries
   let viewport: CandleViewport
   let palette: UpDownPalette
-  /// 십자선을 붙인 봉. 세로선은 봉 가운데, 가로선은 종가에 긋는다(D-056)
+  /// 십자선을 붙인 봉. 세로선은 봉 가운데, 가로선은 `series.crosshairPrices`(봉은 종가)에 긋는다(D-056)
   var crosshairIndex: Int?
   /// 차트 위에 겹친 정보 줄 높이. 봉·선은 이만큼 아래에서 시작하고, 십자선 세로선은 위까지 긋는다 (D-117)
   var insetTop: Double = 0
@@ -59,8 +59,8 @@ struct CanvasCandleChart: View {
         plot: plot, insetTop: insetTop, scale: scale, viewport: viewport,
         hairline: 1 / displayScale)
       let crosshair = crosshairIndex.flatMap { index in
-        series.bars.indices.contains(index)
-          ? (index: index, x: frame.x(index), y: frame.y(series.bars[index].close)) : nil
+        series.crosshairPrices.indices.contains(index)
+          ? (index: index, x: frame.x(index), y: frame.y(series.crosshairPrices[index])) : nil
       }
 
       var axisContext = context
@@ -72,11 +72,13 @@ struct CanvasCandleChart: View {
       if let axes {
         drawRoll(axes.roll, frame: frame, in: &plotContext)
       }
-      drawBars(indices, frame: frame, in: &plotContext)
+      if !series.bars.isEmpty {
+        drawBars(indices, frame: frame, in: &plotContext)
+      }
       drawLines(frame: frame, in: &plotContext)
       if let axes {
         drawGuides(axes, frame: frame, in: &plotContext)
-        if let extremes = axes.extremes {
+        if let extremes = axes.extremes, !series.bars.isEmpty {
           drawExtremeTags(extremes, axes: axes, frame: frame, in: &plotContext)
         }
       }
@@ -177,7 +179,8 @@ struct CanvasCandleChart: View {
 
   /// y 눈금 가격(그림 영역 위 끝~아래 끝)
   private func priceTicks(frame: Frame) -> [Double] {
-    AxisTicks.log(from: frame.price(atY: frame.plot.maxY), to: frame.price(atY: frame.plot.minY))
+    frame.scale.ticks(
+      from: frame.price(atY: frame.plot.maxY), to: frame.price(atY: frame.plot.minY))
   }
 
   private func monthTicks(_ axes: CandleAxes, frame: Frame) -> [MonthTicks.Tick] {
@@ -348,7 +351,8 @@ struct CanvasCandleChart: View {
     context.fill(Path(priceBox), with: .color(box))
     context.draw(
       text(
-        NumberFormat.price(series.bars[crosshair.index].close, decimals: axes.priceDecimals), ink),
+        NumberFormat.price(series.crosshairPrices[crosshair.index], decimals: axes.priceDecimals),
+        ink),
       at: CGPoint(x: priceBox.minX + pad, y: crosshair.y), anchor: .leading)
     if axes.dates.indices.contains(crosshair.index) {
       let dateWidth = ChartText.dateBoxWidth

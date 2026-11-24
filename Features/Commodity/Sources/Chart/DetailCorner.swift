@@ -60,10 +60,11 @@ extension CandleSeries {
     let y = { (price: Double) in insetTop + scale.y(price, height: height) }
     var spans: [ClosedRange<Double>] = []
     for i in first...last {
-      let bar = bars[i]
-      spans.append(y(bar.high)...y(bar.low))
+      if bars.indices.contains(i) {
+        spans.append(y(bars[i].high)...y(bars[i].low))
+      }
       for line in lines {
-        guard let value = line.values[i], value > 0 else { continue }
+        guard let value = line.values[i], value > 0 || !isLog else { continue }
         let lineY = y(value)
         spans.append((lineY - line.width / 2)...(lineY + line.width / 2))
       }

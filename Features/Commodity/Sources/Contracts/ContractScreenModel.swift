@@ -1,0 +1,68 @@
+import Core
+import Observation
+
+/// C-c 화면 Model: 받은 페이지 → 월물을 이어 붙인 응답과 선 계열(`ContractChartModel`)·기간·제스처 상태(`ChartViewState`).
+/// 데이터가 바뀌면 계열을 다시 만들고, 과거 날짜가 앞에 붙었으면 보던 날짜 범위를 유지한다 (D-104, RN `ContractChartScreen`)
+@MainActor
+@Observable
+final class ContractScreenModel {
+  let paged: PagedQuery<ContractsChart>
+  private(set) var chart: ContractChartModel?
+  /// 첫 데이터가 와서 기간을 맞춘 뒤 생긴다. 그 전에는 차트 대신 스켈레톤
+  var view: ChartViewState?
+  /// 이전 3년 받기 (D-104, D-139)
+  let older = OlderPages()
+
+  @ObservationIgnored private var pages: [ContractsChart] = []
+
+  init(paged: PagedQuery<ContractsChart>) {
+    self.paged = paged
+  }
+
+  var query: Query<ChartPages<ContractsChart>> { paged.query }
+
+  /// 보이는 범위를 알렸다·더 받을 것이 바뀌었다. 가장 과거 날짜가 보이면 이전 3년을 받는다
+  func rangeReported() async {
+    let paged = paged
+    await older.rangeReported(
+      firstVisible: view?.viewport.visibleIndices?.lowerBound, hasOlder: paged.hasOlder
+    ) { await paged.fetchOlder() }
+  }
+
+  /// 차트 터치. 이전 3년을 받는 동안은 차트 제스처를 멈춘다 (D-108)
+  func handle(_ event: ChartGestureSurface.Event, width: Double) {
+    view?.handle(event, width: width, locked: older.isLoading)
+  }
+
+  /// 조회 데이터가 바뀌었다. 같은 값이면(자동 새로고침으로 바뀐 것이 없음) 십자선·범위를 건드리지 않는다
+  func dataChanged(period: ChartPeriod) {
+    guard let data = query.state.data, data.pages != pages else { return }
+    pages = data.pages
+    let previous = chart?.chart.dates
+    let next = ContractChartModel(data.merged)
+    chart = next
+    let count = next.chart.dates.count
+    if view == nil {
+      view = ChartViewState(period: period, barCount: count)
+    } else {
+      view?.dataChanged(
+        barCount: count, prepended: Self.prependedDates(previous: previous, next: next.chart.dates))
+    }
+  }
+
+  /// 앞에 붙은 날짜 수. 첫 날짜가 앞당겨지고 마지막 날짜가 같을 때만이다(새로고침으로 오늘이 붙는 경우와 구분)
+  /// (RN `viewportChange.ts` `prependedBars`)
+  static func prependedDates(previous: [LocalDate]?, next: [LocalDate]) -> Int {
+    guard let previous, let oldFirst = previous.first, let newFirst = next.first,
+      newFirst < oldFirst, previous.last == next.last
+    else { return 0 }
+    return next.count - previous.count
+  }
+
+  /// 끝값 라벨은 보이는 범위의 마지막 날 값이다(D-093). 범위가 없으면 전체 범위
+  func endLabels() -> [ContractChartModel.PriceLabel] {
+    guard let chart else { return [] }
+    let range = view?.viewport.visibleIndices ?? 0...max(chart.chart.dates.count - 1, 0)
+    return chart.visibleEndLabels(range)
+  }
+}

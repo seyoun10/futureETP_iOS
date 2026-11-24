@@ -110,3 +110,26 @@ private let twoLines = chart([
     #expect(m.endsRollYieldPct(at: 5) == nil)
   }
 }
+
+@Suite struct ContractScreenModelTests {
+  private let dates = ["2026-10-20", "2026-10-21", "2026-10-22"].map { LocalDate($0)! }
+
+  @Test func prependedDatesCountsOnlyOlderDatesWithSameLastDate() {
+    let older = [LocalDate("2026-10-16")!, LocalDate("2026-10-19")!] + dates
+    #expect(ContractScreenModel.prependedDates(previous: dates, next: older) == 2)
+    // 새로고침으로 오늘이 붙으면 앞에 붙은 것이 아니다
+    #expect(
+      ContractScreenModel.prependedDates(previous: dates, next: dates + [LocalDate("2026-10-23")!])
+        == 0)
+    #expect(ContractScreenModel.prependedDates(previous: nil, next: dates) == 0)
+  }
+
+  @Test func yLabelWidthFitsLongestEndValue() {
+    let wide = ContractChartModel(
+      chart([line("CLK20", "2020-05", last: "2020-04-21", front: true, [18.27, -37.63, 10.01])]))
+    #expect(
+      wide.yLabelWidth
+        == ChartText.width(NumberFormat.price(-37.63, decimals: 3)) + Double(ChartLayout.yLabelPad))
+    #expect(!wide.series.isLog)
+  }
+}
