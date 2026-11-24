@@ -19,6 +19,13 @@ private let utc = TimeZone(identifier: "UTC")!
     #expect(L10n.fill("{{x}} {{y}}", ["x": "1"]) == "1 {{y}}")
   }
 
+  @Test func appLanguageLocaleOverridesTheDeviceLanguage() {
+    let ko = AppLanguage.ko.locale(base: en)
+    let en = AppLanguage.en.locale(base: ko)
+    #expect(L10n.string("common.retry", locale: ko, bundle: bundle) == "다시 시도")
+    #expect(L10n.string("common.retry", locale: en, bundle: bundle) == "Retry")
+  }
+
   @Test func stringLooksUpTheLocaleLanguage() {
     #expect(L10n.string("common.retry", locale: ko, bundle: bundle) == "다시 시도")
     #expect(L10n.string("common.retry", locale: en, bundle: bundle) == "Retry")

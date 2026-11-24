@@ -90,6 +90,16 @@ struct DisplaySettingsTests {
     #expect(restored.upDownStyle == .us)
   }
 
+  @Test func localeTakesTheAppLanguageAndKeepsTheDeviceRegion() {
+    let settings = DisplaySettings(defaults: makeDefaults(), locale: Locale(identifier: "en_KR"))
+    settings.language = .ko
+    #expect(settings.locale.language.languageCode == .korean)
+    #expect(settings.locale.region == .southKorea)
+    settings.language = .en
+    #expect(settings.locale.language.languageCode == .english)
+    #expect(settings.locale.region == .southKorea)
+  }
+
   @Test func ignoresUnknownStoredValues() {
     let defaults = makeDefaults()
     defaults.set("JP", forKey: DisplaySettings.upDownStyleKey)

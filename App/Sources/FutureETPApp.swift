@@ -41,6 +41,8 @@ struct FutureETPApp: App {
         settings: settings
       )
       .environment(displaySettings)
+      // 앱 안 언어 설정을 화면 문구에 적용한다 (D-033, D-073)
+      .environment(\.locale, displaySettings.locale)
       // 다크 전용 테마(D-031)
       .preferredColorScheme(.dark)
       .background(Theme.Colors.background)
