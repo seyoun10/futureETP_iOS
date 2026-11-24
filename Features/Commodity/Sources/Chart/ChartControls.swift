@@ -137,3 +137,19 @@ struct ChartTabMessage: View {
       .frame(maxWidth: .infinity, maxHeight: .infinity)
   }
 }
+
+/// 이전 3년을 받아 차트에 붙일 때까지 차트 왼쪽 가운데에 띄우는 로딩 표시(D-104, RN `OlderDataIndicator`).
+/// 햅틱·5초 상한은 `OlderPages`, 그동안 터치는 차트 잠금(D-108)과 화면 터치 차단(D-139)이 막는다
+struct OlderDataIndicator: View {
+  var body: some View {
+    ProgressView()
+      .tint(Theme.Colors.text)
+      .padding(Theme.Spacing.sm)
+      .background(Theme.Colors.overlay, in: .circle)
+      .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+      .padding(.leading, Theme.Spacing.lg)
+      .allowsHitTesting(false)
+      .accessibilityLabel(Text("common.loading"))
+      .accessibilityIdentifier("olderDataIndicator")
+  }
+}

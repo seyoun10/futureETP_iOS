@@ -18,6 +18,11 @@ struct ChartViewState: Equatable {
   private(set) var period: ChartPeriod
   /// 홈에서 벗어나게 한 제스처. nil이면 홈이다
   private(set) var away: ChartGesture?
+  /// 보이는 범위를 알린 횟수. 보이는 봉 범위가 바뀌거나, 범위가 그대로여도 드래그·핀치가 끝나면 늘어난다
+  /// (가장 과거 끝에서 다시 끌면 이전 3년을 다시 시도, D-139, RN `useChartViewport` `reportRange`)
+  private(set) var rangeReports = 0
+  /// 이번 터치에서 드래그·핀치로 범위를 움직였는지
+  private var movedInGesture = false
 
   init(period: ChartPeriod, barCount: Int) {
     self.period = period
@@ -44,22 +49,34 @@ struct ChartViewState: Equatable {
     .lastBars(min(period.bars, barCount), of: barCount)
   }
 
-  /// 차트 터치. 십자선이 있을 때의 끌기는 십자선만 옮겨 범위를 바꾸지 않는다
-  mutating func handle(_ event: ChartGestureSurface.Event, width: Double) {
+  /// 차트 터치. 십자선이 있을 때의 끌기는 십자선만 옮겨 범위를 바꾸지 않는다.
+  /// `locked`(이전 3년을 받는 중, D-108)면 탭·길게 누르기·드래그·핀치를 무시한다
+  mutating func handle(_ event: ChartGestureSurface.Event, width: Double, locked: Bool = false) {
+    let before = viewport.visibleIndices
     switch event {
     case .touchSequenceBegan: interaction.touchSequenceBegan()
+    case .pinchEnded: interaction.pinchEnded()
+    case .activeChanged(let active):
+      if !active, movedInGesture {
+        movedInGesture = false
+        rangeReports += 1
+      }
+    case _ where locked: break
     case .tapped: interaction.tapped()
     case .pressed(let x): interaction.pressed(atX: x, width: width)
     case .dragged(let deltaX, let x):
       let moves = interaction.crosshairIndex == nil && !interaction.isPinching
       interaction.dragged(byX: deltaX, atX: x, width: width)
-      if moves { updateAway(.pan) }
+      if moves {
+        movedInGesture = true
+        updateAway(.pan)
+      }
     case .pinched(let scale, let startFocalX, let focalX):
       interaction.pinched(scale: scale, startFocalX: startFocalX, focalX: focalX, width: width)
+      movedInGesture = true
       updateAway(.zoom)
-    case .pinchEnded: interaction.pinchEnded()
-    case .activeChanged: break
     }
+    reportIfChanged(from: before)
   }
 
   /// 기간 칩을 눌렀다. 그 기간의 최근 위치로 맞추고 십자선을 지운다
@@ -70,19 +87,27 @@ struct ChartViewState: Equatable {
 
   /// [↻]: 고른 기간의 최근 위치로 돌아가고 십자선을 지운다
   mutating func resetView() {
+    let before = viewport.visibleIndices
     away = nil
     interaction.reset(viewport: Self.home(period, barCount: viewport.barCount))
+    reportIfChanged(from: before)
   }
 
   /// 차트 데이터가 바뀌었다(앞에 과거 봉 `prepended`개가 붙음·새로고침). 십자선은 지운다.
   /// 홈이면 같은 기간의 최근 위치로 다시 맞추고, 아니면 보던 날짜 범위를 그대로 둔다 (D-104)
   mutating func dataChanged(barCount: Int, prepended: Int) {
+    let before = viewport.visibleIndices
     if away == nil {
       interaction.reset(viewport: Self.home(period, barCount: barCount))
     } else {
       interaction.dataChanged(barCount: barCount, prepended: prepended)
       updateAway(nil)
     }
+    reportIfChanged(from: before)
+  }
+
+  private mutating func reportIfChanged(from before: ClosedRange<Int>?) {
+    if viewport.visibleIndices != before { rangeReports += 1 }
   }
 
   /// 홈으로 돌아왔으면 nil, 처음 벗어났으면 그 제스처. 한 번 핀치하면 홈에 돌아올 때까지 핀치로 둔다

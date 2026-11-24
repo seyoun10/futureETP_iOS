@@ -12,6 +12,8 @@ final class DisparityScreenModel {
   private(set) var chart: DisparityChartModel?
   /// 첫 데이터가 와서 기간을 맞춘 뒤 생긴다. 그 전에는 차트 대신 스켈레톤
   var view: ChartViewState?
+  /// 이전 3년 받기 (D-104, D-139)
+  let older = OlderPages()
 
   @ObservationIgnored private var pages: [DisparityChart] = []
 
@@ -20,6 +22,19 @@ final class DisparityScreenModel {
   }
 
   var query: Query<ChartPages<DisparityChart>> { paged.query }
+
+  /// 보이는 범위를 알렸다(`ChartViewState.rangeReports`)·더 받을 것이 바뀌었다. 가장 과거 봉이 보이면 이전 3년을 받는다
+  func rangeReported() async {
+    let paged = paged
+    await older.rangeReported(
+      firstVisible: view?.viewport.visibleIndices?.lowerBound, hasOlder: paged.hasOlder
+    ) { await paged.fetchOlder() }
+  }
+
+  /// 차트 터치. 이전 3년을 받는 동안은 차트 제스처를 멈춘다 (D-108)
+  func handle(_ event: ChartGestureSurface.Event, width: Double) {
+    view?.handle(event, width: width, locked: older.isLoading)
+  }
 
   /// 조회 데이터가 바뀌었다. 같은 값이면(자동 새로고침으로 바뀐 것이 없음) 십자선·범위를 건드리지 않는다
   func dataChanged(period: ChartPeriod) {

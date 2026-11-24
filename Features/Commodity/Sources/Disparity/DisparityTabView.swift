@@ -99,7 +99,7 @@ private struct DisparityChartView: View {
               series: chart.series, viewport: view.viewport, palette: display.palette,
               crosshairIndex: view.crosshairIndex, insetTop: infoHeight, axes: axes
             )
-            ChartGestureSurface { model.view?.handle($0, width: plotWidth) }
+            ChartGestureSurface { model.handle($0, width: plotWidth) }
               .accessibilityIdentifier("disparityChart")
             if let index = view.crosshairIndex {
               detail(
@@ -117,10 +117,14 @@ private struct DisparityChartView: View {
               ChartResetButton { model.view?.resetView() }
                 .padding(.bottom, ChartLayout.xLabelHeight + Theme.Spacing.xs)
             }
+            if model.older.isLoading {
+              OlderDataIndicator()
+            }
           }
         }
       }
       .sensoryFeedback(.selection, trigger: view?.crosshairIndex) { _, new in new != nil }
+      .sensoryFeedback(.impact(weight: .light), trigger: model.older.startCount)
       if !isLandscape, let view {
         PeriodChips(selected: view.selectedPeriod, nearest: view.nearestPeriod) { period in
           model.view?.select(period)
@@ -129,6 +133,27 @@ private struct DisparityChartView: View {
       }
     }
     .background(Theme.Colors.background)
+    .onChange(
+      of: OlderTrigger(reports: view?.rangeReports, hasOlder: model.paged.hasOlder), initial: true
+    ) {
+      Task { await model.rangeReported() }
+    }
+    .onDisappear { model.older.cancel() }
+    // 받는 동안 title-bar·tab-bar·기간 칩까지 막는다 (D-139)
+    .blocksTouches(model.older.isLoading)
+    .alert(
+      Text("chart.olderFailedTitle"), isPresented: Bindable(model.older).showsFailure
+    ) {
+      Button("common.confirm", role: .cancel) {}
+    } message: {
+      Text("chart.olderFailedMessage")
+    }
+  }
+
+  /// 보이는 범위를 알리거나 더 받을 것이 바뀌면 이전 3년을 확인한다 (RN `useOlderPages` effect `[range, hasNextPage]`)
+  private struct OlderTrigger: Equatable {
+    let reports: Int?
+    let hasOlder: Bool
   }
 
   /// 십자선 상세 박스. 정보 줄 아래, 봉·선을 가장 적게 가리는 귀퉁이에 둔다. 터치는 차트로 흘려보낸다

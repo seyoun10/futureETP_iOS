@@ -103,3 +103,54 @@ struct ChartViewStateTests {
     #expect(state.showsReset)
   }
 }
+
+/// 보이는 범위 알림과 잠금 (D-108, D-139)
+struct ChartViewStateRangeReportTests {
+  private let width = 126.0
+  private func make() -> ChartViewState { ChartViewState(period: .m6, barCount: 756) }
+
+  @Test func reportsWhenTheVisibleBarsChange() {
+    var state = make()
+    state.handle(.dragged(deltaX: 30.2, x: 60), width: width)
+    #expect(state.rangeReports == 1)
+    // 가장자리 봉이 그대로 걸쳐 있으면(599.8 → 599.7) 범위가 그대로다
+    state.handle(.dragged(deltaX: 0.1, x: 60), width: width)
+    #expect(state.rangeReports == 1)
+  }
+
+  @Test func reportsAgainWhenADragEndsWithTheSameRange() {
+    var state = ChartViewState(period: .m12, barCount: 100)
+    state.handle(.activeChanged(true), width: width)
+    // 가장 과거 끝에서 더 끌어도 범위가 그대로다
+    state.handle(.dragged(deltaX: 30, x: 60), width: width)
+    #expect(state.rangeReports == 0)
+    state.handle(.activeChanged(false), width: width)
+    #expect(state.rangeReports == 1)
+  }
+
+  @Test func tapOrLongPressEndDoesNotReport() {
+    var state = make()
+    state.handle(.activeChanged(true), width: width)
+    state.handle(.pressed(x: 60), width: width)
+    state.handle(.activeChanged(false), width: width)
+    #expect(state.rangeReports == 0)
+  }
+
+  @Test func lockedIgnoresGestures() {
+    var state = make()
+    state.handle(.dragged(deltaX: 30, x: 60), width: width, locked: true)
+    state.handle(.pressed(x: 60), width: width, locked: true)
+    #expect(state.viewport.lower == 630)
+    #expect(state.crosshairIndex == nil)
+    #expect(state.rangeReports == 0)
+  }
+
+  @Test func prependedBarsReportTheShiftedRange() {
+    var state = make()
+    state.handle(.dragged(deltaX: 30, x: 60), width: width)
+    let before = state.rangeReports
+    state.dataChanged(barCount: 1512, prepended: 756)
+    #expect(state.rangeReports == before + 1)
+    #expect(state.viewport.visibleIndices?.lowerBound == 1356)
+  }
+}
