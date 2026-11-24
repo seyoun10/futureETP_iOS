@@ -92,7 +92,8 @@ struct RootView: View {
     let repository = LiveCommoditiesRepository(client: client)
     return CommodityQueries(
       disparity: { queryCache.disparityChart(repository, code: $0, query: $1) },
-      contracts: { queryCache.contractsChart(repository, code: $0) })
+      contracts: { queryCache.contractsChart(repository, code: $0) },
+      curve: { queryCache.curve(repository, code: $0, baseDate: $1) })
   }
 
   /// 이 기기의 알림 대상 원자재가 없다. 설정을 받기 전이나 조회 실패면 점을 띄우지 않는다 (D-124)

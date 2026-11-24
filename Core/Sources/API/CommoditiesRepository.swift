@@ -85,3 +85,28 @@ extension QueryCache {
     }
   }
 }
+
+/// C-b 월물커브 `GET /v1/commodities/:code/curve?baseDate` (D-090)
+public protocol CurveRepository: Sendable {
+  func fetchCurve(_ code: CommodityCode, query: CurveQuery) async throws -> Curve
+}
+
+extension LiveCommoditiesRepository: CurveRepository {
+  public func fetchCurve(_ code: CommodityCode, query: CurveQuery) async throws -> Curve {
+    try await client.send(
+      APIRequest("/commodities/\(code.rawValue)/curve", query: query.queryItems, as: Curve.self))
+  }
+}
+
+extension QueryCache {
+  /// C-b 조회 (RN `useCurve` + `chartCacheOptions`). 기준일마다 다른 캐시 항목이고, nil은 서버가 고른 최근 기준일이다.
+  /// 화면을 떠나도 1시간 두고 `nextUpdateAt`까지 새것으로 본다
+  public func curve(_ repository: any CurveRepository, code: CommodityCode, baseDate: LocalDate?)
+    -> Query<Curve>
+  {
+    query(
+      QueryKeys.curve(code, baseDate: baseDate), keepFor: Self.chartKeepFor,
+      stalePolicy: .untilNextUpdate, freshness: { $0.freshness },
+      fetch: { try await repository.fetchCurve(code, query: CurveQuery(baseDate: baseDate)) })
+  }
+}

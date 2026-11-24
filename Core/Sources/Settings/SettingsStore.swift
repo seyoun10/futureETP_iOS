@@ -20,6 +20,11 @@ public enum QueryKeys {
   public static func contracts(_ code: CommodityCode) -> [String] {
     commodity(code) + ["contracts"]
   }
+
+  /// 기준일이 nil(서버가 고른 최근 기준일)이면 `"latest"`
+  public static func curve(_ code: CommodityCode, baseDate: LocalDate?) -> [String] {
+    commodity(code) + ["curve", baseDate?.description ?? "latest"]
+  }
 }
 
 /// 서버 설정 조회와 낙관적 변경 (RN `api/useSettings.ts`, D-082).

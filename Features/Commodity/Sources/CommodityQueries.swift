@@ -6,12 +6,16 @@ public struct CommodityQueries {
   public let disparity: @MainActor (CommodityCode, DisparityQuery) -> PagedQuery<DisparityChart>
   /// C-c 조회. 원자재마다 하나다
   public let contracts: @MainActor (CommodityCode) -> PagedQuery<ContractsChart>
+  /// C-b 조회. 기준일마다 다른 캐시 항목이다(nil은 서버가 고른 최근 기준일)
+  public let curve: @MainActor (CommodityCode, LocalDate?) -> Query<Curve>
 
   public init(
     disparity: @escaping @MainActor (CommodityCode, DisparityQuery) -> PagedQuery<DisparityChart>,
-    contracts: @escaping @MainActor (CommodityCode) -> PagedQuery<ContractsChart>
+    contracts: @escaping @MainActor (CommodityCode) -> PagedQuery<ContractsChart>,
+    curve: @escaping @MainActor (CommodityCode, LocalDate?) -> Query<Curve>
   ) {
     self.disparity = disparity
     self.contracts = contracts
+    self.curve = curve
   }
 }
