@@ -9,7 +9,6 @@ public struct CommodityListView: View {
   private let onSelect: (CommodityCode) -> Void
   private let onOpenSettings: () -> Void
   @State private var refresh = PullRefresh()
-  @State private var settingsTaps = 0
 
   /// - Parameters:
   ///   - alertOff: 이 기기의 알림 대상 원자재가 없다. [⚙]에 빨간 점을 띄운다 (D-124)
@@ -38,13 +37,12 @@ public struct CommodityListView: View {
     .toolbarTitleDisplayMode(.inlineLarge)
     .toolbar {
       ToolbarItem(placement: .topBarTrailing) {
-        settingsButton
+        SettingsButton(alertOff: alertOff, action: onOpenSettings)
       }
     }
     // 새로고침 중에는 헤더를 포함한 화면 전체 터치를 막는다 (D-138)
     .blocksTouches(refresh.isRefreshing)
     .sensoryFeedback(.impact(weight: .light), trigger: refresh.pullCount)
-    .sensoryFeedback(.selection, trigger: settingsTaps)
     .alert(Text("commodityList.refreshFailedTitle"), isPresented: $refresh.showsFailure) {
       Button("common.confirm", role: .cancel) {}
     } message: {
@@ -70,27 +68,6 @@ public struct CommodityListView: View {
         return query.state.error == nil
       }
     }
-  }
-
-  private var settingsButton: some View {
-    Button {
-      settingsTaps += 1
-      onOpenSettings()
-    } label: {
-      Image(systemName: "gearshape")
-        .foregroundStyle(Theme.Colors.text)
-        .overlay(alignment: .topTrailing) {
-          if alertOff {
-            Circle()
-              .fill(Theme.Colors.badge)
-              .frame(width: 8, height: 8)
-              .offset(x: 3, y: -3)
-          }
-        }
-    }
-    .accessibilityLabel(Text("settings.title"))
-    .accessibilityHint(alertOff ? Text("settings.alertOffBadge") : Text(verbatim: ""))
-    .accessibilityIdentifier("openSettings")
   }
 }
 

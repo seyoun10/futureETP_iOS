@@ -43,14 +43,21 @@ struct RootView: View {
       NavigationStack(path: $path) {
         CommodityListView(
           query: queryCache.commodityList(LiveCommoditiesRepository(client: client)),
-          // 설정을 받기 전이나 조회 실패면 점을 띄우지 않는다 (D-124)
-          alertOff: settings.data.map { $0.alertCommodity == nil } ?? false,
+          alertOff: alertOff,
           onSelect: { path.append(.commodity($0)) },
           onOpenSettings: { path.append(.settings) }
         )
         .navigationDestination(for: Route.self) { route in
           switch route {
-          case .commodity: CommodityView()
+          case .commodity(let code):
+            CommodityView(
+              code: code,
+              isAlert: settings.data?.alertCommodity == code,
+              alertOff: alertOff,
+              // 탭 이력과 상관없이 A로 간다 (screens.md C)
+              onBack: { path.removeAll() },
+              onOpenSettings: { path.append(.settings) }
+            )
           case .settings: SettingsView()
           case .accessKey: accessKey
           #if DEBUG
@@ -77,6 +84,11 @@ struct RootView: View {
     } else {
       NavigationStack { accessKey }
     }
+  }
+
+  /// 이 기기의 알림 대상 원자재가 없다. 설정을 받기 전이나 조회 실패면 점을 띄우지 않는다 (D-124)
+  private var alertOff: Bool {
+    settings.data.map { $0.alertCommodity == nil } ?? false
   }
 
   // 저장 뒤 옛 키로 실패한 조회를 다시 불러온다. 보이는 화면만 바로, 나머지는 다음 진입 때 (D-044)
