@@ -25,6 +25,13 @@ public final class DisplaySettings {
   /// 언어만 앱 설정으로 바꾸고 지역·달력 등은 기기 값을 둔다
   public var locale: Locale { language.locale(base: baseLocale) }
 
+  /// 기기 언어·지역 기준 기본값으로 되돌린다(B [초기화])
+  public func reset() {
+    let fallback = Self.defaults(for: baseLocale)
+    language = fallback.language
+    upDownStyle = fallback.upDownStyle
+  }
+
   @ObservationIgnored private let defaults: UserDefaults
   @ObservationIgnored private let baseLocale: Locale
 
@@ -41,7 +48,7 @@ public final class DisplaySettings {
   }
 
   /// 저장값이 없을 때 기기 언어·지역으로 정하는 기본값
-  nonisolated static func defaults(for locale: Locale) -> (
+  nonisolated public static func defaults(for locale: Locale) -> (
     language: AppLanguage, upDownStyle: UpDownStyle
   ) {
     (

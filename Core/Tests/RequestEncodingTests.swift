@@ -136,6 +136,13 @@ struct RareLevelsTests {
     #expect(RareLevels(levels) == nil)
   }
 
+  @Test func disparityDefaultsMatchServerColumns() {
+    let patch = SettingsPatch.disparityDefaults
+    #expect(patch.basis == .front && patch.maPeriod == .days100 && patch.window == .years10)
+    #expect(patch.rareLevels?.values == [1, 2, 4, 8, 16])
+    #expect(patch.locale == nil && patch.alertCommodity == nil && patch.quietTime == nil)
+  }
+
   @Test(arguments: [
     (QuietTime(startMin: 1320, endMin: 420), true),  // 자정 넘김
     (QuietTime(startMin: 0, endMin: 1410), true),

@@ -12,17 +12,21 @@ public struct RareLevels: Sendable, Equatable, Encodable {
   /// 개수·범위·소수 첫째 자리·중복을 본다. 부동소수 오차(0.30000000000000004)는 허용하고 반올림한 값을 쓴다.
   /// 중복은 반올림 뒤 값으로 본다(1과 1.00000000001은 중복). 규칙 밖이면 nil
   public init?(_ levels: [Double]) {
-    guard levels.count == Self.count else { return nil }
-    var tenths: [Int] = []
-    for level in levels {
-      guard level.isFinite, Self.range.contains(level) else { return nil }
-      let scaled = level * 10
-      guard abs(scaled - scaled.rounded()) < 1e-9 else { return nil }
-      tenths.append(Int(scaled.rounded()))
-    }
+    guard levels.count == Self.count, levels.allSatisfy(Self.isValid) else { return nil }
+    let tenths = levels.map { Int(($0 * 10).rounded()) }
     guard Set(tenths).count == tenths.count else { return nil }
     values = tenths.sorted().map { Double($0) / 10 }
   }
+
+  /// 레벨 하나가 범위 안이고 소수 첫째 자리까지다(원본 `rareLevelSchema`). 부동소수 오차는 허용한다
+  public static func isValid(_ level: Double) -> Bool {
+    guard level.isFinite, range.contains(level) else { return false }
+    let scaled = level * 10
+    return abs(scaled - scaled.rounded()) < 1e-9
+  }
+
+  /// 이격도차트 기본 레벨 (원본 `DISPARITY_SETTINGS_DEFAULTS.rareLevels`)
+  public static let defaults = RareLevels([1, 2, 4, 8, 16])!
 
   /// query 문자열 `1,2.5,5,10,20`. 각 값은 JS 숫자 기본 문자열과 같다(정수는 소수점 없이)
   public var queryValue: String {

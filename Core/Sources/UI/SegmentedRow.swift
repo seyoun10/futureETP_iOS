@@ -40,17 +40,19 @@ public struct SegmentedRow<Value: Hashable>: View {
   public var body: some View {
     VStack(alignment: .leading, spacing: 0) {
       if stacked {
-        VStack(alignment: .leading, spacing: Theme.Spacing.sm) {
-          title
-          group
-        }
-        .modifier(RowPadding())
+        stackedLayout
       } else {
-        HStack(spacing: Theme.Spacing.sm) {
-          title.frame(maxWidth: .infinity, alignment: .leading)
-          group
+        // 이름과 선택지가 한 줄에 들어가지 않으면(긴 영어 선택지) 쌓아서 선택지가 잘리지 않게 한다
+        ViewThatFits(in: .horizontal) {
+          // 이름·선택지 모두 줄이지 않은 폭으로 재야 넘칠 때 쌓은 배치로 간다
+          HStack(spacing: Theme.Spacing.sm) {
+            title.fixedSize()
+            Spacer(minLength: 0)
+            group(stacked: false).fixedSize()
+          }
+          .modifier(RowPadding())
+          stackedLayout
         }
-        .modifier(RowPadding())
       }
       if let description {
         Text(verbatim: description)
@@ -70,7 +72,15 @@ public struct SegmentedRow<Value: Hashable>: View {
       .foregroundStyle(Theme.Colors.text)
   }
 
-  private var group: some View {
+  private var stackedLayout: some View {
+    VStack(alignment: .leading, spacing: Theme.Spacing.sm) {
+      title
+      group(stacked: true)
+    }
+    .modifier(RowPadding())
+  }
+
+  private func group(stacked: Bool) -> some View {
     HStack(spacing: 0) {
       ForEach(options.indices, id: \.self) { index in
         let option = options[index]

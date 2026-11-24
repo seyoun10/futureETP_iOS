@@ -48,7 +48,7 @@ public final class SettingsStore {
   private var pending: [(id: Int, patch: SettingsPatch)] = []
   @ObservationIgnored private var nextID = 0
   /// 마지막으로 줄 세운 변경. 다음 변경은 이것이 끝난 뒤 보낸다(RN mutation `scope`)
-  @ObservationIgnored private var tail: Task<Void, Never>?
+  @ObservationIgnored private var tail: Task<(any Error)?, Never>?
 
   public init(repository: any SettingsRepository, cache: QueryCache) {
     self.repository = repository
@@ -62,23 +62,25 @@ public final class SettingsStore {
     return pending.reduce(settings) { $0.applying($1.patch) }
   }
 
-  /// 변경을 줄 세워 보낸다. 반환된 Task는 그 변경이 끝나면(성공·실패) 끝난다. 실패는 오류 줄 대신 서버 값 재조회로 맞춘다
+  /// 변경을 줄 세워 보낸다. 반환된 Task는 그 변경이 끝나면 실패 원인(성공이면 nil)으로 끝난다.
+  /// 실패하면 서버 값을 다시 조회해 맞춘다. 오류 줄은 부른 화면이 정한다(B는 띄우고 시간대·언어 맞춤은 띄우지 않는다)
   @discardableResult
-  public func update(_ patch: SettingsPatch) -> Task<Void, Never> {
+  public func update(_ patch: SettingsPatch) -> Task<(any Error)?, Never> {
     let id = nextID
     nextID += 1
     pending.append((id, patch))
     let previous = tail
-    let task = Task {
-      await previous?.value
-      await send(patch)
+    let task = Task { () -> (any Error)? in
+      _ = await previous?.value
+      let error = await send(patch)
       pending.removeAll { $0.id == id }
+      return error
     }
     tail = task
     return task
   }
 
-  private func send(_ patch: SettingsPatch) async {
+  private func send(_ patch: SettingsPatch) async -> (any Error)? {
     // 진행 중인 조회가 PATCH보다 늦게 끝나 옛 값으로 덮지 않게 끊는다
     query.cancel()
     do {
@@ -87,9 +89,11 @@ public final class SettingsStore {
       query.setData(settings)
       // 알림 대상이 바뀌면 A 목록의 🔔도 바뀐다 (D-124)
       if patch.alertCommodity != nil { cache.invalidate(prefix: QueryKeys.commodityList) }
+      return nil
     } catch {
       // 응답을 못 받았을 뿐 서버에 반영됐을 수 있어 서버 값을 다시 맞춘다. 기다리지 않는다
       query.invalidate()
+      return error
     }
   }
 }

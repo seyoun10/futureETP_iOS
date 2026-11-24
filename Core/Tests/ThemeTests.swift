@@ -90,6 +90,15 @@ struct DisplaySettingsTests {
     #expect(restored.upDownStyle == .us)
   }
 
+  @Test func resetReturnsToDeviceDefaults() {
+    let settings = DisplaySettings(defaults: makeDefaults(), locale: Locale(identifier: "ko_KR"))
+    settings.language = .en
+    settings.upDownStyle = .us
+    settings.reset()
+    #expect(settings.language == .ko)
+    #expect(settings.upDownStyle == .kr)
+  }
+
   @Test func localeTakesTheAppLanguageAndKeepsTheDeviceRegion() {
     let settings = DisplaySettings(defaults: makeDefaults(), locale: Locale(identifier: "en_KR"))
     settings.language = .ko

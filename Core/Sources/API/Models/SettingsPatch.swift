@@ -63,3 +63,10 @@ extension QuietTime {
     return valid(startMin) && valid(endMin) && startMin != endMin
   }
 }
+
+extension SettingsPatch {
+  /// 이격도차트 설정 기본값. 서버 기기 설정 컬럼 기본값과 같고 B [초기화]가 이 값으로 PATCH한다
+  /// (원본 `DISPARITY_SETTINGS_DEFAULTS`)
+  public static let disparityDefaults = SettingsPatch(
+    basis: .front, maPeriod: .days100, window: .years10, rareLevels: .defaults)
+}

@@ -79,11 +79,11 @@ private func waitUntil(_ condition: () async -> Bool) async {
     #expect(await repository.calls == ["fetch", "update KR"])
 
     await repository.finishUpdate(.success(settings(basis: .kr)))
-    await first.value
+    _ = await first.value
     #expect(store.data?.basis == .us)
     await waitUntil { await repository.waiting.updates == 1 }
     await repository.finishUpdate(.success(settings(basis: .us)))
-    await second.value
+    _ = await second.value
     #expect(await repository.calls == ["fetch", "update KR", "update US"])
     #expect(store.query.state.data?.basis == .us)
   }
@@ -94,12 +94,12 @@ private func waitUntil(_ condition: () async -> Bool) async {
     let second = store.update(SettingsPatch(locale: .en))
     await waitUntil { await repository.waiting.updates == 1 }
     await repository.finishUpdate(.failure(AppError(.network)))
-    await first.value
+    _ = await first.value
     #expect(store.data?.basis == .front)
     #expect(store.data?.locale == .en)
     await waitUntil { await repository.waiting.updates == 1 }
     await repository.finishUpdate(.success(settings(locale: .en)))
-    await second.value
+    _ = await second.value
     #expect(store.data?.locale == .en)
   }
 
@@ -111,7 +111,7 @@ private func waitUntil(_ condition: () async -> Bool) async {
     let update = store.update(SettingsPatch(basis: .kr))
     await waitUntil { await repository.waiting.updates == 1 }
     await repository.finishUpdate(.success(settings(basis: .kr)))
-    await update.value
+    _ = await update.value
     // 끊긴 조회가 늦게 옛 값으로 끝나도 버린다
     await repository.finishFetch(.success(settings()))
     await refetch.value
@@ -125,7 +125,7 @@ private func waitUntil(_ condition: () async -> Bool) async {
     let update = store.update(SettingsPatch(basis: .kr))
     await waitUntil { await repository.waiting.updates == 1 }
     await repository.finishUpdate(.failure(AppError(.timeout)))
-    await update.value
+    #expect((await update.value as? AppError)?.code == .timeout)
     await waitUntil { await repository.waiting.fetches == 1 }
     #expect(await repository.calls == ["fetch", "update KR", "fetch"])
     await repository.finishFetch(.success(settings(basis: .kr)))
@@ -143,13 +143,13 @@ private func waitUntil(_ condition: () async -> Bool) async {
     let other = store.update(SettingsPatch(basis: .kr))
     await waitUntil { await repository.waiting.updates == 1 }
     await repository.finishUpdate(.success(settings(basis: .kr)))
-    await other.value
+    _ = await other.value
     #expect(await counter.value == 1)
 
     let alert = store.update(SettingsPatch(alertCommodity: .some(nil)))
     await waitUntil { await repository.waiting.updates == 1 }
     await repository.finishUpdate(.success(settings()))
-    await alert.value
+    _ = await alert.value
     await waitUntil { await counter.value == 2 }
     #expect(await counter.value == 2)
   }
@@ -182,7 +182,7 @@ private func waitUntil(_ condition: () async -> Bool) async {
     await waitUntil { await counter.value == 1 }
     query.cancel()
     await query.refetch()
-    await first.value
+    _ = await first.value
     #expect(query.state.data == 2)
   }
 }
