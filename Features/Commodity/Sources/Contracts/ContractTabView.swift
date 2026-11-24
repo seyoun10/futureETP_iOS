@@ -60,6 +60,13 @@ private struct ContractChartView: View {
             )
             ChartGestureSurface { model.handle($0, width: plotWidth) }
               .accessibilityIdentifier("contractChart")
+            if let index = view.crosshairIndex {
+              detail(
+                index: index, viewport: view.viewport,
+                plot: CGSize(
+                  width: plotWidth,
+                  height: max(geometry.size.height - ChartLayout.xLabelHeight, 1)))
+            }
             ContractLegend(chart: chart)
               .onGeometryChange(for: CGFloat.self, of: \.size.height) { legendHeight = $0 }
               .frame(maxHeight: .infinity, alignment: .top)
@@ -105,6 +112,17 @@ private struct ContractChartView: View {
   private struct OlderTrigger: Equatable {
     let reports: Int?
     let hasOlder: Bool
+  }
+
+  /// 십자선 상세 박스. 범례 아래, 선을 가장 적게 가리는 귀퉁이에 둔다. 터치는 차트로 흘려보낸다
+  private func detail(index: Int, viewport: CandleViewport, plot: CGSize) -> some View {
+    PlacedDetailBox(
+      rows: ContractDetail.rows(chart, index: index) { L10n.string($0, $1, locale: locale) },
+      index: index, series: chart.series, viewport: viewport, plot: plot, insetTop: legendHeight
+    )
+    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+    .allowsHitTesting(false)
+    .accessibilityIdentifier("contractDetail")
   }
 
   /// 축 입력. y축 라벨은 각 선의 보이는 범위 끝값을 선 색으로(D-093), 가격 점선은 없다

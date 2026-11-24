@@ -8,6 +8,8 @@ enum DetailRow: Equatable {
     var label: String
     var value: String?
     var color: Color = Theme.Colors.text
+    /// 이름 뒤 표식(C-c 대표월물 ●). 줄 색이 아니라 A 원자재 목록과 같은 회색이다
+    var mark: String? = nil
   }
 
   case single(Cell)
@@ -26,7 +28,12 @@ struct DetailBox: View {
         case .single(let cell):
           GridRow {
             HStack(spacing: Theme.Spacing.md) {
-              Text(verbatim: cell.label)
+              HStack(spacing: 0) {
+                Text(verbatim: cell.label)
+                if let mark = cell.mark {
+                  Text(verbatim: mark).foregroundStyle(Theme.Colors.textSecondary)
+                }
+              }
               Spacer(minLength: 0)
               if let value = cell.value { Text(verbatim: value) }
             }

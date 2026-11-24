@@ -133,3 +133,32 @@ private let twoLines = chart([
     #expect(!wide.series.isLog)
   }
 }
+
+@Suite struct ContractDetailTests {
+  private let t: DisparityInfo.Translate = { key, values in
+    values.isEmpty
+      ? key
+      : "\(key)(\(values.sorted { $0.key < $1.key }.map { "\($0.key)=\($0.value)" }.joined()))"
+  }
+
+  @Test func rowsAreDateThenPricedContractsInLineColorThenRollYield() {
+    let model = ContractChartModel(twoLines)
+    let rows = ContractDetail.rows(model, index: 1, t: t)
+    let colors = Theme.ChartColors.contractLines
+    let pct = NumberFormat.changePct(try! #require(model.endsRollYieldPct(at: 1)))
+    #expect(
+      rows == [
+        .single(.init(label: "2026-10-21", value: nil)),
+        .single(.init(label: "DEC26", value: "3.200", color: colors[0], mark: "●")),
+        .single(.init(label: "JAN27", value: "3.500", color: colors[1])),
+        .single(.init(label: "contracts.rollYield", value: "curve.perYear(pct=\(pct))")),
+      ])
+  }
+
+  @Test func lastDateIsProvisionalAndSinglePriceHasNoRollYield() {
+    let rows = ContractDetail.rows(ContractChartModel(twoLines), index: 2, t: t)
+    #expect(rows.first == .single(.init(label: "2026-10-22", value: "contracts.provisional")))
+    #expect(rows.count == 2)
+    #expect(ContractDetail.rows(ContractChartModel(twoLines), index: 3, t: t).isEmpty)
+  }
+}
