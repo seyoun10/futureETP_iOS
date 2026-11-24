@@ -18,3 +18,7 @@ Config/Secrets*.xcconfig
 !Config/Secrets.example.xcconfig
 GoogleService-Info.plist
 .DS_Store
+# Tuist 생성물
+*.xcodeproj
+*.xcworkspace
+Derived/

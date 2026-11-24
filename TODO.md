@@ -18,16 +18,16 @@
 ## 0. 환경
 - [x] Xcode 27.2(27B52) · Swift 6.4.4 · 시뮬레이터 런타임 iOS 27.2 확인(2026-11-24)
 - [ ] Apple Developer 가입 전에는 시뮬레이터와 개인 무료 서명(7일) 실기기만 가능. APNs는 가입 뒤 (D-039, futureETP TODO 5-10)
-- [ ] 프로젝트 파일 관리: Xcode 프로젝트 직접 vs XcodeGen·Tuist 생성(사람이 아닌 Claude가 편집하기 쉬운 쪽)을 1단계에서 정한다
+- [x] 프로젝트 파일 관리: Tuist 4.218.4 + mise 고정 (IOS-003)
 
 ## 1. 스택 확정
 - [ ] `docs/tech-stack.md`의 후보를 하나씩 정한다. 각 패키지·도구의 최신 안정 버전을 웹 검색으로 확인하고 출처 날짜를 적는다. 결정과 근거는 `docs/decisions.md`(IOS-003부터)
 - [ ] 차트 방식은 2단계 뒤 C-a 스파이크(아래 4단계 첫 항목)로 정한다
 
 ## 2. 스캐폴딩
-- [ ] 프로젝트 생성, 앱 ID `io.github.seyoon.futureetp`·dev `.dev` 두 변형, 앱 이름·아이콘(RN `apps/mobile/assets` 재사용)
+- [ ] `brew install mise` → `mise install`(Tuist), `Project.swift`로 프로젝트 생성, 앱 ID `io.github.seyoon.futureetp`·dev `.dev` 두 변형, 앱 이름·아이콘(RN `apps/mobile/assets` 재사용)
 - [ ] lint·format·test 설정과 검사 명령 하나(`check`), CLAUDE.md Commands를 실제 명령으로 갱신
-  - import 방향 규칙(architecture.md "규칙")을 검사에 넣는다. 후보: feature·Core를 SPM 로컬 패키지 모듈로 나눠 컴파일러가 막게 하거나, 검사 스크립트
+  - import 방향 규칙(architecture.md "규칙")은 Tuist 타깃(App → features → Core) 의존성으로 컴파일러가 막는다 (IOS-003)
 - [ ] dev 변형이 로컬 dev 서버 `GET /v1/health`를 부르는 최소 화면으로 연결 확인
 - [ ] (선택) 원격 저장소·CI(GitHub Actions에서 check)
 

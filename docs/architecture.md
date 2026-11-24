@@ -6,30 +6,32 @@
 ## 디렉터리 구조 (초안)
 
 ```
-FutureETP/
-├─ App/                          @main, 루트 내비게이션, 환경(설정·Locale) 주입
-├─ Features/
-│  ├─ CommodityList/             A
-│  ├─ Settings/ AlertSettings/ AccessKey/ DataSources/   B, B-a, B-b
-│  └─ Commodity/                 C: DisparityChart(C-a)·ContractChart(C-c)·Curve(C-b)·ETP(C-d, C-d-a)
-├─ Core/
-│  ├─ API/                       APIClient, AppError, 엔드포인트, Codable 모델, 조회 캐시
-│  ├─ Charts/                    Canvas 차트·뷰포트
-│  ├─ UI/                        공용 View(ScreenHeader, FreshnessLine, QueryStateView, SegmentedControl)
-│  ├─ Settings/                  기기 UI 설정(언어·등락 색)
-│  ├─ Theme/                     테마 토큰(다크 전용)
-│  ├─ Push/                      APNs 등록, 알림 탭 이동
-│  └─ Util/                      숫자·날짜 포맷, Keychain, 햅틱
-└─ Resources/                    Localizable.xcstrings, InfoPlist.xcstrings, Assets
-FutureETPTests/                  Swift Testing
-FutureETPUITests/
-docs/                            tech-stack, architecture, decisions
+Project.swift / Tuist/          Tuist 프로젝트 정의(타깃·configuration·의존성, IOS-003). 생성물은 커밋 안 함
+mise.toml                       Tuist 버전 고정
+Config/                         *.xcconfig(Debug-Dev·Release, Secrets.example)
+App/                            타깃 FutureETP: @main, 루트 내비게이션, 환경(설정·Locale) 주입. features·Core에 의존
+Features/                       feature마다 framework 타깃 하나. Core에만 의존
+├─ CommodityList/               A
+├─ Settings/                    B, B-a, B-b, 데이터 출처
+└─ Commodity/                   C: DisparityChart(C-a)·ContractChart(C-c)·Curve(C-b)·ETP(C-d, C-d-a)
+Core/                           framework 타깃 Core. 다른 타깃에 의존하지 않음
+├─ API/                         APIClient, AppError, 엔드포인트, Codable 모델, 조회 캐시
+├─ Charts/                      차트·뷰포트
+├─ UI/                          공용 View(ScreenHeader, FreshnessLine, QueryStateView, SegmentedControl)
+├─ Settings/                    기기 UI 설정(언어·등락 색)
+├─ Theme/                       테마 토큰(다크 전용)
+├─ Push/                        APNs 등록, 알림 탭 이동
+├─ Util/                        숫자·날짜 포맷, Keychain, 햅틱
+└─ Resources/                   Localizable.xcstrings, Assets(앱 타깃은 InfoPlist.xcstrings)
+*/Tests/                        타깃별 Swift Testing 테스트 타깃
+FutureETPUITests/               XCUITest
+docs/                           tech-stack, architecture, decisions
 ```
 
 규칙
 - 화면 → `@Observable` 모델(화면별 Model) → repository → API client 한 방향. 화면은 HTTP·저장소를 직접 부르지 않는다.
 - 화면 전용 코드는 해당 feature 안에, 두 곳 이상에서 쓰면 공용 계층(`core`)으로 옮긴다.
-- import 방향(RN D-041, 2026-11-19 lint로 강제): feature끼리 import하지 않는다(컴포넌트·헬퍼·조회도 다른 feature가 쓰면 `Core`로 옮긴다). `Core`는 features·`App`을 import하지 않고, features는 `App`(라우트)을 import하지 않는다. 2단계에서 검사로 강제한다.
+- import 방향(RN D-041, 2026-11-19 lint로 강제): feature끼리 import하지 않는다(컴포넌트·헬퍼·조회도 다른 feature가 쓰면 `Core`로 옮긴다). `Core`는 features·`App`을 import하지 않고, features는 `App`(라우트)을 import하지 않는다. Tuist 타깃 의존성(App → features → Core)으로 컴파일러가 막는다(IOS-003).
 - RN에서 공용으로 옮긴 것: `SectionHeader`·`SettingsHeaderButton`(공용 UI), 에러 code → 사용자 문구 함수 `errorText`(API의 `AppError` 옆), ETP 정렬 기준 `ETP_SORTS`(util).
 - 월물 심볼은 서버 표준형(`CLZ26`)만 쓴다. 표시 표기(`DEC26`)는 포맷 함수가 만든다.
 
