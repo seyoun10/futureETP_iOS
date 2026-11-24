@@ -33,7 +33,8 @@
   - View 완료(2026-11-24): `FooterLine`·`FreshnessLine`(`FooterTime`)·`QueryStateView`(`QueryState.phase`)·`LoadingView`·`CenterSpinner`·`ErrorView`
   - 조회 캐시 완료(2026-11-24): `QueryCache`(키 접두사 무효화·`keepFor` 5분/차트 1시간)·`Query`(진행 중 조회 합류·`StalePolicy.untilNextUpdate`)·`.queryLifecycle`(진입·앱 복귀 재조회·`nextUpdateAt` + 1분 자동 새로고침)·키 저장 뒤 전체 무효화. 남음: 무한 조회(`before`, C-a·C-c에서), 기준 시각 줄을 홈 인디케이터 여백에 겹치는 배치·화면에서 기기 확인(A 화면에서)
 - [ ] 앱 실행 때 시간대 PATCH (D-084), 세로 잠금·[⟲] 가로 전환 (D-076)
-  - 시간대·언어 PATCH 코드 완료(2026-11-24): `SettingsStore`(설정 조회·낙관적 PATCH 줄 세우기)·`.deviceSettingsSync`(루트, 키 있을 때). 남음: dev 서버에서 기기 시간대·언어 바꿔 PATCH 확인, 세로 잠금·[⟲] 가로 전환
+  - 시간대·언어 PATCH 코드 완료(2026-11-24): `SettingsStore`(설정 조회·낙관적 PATCH 줄 세우기)·`.deviceSettingsSync`(루트, 키 있을 때). 남음: dev 서버에서 기기 시간대·언어 바꿔 PATCH 확인
+  - 세로 잠금 기반 완료(2026-11-24): `OrientationLock`(시작 세로, `lockPortrait`·`lockLandscape`·[⟲]용 `toggle(isLandscape:)`, `AppDelegate`가 허용 방향 반환)·`\.isLandscape`(창 모양, 루트 `providesIsLandscape`). 남음(C 화면에서): C title-bar [⟲](ETP 탭 밖에서만), ETP 탭 진입·C를 떠날 때 `lockPortrait`, 가로 title-bar·tab-bar 높이, 시뮬레이터 회전 확인
 
 ## 4. 화면 수직 슬라이스 (RN 순서)
 - [ ] C-a 차트 스파이크: 봉 756개 + 이평선·rare-level 밴드, 핀치·드래그·십자선, 가장 과거 봉이 보이면 이전 3년 이어 받기에서 범위 유지, 60fps 이상 (D-056, D-087, D-104, D-106) → 차트 방식 결정
