@@ -49,6 +49,8 @@ let project = Project(
         "CFBundleVersion": "$(CURRENT_PROJECT_VERSION)",
         "UILaunchScreen": ["UIColorName": "LaunchBackground"],
         "UIUserInterfaceStyle": "Dark",
+        // ProMotion 기기에서 차트 제스처를 120Hz로 그린다 (C-a 스파이크)
+        "CADisableMinimumFrameDurationOnPhone": true,
         // 세로 고정, [⟲]로만 가로 전환 (D-076). 잠금은 코드에서 한다
         "UISupportedInterfaceOrientations": [
           "UIInterfaceOrientationPortrait",
@@ -105,12 +107,23 @@ let project = Project(
       dependencies: [.target(name: "Settings"), .target(name: "Core")],
       settings: .settings(base: mainActorSettings, defaultSettings: defaultSettings)
     ),
+    .target(
+      name: "CommodityTests",
+      destinations: destinations,
+      product: .unitTests,
+      bundleId: "io.github.seyoon.futureetp.commoditytests",
+      deploymentTargets: deploymentTargets,
+      sources: ["Features/Commodity/Tests/**"],
+      dependencies: [.target(name: "Commodity"), .target(name: "Core")],
+      settings: .settings(base: mainActorSettings, defaultSettings: defaultSettings)
+    ),
   ] + features.map(feature),
   schemes: [
     .scheme(
       name: "FutureETP-Dev",
       buildAction: .buildAction(targets: ["FutureETP"]),
-      testAction: .targets(["CoreTests", "SettingsTests"], configuration: "Debug-Dev"),
+      testAction: .targets(
+        ["CoreTests", "SettingsTests", "CommodityTests"], configuration: "Debug-Dev"),
       runAction: .runAction(configuration: "Debug-Dev"),
       archiveAction: .archiveAction(configuration: "Debug-Dev"),
       profileAction: .profileAction(configuration: "Debug-Dev"),

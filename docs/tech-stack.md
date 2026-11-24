@@ -1,10 +1,10 @@
 # Tech Stack
 
-> Swift/SwiftUI 앱의 스택. 차트만 C-a 스파이크 뒤 확정한다.
+> Swift/SwiftUI 앱의 스택.
 > 결정 근거는 `decisions.md`(IOS-xxx)에 적고 여기에는 결과만 적는다. 버전은 확정할 때 웹 검색으로 최신 안정판을 확인하고 출처 날짜를 함께 적는다.
 > 서버·DB·배치는 `../futureETP/docs/tech-stack.md`(공용).
 
-상태: 확정 (2026-11-24, IOS-003~006). 차트만 후보
+상태: 확정 (2026-11-24, IOS-003~008)
 
 | 영역 | 선택 | 메모 |
 |---|---|---|
@@ -13,7 +13,7 @@
 | 상태 | Observation(`@Observable`) + 화면별 Model, 앱 전역 `AppSettings` | RN의 TanStack Query 캐시(staleTime·자동 새로고침)는 작은 조회 캐시 계층으로 직접 만든다 |
 | 내비게이션 | `NavigationStack` + `TabView`(C 하단 탭) | A → C 스택, 탭 밖 C-d-a |
 | HTTP / JSON | `URLSession` async/await + `Codable` | 의존성 없음. 타임아웃 15초·취소는 Task 취소로 |
-| 차트 | 후보: SwiftUI `Canvas` 직접 구현, Swift Charts | TODO 4단계 C-a 스파이크 뒤 결정. C-a 봉 756~3,000개 + 핀치·드래그·십자선 |
+| 차트 | SwiftUI `Canvas` 직접 구현 (IOS-008) | Swift Charts는 C-a 스파이크에서 756봉 23fps라 제외. C-b 커브도 같은 방식으로 그린다 |
 | 보안 저장소 | Keychain | 접근 키(D-044)·installation ID |
 | 기기 설정 저장 | `UserDefaults`(`@AppStorage`) | 언어·등락 색(D-073) |
 | QR | VisionKit `DataScannerViewController` (IOS-006) | B-b(D-078). iOS 16+·A12+라 iPhone 14 Pro 가능. 시뮬레이터는 카메라가 없어 붙여넣기로 시험 |

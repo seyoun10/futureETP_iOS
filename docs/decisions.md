@@ -78,3 +78,12 @@
 - 결정: 모델은 (a). `Core/Sources/API/Models/`에 계약 이름별 파일로 두고, enum 문자열은 Swift enum, `date-time`은 `Date`(`JSONDecoder.api()`, `Z` UTC만), `date`는 `LocalDate`, `YYYY-MM`은 `ContractMonth`로 받는다. 검증은 (a). `scripts/capture-fixtures.sh`가 dev 서버 응답 봉투를 `Core/Tests/Fixtures/<스키마>[.<변형>].json`으로 저장하고, `scripts/validate-fixtures.mjs`(check.sh)가 원본 zod로, `ContractFixtureTests`가 `APIClient` 디코딩으로 같은 파일을 본다.
 - 근거: 스키마가 17개로 적고 생성 도구는 이름·enum·날짜 타입을 다시 손봐야 한다. JSON Schema는 zod에서 생성되므로 zod로 검증하면 같은 규칙에 refine까지 함께 보고, 외부 패키지를 쓰지 않는다(IOS-006).
 - 영향: check.sh가 `../futureETP`(`node_modules` 설치됨)와 Node를 필요로 한다(`FUTUREETP_DIR`로 위치 변경). nullable 필드는 synthesized `Decodable`이라 키가 빠져도 nil로 받는다(zod는 거절). 서버는 항상 키를 보내므로 런타임 디코딩은 이대로 두고, 키 누락은 예시 검증이 잡는다. 계약에 정수 범위(`minimum` 등)가 있으면 `init(from:)`에서 확인한다.
+
+## IOS-008: 차트는 SwiftUI `Canvas`로 직접 그린다
+- 날짜: 2026-11-24
+- 상태: 확정
+- 맥락: TODO 4단계 C-a 스파이크. C-a는 봉 756개(이전 3년을 이어 받으면 3,000개 이상)에 이평선·rare-level 밴드 6개를 겹치고, 핀치·드래그마다 보이는 봉으로 log y축을 다시 맞춘다(D-056, D-087, D-106). 60fps 이상이 기준이다.
+- 선택지: (a) SwiftUI `Canvas`에 `Path`로 직접 그리기 (b) Swift Charts(`RectangleMark`·`RuleMark`·`LineMark`, x·y 도메인을 보이는 범위로)
+- 결정: (a). 보이는 범위는 소수 봉 순번 `CandleViewport`, y는 `PriceScale`(log, 위·아래 6% 여백), 선은 `LineSample`(1pt에 점 하나 이하)로 RN `fitTransform.ts`·`lineSampling.ts`와 같은 규칙을 순수 타입으로 둔다. 위치는 `Features/Commodity/Sources/Chart`(C-a·C-c가 같은 feature라 Core에 두지 않는다).
+- 근거: 같은 가짜 봉·같은 4초 자동 시나리오(1년 범위로 끝→처음 이동 뒤 20봉→전체 축소)를 iPhone 18 Pro 시뮬레이터(60Hz, Debug-Dev)에서 잰 결과, Canvas는 756봉 60.0fps(최악 16.7ms, 끊김 0)·3,024봉 59.5fps(최악 33.5ms, 끊김 2), Swift Charts는 보이는 봉만 넘겨도 756봉 23.0fps(최악 161ms)·3,024봉 18.9fps(최악 261ms)였다. Swift Charts는 프레임마다 마크 수천 개를 다시 만들어 목표에 한참 못 미친다. Canvas는 색별로 `Path` 하나에 모아 4~11번만 그린다.
+- 영향: 축·라벨·십자선·롤 음영도 직접 그린다(RN도 라이브러리 축을 끄고 레이어로 그렸다). ProMotion 120Hz를 위해 Info.plist에 `CADisableMinimumFrameDurationOnPhone`을 켰다. 실기기(iPhone 14 Pro, 120Hz)와 Release 빌드 측정은 남았다(TODO). 스파이크 화면(`ChartSpikeView`, dev 빌드 실행 인자 `-chartSpike`)과 비교용 `SwiftChartsCandleChart`는 C-a 화면을 만들 때 지운다.

@@ -17,7 +17,7 @@
 - [ ] Apple Developer 가입 전에는 시뮬레이터와 개인 무료 서명(7일) 실기기만 가능. APNs는 가입 뒤 (D-039, futureETP TODO 5-10)
 
 ## 1. 스택 확정
-- [ ] 차트 방식은 2단계 뒤 C-a 스파이크(아래 4단계 첫 항목)로 정한다
+- [x] 차트는 SwiftUI `Canvas` 직접 구현 (IOS-008, 2026-11-24)
 
 ## 2. 스캐폴딩
 - [ ] (선택) 원격 저장소·CI(GitHub Actions에서 check)
@@ -38,6 +38,8 @@
 
 ## 4. 화면 수직 슬라이스 (RN 순서)
 - [ ] C-a 차트 스파이크: 봉 756개 + 이평선·rare-level 밴드, 핀치·드래그·십자선, 가장 과거 봉이 보이면 이전 3년 이어 받기에서 범위 유지, 60fps 이상 (D-056, D-087, D-104, D-106) → 차트 방식 결정
+  - 1단계 렌더링 완료(2026-11-24): `CandleViewport`·`PriceScale`·`LineSample`·`CanvasCandleChart`, 측정 화면 `ChartSpikeView`(dev, `-chartSpike`). Canvas로 결정(IOS-008)
+  - 남음: 2단계 길게 누르기 십자선·상세 박스·봉 스냅 햅틱(핀치를 시작한 터치에서는 띄우지 않음, 원본 변경 반영 항목), 핀치 중 손가락 가운데 이동 따라가기 / 3단계 이전 3년 앞에 붙이기에서 범위 유지(`shiftedView`)·데이터가 바뀌면 십자선 지우기 / 실기기 120Hz·Release 측정
 - [ ] A 원자재 목록: `GET /v1/commodities`, 대표월물 ●·알림 🔔·거래 없음, 당겨서 새로고침(햅틱·터치 차단·5초 시간 초과 Alert, D-138), C-a 이동·미리 조회 (D-085)
 - [ ] C-a 이격도차트: `GET /v1/commodities/:code/disparity`, 기간 버튼 6개(D-102), 롤 음영, 십자선 상세, 가로 모드, 이전 3년 받기 중 화면 터치 차단·5초 시간 초과·실패 Alert (D-086, D-103, D-108, D-139)
 - [ ] C-c 월물차트: `GET /v1/commodities/:code/contracts`, log y축, 끝값 라벨 (D-092, D-093, D-113, D-118)

@@ -14,11 +14,11 @@ Features/                       feature마다 framework 타깃 하나. Core에�
 ├─ CommodityList/               A
 ├─ Settings/                    B, B-a, B-b, 데이터 출처
 └─ Commodity/                   C: DisparityChart(C-a)·ContractChart(C-c)·Curve(C-b)·ETP(C-d, C-d-a)
+   └─ Sources/Chart/            C-a·C-c 공용 캔들 차트(Canvas)·뷰포트(IOS-008). Spike/는 dev 전용 측정 화면
 Core/                           framework 타깃 Core. 다른 타깃에 의존하지 않음
 ├─ AppEnvironment.swift         변형·서버 주소·dev 토큰(Info.plist ← xcconfig)
 ├─ API/                         APIClient, AppError, 엔드포인트, 조회 캐시
 │  └─ Models/                   계약 스키마별 Codable 모델, 도메인 enum, LocalDate·ContractMonth, JSONDecoder.api() (IOS-007)
-├─ Charts/                      차트·뷰포트
 ├─ UI/                          공용 View(ScreenHeader, FreshnessLine, QueryStateView, SegmentedControl)
 ├─ Settings/                    기기 UI 설정(언어·등락 색)
 ├─ Theme/                       테마 토큰(다크 전용)
@@ -59,7 +59,7 @@ MVVM + repository (IOS-005). Clean Architecture의 UseCase·Entity 계층은 두
 | `src/app/`(Expo Router) | `App/` + `NavigationStack`·`TabView` |
 | `src/features/*` | `Features/*` |
 | `src/api`(fetch 래퍼·AppError·TanStack Query) | `Core/API`(APIClient + 조회 캐시) |
-| `src/charts`(Victory + Skia) | `Core/Charts`(Canvas) |
+| `src/charts`(Victory + Skia) | `Features/Commodity/Sources/Chart`(Canvas, 차트는 C 화면만 쓴다) |
 | `src/stores`(Zustand persist) | `Core/Settings`(`@Observable` + UserDefaults) |
 | `src/theme` | `Core/Theme` |
 | `src/i18n` | `App/Resources/Localizable.xcstrings`(RN `locales/{ko,en}.ts`에서 `scripts/gen-strings.mjs`로 생성)·`InfoPlist.xcstrings` |
