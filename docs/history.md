@@ -17,3 +17,6 @@ TODO.md에서 끝난 항목을 같은 절 이름 아래로 옮겨 둔다.
 - [x] lint·format·test 설정과 검사 명령 `scripts/check.sh`(lint → generate → `tuist inspect dependencies --only implicit` → Release 빌드 → Debug-Dev 테스트), `.swift-format` 기본값·2칸, CLAUDE.md Commands 갱신(2026-11-24)
 - [x] dev 변형이 로컬 dev 서버 `GET /v1/health`를 부르는 최소 화면으로 연결 확인: Core `HealthRepository`, A 자리에 dev 전용 `server: ok` 줄(4단계 A 구현 때 지운다), 시뮬레이터에서 확인(2026-11-24)
 
+
+## 3. 공통 기반
+- [x] API client: `Core/API` `APIClient`(Bearer·`X-Device-Id`, 키 없으면 요청 없이 `UNAUTHORIZED`, 전체 15초 타임아웃, 봉투 디코딩·봉투 아닌 5xx는 `INTERNAL`·모르는 코드는 `SCHEMA_MISMATCH`, GET만 `NETWORK`·`TIMEOUT`·`INTERNAL` 최대 2회 재시도 1초·2초, 호출자 취소는 `CancellationError`)·`AppError`, `HealthRepository`를 그 위로 옮김(2026-11-24, D-042, D-072)

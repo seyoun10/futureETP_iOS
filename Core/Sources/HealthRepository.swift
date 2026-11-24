@@ -2,6 +2,7 @@ import Foundation
 
 /// `GET /v1/health` 응답 `data` (계약 `schemas/health.json`)
 public struct Health: Decodable, Sendable, Equatable {
+  /// 계약상 항상 `"ok"`
   public let status: String
   public let commit: String?
 
@@ -16,38 +17,19 @@ public protocol HealthRepository: Sendable {
   func fetch() async throws -> Health
 }
 
-/// 2단계 연결 확인용 최소 구현. 3단계 API client가 생기면 그쪽으로 옮긴다
 public struct LiveHealthRepository: HealthRepository {
-  public typealias Transport = @Sendable (URLRequest) async throws -> (Data, URLResponse)
+  private let client: APIClient
 
-  private let baseURL: URL
-  private let transport: Transport
-
-  public init(
-    baseURL: URL,
-    transport: @escaping Transport = { try await URLSession.shared.data(for: $0) }
-  ) {
-    self.baseURL = baseURL
-    self.transport = transport
+  public init(client: APIClient) {
+    self.client = client
   }
 
   public func fetch() async throws -> Health {
-    var request = URLRequest(url: baseURL.appending(path: "v1/health"), timeoutInterval: 15)
-    request.setValue("application/json", forHTTPHeaderField: "Accept")
-    let (data, _) = try await transport(request)
-    let envelope = try JSONDecoder().decode(Envelope.self, from: data)
-    guard envelope.success, let health = envelope.data, health.status == "ok" else {
-      throw HealthError.notOK
+    let health = try await client.send(APIRequest("/health", auth: false, as: Health.self))
+    // 계약의 const "ok"를 벗어나면 모델 불일치다 (D-042)
+    guard health.status == "ok" else {
+      throw AppError(.schemaMismatch, message: "health.status is \(health.status)")
     }
     return health
   }
-
-  private struct Envelope: Decodable {
-    let success: Bool
-    let data: Health?
-  }
-}
-
-public enum HealthError: Error, Equatable {
-  case notOK
 }

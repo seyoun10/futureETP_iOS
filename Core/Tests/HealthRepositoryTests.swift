@@ -3,36 +3,41 @@ import Foundation
 import Testing
 
 struct HealthRepositoryTests {
-  private func repository(
-    body: String, seen: (@Sendable (URLRequest) -> Void)? = nil
-  ) -> LiveHealthRepository {
-    LiveHealthRepository(baseURL: URL(string: "http://localhost:3000")!) { request in
-      seen?(request)
-      return (Data(body.utf8), URLResponse())
-    }
+  private func repository(body: String) -> LiveHealthRepository {
+    let client = APIClient(
+      baseURL: URL(string: "http://localhost:3000")!,
+      accessToken: { nil },
+      deviceID: { "" },
+      transport: { request in
+        #expect(request.url?.absoluteString == "http://localhost:3000/v1/health")
+        #expect(request.value(forHTTPHeaderField: "Authorization") == nil)
+        let response = HTTPURLResponse(
+          url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!
+        return (Data(body.utf8), response)
+      },
+      retryDelay: { _ in .zero }
+    )
+    return LiveHealthRepository(client: client)
   }
 
-  @Test func decodesOK() async throws {
+  @Test func decodesOKWithoutAuth() async throws {
     let health = try await repository(
       body: #"{"success":true,"data":{"status":"ok","commit":"abc123"}}"#
     ).fetch()
     #expect(health == Health(status: "ok", commit: "abc123"))
   }
 
-  @Test func callsHealthPathWithoutAuth() async throws {
-    _ = try await repository(
-      body: #"{"success":true,"data":{"status":"ok","commit":null}}"#,
-      seen: { request in
-        #expect(request.url?.absoluteString == "http://localhost:3000/v1/health")
-        #expect(request.value(forHTTPHeaderField: "Authorization") == nil)
-      }
+  @Test func nullCommitIsAllowed() async throws {
+    let health = try await repository(
+      body: #"{"success":true,"data":{"status":"ok","commit":null}}"#
     ).fetch()
+    #expect(health.commit == nil)
   }
 
-  @Test func failsOnErrorEnvelope() async {
-    await #expect(throws: HealthError.notOK) {
+  @Test func statusOtherThanOKIsSchemaMismatch() async {
+    await #expect(throws: AppError(.schemaMismatch, message: "health.status is down")) {
       try await repository(
-        body: #"{"success":false,"error":{"code":"INTERNAL","message":"x"}}"#
+        body: #"{"success":true,"data":{"status":"down","commit":null}}"#
       ).fetch()
     }
   }
