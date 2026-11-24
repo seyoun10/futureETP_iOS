@@ -6,6 +6,7 @@ import SwiftUI
 struct FutureETPApp: App {
   private let environment: AppEnvironment
   @State private var keys: AccessKeyStore
+  @State private var displaySettings = DisplaySettings()
   private let client: APIClient
 
   init() {
@@ -29,6 +30,10 @@ struct FutureETPApp: App {
   var body: some Scene {
     WindowGroup {
       RootView(environment: environment, keys: keys, client: client)
+        .environment(displaySettings)
+        // 다크 전용 테마(D-031)
+        .preferredColorScheme(.dark)
+        .background(Theme.Colors.background)
     }
   }
 }

@@ -50,7 +50,7 @@ public struct AccessKeyView: View {
       }
       if let message = model.message {
         Text(message.key)
-          .foregroundStyle(.red)
+          .foregroundStyle(Theme.Colors.error)
           .frame(maxWidth: .infinity)
           .accessibilityAddTraits(.isStaticText)
       }
