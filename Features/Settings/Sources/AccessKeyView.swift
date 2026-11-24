@@ -97,7 +97,7 @@ public struct AccessKeyView: View {
 }
 
 extension AccessKeyModel.Message {
-  /// i18n 키. String Catalog는 i18n 항목에서 채운다
+  /// i18n 키. App/Resources/Localizable.xcstrings(RN 리소스에서 생성)에 있다
   var key: LocalizedStringKey {
     switch self {
     case .notice(let notice): LocalizedStringKey("accessKey.\(notice.rawValue)")

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# 커밋 전 검사: lint → 계약 예시 → import 방향 → 빌드(dev·prod) → 테스트
+# 커밋 전 검사: lint → 계약 예시 → 문구 카탈로그 → import 방향 → 빌드(dev·prod) → 테스트
 # 기기는 SIMULATOR 환경 변수로 바꿀 수 있다
 set -euo pipefail
 cd "$(dirname "$0")/.."
@@ -17,6 +17,9 @@ swift format lint --recursive --strict "${SOURCES[@]}"
 
 step "계약 예시 스키마 검사 (D-142)"
 node scripts/validate-fixtures.mjs
+
+step "문구 카탈로그 (D-033)"
+node --no-warnings scripts/gen-strings.mjs --check
 
 step "generate"
 mise exec -- tuist generate --no-open >/dev/null
