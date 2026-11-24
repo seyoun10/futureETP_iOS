@@ -33,6 +33,14 @@ struct CandleViewport: Equatable, Sendable {
     return first...last
   }
 
+  /// 가운데가 범위 안인 봉 순번. 꼬리표는 꼬리가 화면 밖인 봉을 뺀다(RN `centerIndexRange`). 없으면 nil
+  var centerIndices: ClosedRange<Int>? {
+    guard barCount > 0 else { return nil }
+    let first = max(Int((lower - 0.5).rounded(.up)), 0)
+    let last = min(Int((upper - 0.5).rounded(.down)), barCount - 1)
+    return first <= last ? first...last : nil
+  }
+
   /// 가장 과거 봉이 보인다(이전 3년을 이어 받을 때, D-104)
   var showsFirstBar: Bool { barCount > 0 && lower < 1 }
 

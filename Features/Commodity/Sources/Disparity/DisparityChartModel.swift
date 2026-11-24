@@ -37,12 +37,7 @@ struct DisparityChartModel {
     case band(direction: Direction, level: Double)
   }
 
-  /// 롤 표시: 한국형·미국형은 롤 기간 음영 구간, 대표월물은 전환일 봉 순번 (D-103)
-  struct RollMarks: Equatable, Sendable {
-    var shading: [ClosedRange<Int>] = []
-    var switches: [Int] = []
-  }
-
+  typealias RollMarks = ChartRollMarks
   typealias PriceLabel = ChartPriceLabel
 
   /// 보이는 봉의 최고가·최저가 봉과 현재가 기준 저점대비(LC)·고점대비(HC) %

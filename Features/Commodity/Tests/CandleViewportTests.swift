@@ -138,3 +138,11 @@ struct LineSampleTests {
     #expect(longIndices[1] == 8)
   }
 }
+
+struct CandleViewportCenterIndicesTests {
+  @Test func barsWhoseCenterIsInside() {
+    #expect(CandleViewport(barCount: 100, lower: 10.4, upper: 40.6).centerIndices == 10...40)
+    #expect(CandleViewport(barCount: 100, lower: 10.6, upper: 40.4).centerIndices == 11...39)
+    #expect(CandleViewport(barCount: 100, lower: 0, upper: 100).centerIndices == 0...99)
+  }
+}

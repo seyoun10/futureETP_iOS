@@ -15,6 +15,17 @@ struct CandleAxes {
   /// 가장 넓은 월 라벨 폭
   let monthLabelWidth: Double
   let locale: Locale
+  /// 롤 음영·대표월물 전환일 점선(봉 뒤)
+  var roll = ChartRollMarks()
+  /// 보이는 봉 중 최고가·최저가 봉의 꼬리표. 없으면 그리지 않는다
+  var extremes: ExtremeTags?
+
+  struct ExtremeTags {
+    /// 꼬리표 %의 기준(마지막 봉 종가)
+    let currentPrice: Double
+    /// 꼬리표가 비켜 갈 회색 점선 가격
+    let guidePrice: Double
+  }
 
   /// 우측 y축 자리: 가장 큰 가격 라벨 + 여백 (RN `CandleChart` `yLabelWidth`)
   static func yLabelWidth(maxPrice: Double, decimals: Int) -> Double {
@@ -58,10 +69,16 @@ struct CanvasCandleChart: View {
       }
       var plotContext = context
       plotContext.clip(to: Path(plot))
+      if let axes {
+        drawRoll(axes.roll, frame: frame, in: &plotContext)
+      }
       drawBars(indices, frame: frame, in: &plotContext)
       drawLines(frame: frame, in: &plotContext)
       if let axes {
         drawGuides(axes, frame: frame, in: &plotContext)
+        if let extremes = axes.extremes {
+          drawExtremeTags(extremes, axes: axes, frame: frame, in: &plotContext)
+        }
       }
       if let crosshair {
         var cross = Path()
@@ -199,6 +216,70 @@ struct CanvasCandleChart: View {
       context.stroke(
         path, with: .color(guide.color),
         style: StrokeStyle(lineWidth: 1, dash: ChartLayout.guideDash))
+    }
+  }
+
+  /// 롤 기간 음영과 대표월물 전환일 세로 점선 (RN `RollLayer`)
+  private func drawRoll(_ roll: ChartRollMarks, frame: Frame, in context: inout GraphicsContext) {
+    let plot = frame.plot
+    let half = plot.width / viewport.span / 2
+    var shade = Path()
+    for segment in roll.shading {
+      let left = frame.x(segment.lowerBound) - half
+      let right = frame.x(segment.upperBound) + half
+      guard right >= plot.minX, left <= plot.maxX else { continue }
+      shade.addRect(CGRect(x: left, y: plot.minY, width: right - left, height: plot.height))
+    }
+    context.fill(shade, with: .color(Theme.ChartColors.rollShade))
+    var switches = Path()
+    for index in roll.switches {
+      let x = frame.x(index)
+      guard x >= plot.minX, x <= plot.maxX else { continue }
+      switches.move(to: CGPoint(x: x, y: plot.minY))
+      switches.addLine(to: CGPoint(x: x, y: plot.maxY))
+    }
+    context.stroke(
+      switches, with: .color(Theme.ChartColors.rollSwitch),
+      style: StrokeStyle(lineWidth: 1, dash: ChartLayout.guideDash))
+  }
+
+  /// 보이는 봉(가운데가 화면 안) 중 최고가·최저가 봉의 꼬리표 `고가 가격(현재가 대비 %, 날짜)` (RN `ExtremeTagsLayer`)
+  private func drawExtremeTags(
+    _ extremes: CandleAxes.ExtremeTags, axes: CandleAxes, frame: Frame,
+    in context: inout GraphicsContext
+  ) {
+    guard let indices = viewport.centerIndices, extremes.currentPrice > 0 else { return }
+    var high = indices.lowerBound
+    var low = indices.lowerBound
+    for i in indices {
+      if series.bars[i].high > series.bars[high].high { high = i }
+      if series.bars[i].low < series.bars[low].low { low = i }
+    }
+    let plot = frame.plot
+    let lineY = frame.y(extremes.guidePrice)
+    let height = ChartText.lineHeight
+    for (index, kind) in [(high, ExtremeTagLayout.Kind.high), (low, .low)] {
+      let bar = series.bars[index]
+      let price = kind == .high ? bar.high : bar.low
+      let date = axes.dates.indices.contains(index) ? axes.dates[index] : nil
+      let text = L10n.string(
+        kind == .high ? "chart.highTag" : "chart.lowTag",
+        [
+          "price": NumberFormat.price(price, decimals: axes.priceDecimals),
+          "pct": NumberFormat.changePct((price / extremes.currentPrice - 1) * 100),
+          "date": date.map { String(format: "%02d/%02d", $0.month, $0.day) } ?? "",
+        ], locale: axes.locale)
+      // 화살표 위치와 상관없이 글자 수가 같아 너비도 같다
+      let width = ChartText.width(kind.arrow + text)
+      let placed = ExtremeTagLayout.left(
+        kind, x: frame.x(index), width: width, arrowWidth: ChartText.width(kind.arrow),
+        left: plot.minX, right: plot.maxX)
+      let top = ExtremeTagLayout.top(
+        kind, y: frame.y(price), height: height, lineY: lineY, top: plot.minY, bottom: plot.maxY)
+      context.draw(
+        Text(verbatim: placed.arrowFirst ? kind.arrow + text : text + kind.arrow)
+          .font(ChartText.font).foregroundStyle(Theme.ChartColors.extremeTag),
+        at: CGPoint(x: placed.left, y: top), anchor: .topLeading)
     }
   }
 

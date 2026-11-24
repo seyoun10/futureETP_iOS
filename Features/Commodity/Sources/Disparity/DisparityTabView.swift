@@ -138,7 +138,11 @@ private struct DisparityChartView: View {
       dates: chart.dates, priceDecimals: data.priceDecimals,
       labels: chart.priceLabels(at: index), guides: guides,
       yLabelWidth: chart.yLabelWidth(decimals: data.priceDecimals),
-      monthLabelWidth: ChartText.widestMonthLabel(locale: locale), locale: locale)
+      monthLabelWidth: ChartText.widestMonthLabel(locale: locale), locale: locale,
+      roll: chart.roll,
+      extremes: guides.first.map { gray in
+        .init(currentPrice: chart.bars[chart.bars.count - 1].close, guidePrice: gray.price)
+      })
   }
 }
 

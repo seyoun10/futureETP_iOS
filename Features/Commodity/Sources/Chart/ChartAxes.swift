@@ -162,6 +162,12 @@ struct ChartPriceLabel: Equatable, Sendable {
   let color: Color
 }
 
+/// 롤 표시: 한국형·미국형은 롤 기간 음영 구간, 대표월물은 전환일 봉 순번(세로 점선) (D-103, RN `RollLayer`)
+struct ChartRollMarks: Equatable, Sendable {
+  var shading: [ClosedRange<Int>] = []
+  var switches: [Int] = []
+}
+
 /// 차트 축·십자선 글자. Canvas 밖에서 자리(y축 폭·월 라벨 폭)를 잴 때도 같은 글꼴을 쓴다
 enum ChartText {
   static let font = Font.system(size: ChartLayout.fontSize).monospacedDigit()
@@ -172,6 +178,8 @@ enum ChartText {
     (text as NSString).size(withAttributes: [.font: uiFont]).width.rounded(.up)
   }
 
+  /// 글자 한 줄 높이(꼬리표)
+  static let lineHeight = Double(uiFont.lineHeight.rounded(.up))
   /// 라벨 상자 높이(겹침 판정에도 쓴다)
   static let labelHeight = Double(ChartLayout.fontSize + 2 * ChartLayout.labelPad)
   /// 십자선 날짜 상자 너비
