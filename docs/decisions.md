@@ -60,3 +60,11 @@
 - 결정: (a). 화면 `@Observable` 타입이 ViewModel 역할이고 이름은 `<Screen>Model`(예: `CommodityListModel`)로 쓴다. repository는 protocol과 구현으로 나눠 테스트에서 가짜로 바꾼다. 응답 `Codable` 모델을 화면까지 그대로 쓰고 Entity로 다시 매핑하지 않는다.
 - 근거: 앱은 계산하지 않고 서버 값을 표시만 해서 UseCase는 대부분 값을 넘기기만 하고 DTO↔Entity 매핑만 늘어난다. RN 구조(D-041: 화면 → 훅 → 조회 → API)와 1:1로 대응해 원본 변경을 따라가기 쉽다. 의존 방향은 Tuist 타깃(IOS-003)이 강제한다.
 - 영향: 로직이 있는 곳(낙관적 PATCH, rare 레벨 입력 검증, 무한 조회)은 화면 Model 또는 repository에 둔다. 한 로직을 두 화면 이상이 쓰면 `Core`로 옮긴다.
+
+## IOS-006: 나머지 스택은 후보대로 확정하고 QR은 VisionKit, 햅틱은 `sensoryFeedback`
+- 날짜: 2026-11-24
+- 상태: 확정
+- 맥락: TODO 1단계. `docs/tech-stack.md` 후보 가운데 둘 중 하나로 남은 줄과 나머지 줄을 확정한다.
+- 결정: SwiftUI, Observation, `NavigationStack`+`TabView`, `URLSession`+`Codable`, Keychain(`Security`), `UserDefaults`, String Catalog, APNs 직접, Swift Testing·XCUITest, swift-format(Xcode 동봉)은 후보대로. QR은 VisionKit `DataScannerViewController`, 햅틱은 SwiftUI `sensoryFeedback`. 외부 패키지는 쓰지 않는다. 차트는 C-a 스파이크 뒤 정한다.
+- 근거: QR은 `DataScannerViewController`가 카메라 세션·권한 화면·인식 영역을 맡아 AVFoundation 직접 구현보다 코드가 적고, iOS 16+·A12+라 iOS 18 대상(IOS-004)과 iPhone 14 Pro에서 된다. `sensoryFeedback`은 iOS 17+ SwiftUI 수정자라 UIKit 생성기를 감쌀 필요가 없다.
+- 영향: 시뮬레이터에는 카메라가 없어 QR은 실기기에서만 시험하고, 시뮬레이터에서는 붙여넣기로 B-b를 시험한다. `DataScannerViewController.isSupported`가 false면 붙여넣기만 보인다.
