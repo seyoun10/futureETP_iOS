@@ -57,6 +57,8 @@ public struct AccessKeyView: View {
     }
     .titleBarSeparator()
     .navigationTitle(Text("settings.accessKey"))
+    // A에서 바로 올라오면(실행 때 거절) 큰 제목 모드를 이어받아 접힌 채 그려져 카드가 구분선에 붙는다
+    .navigationBarTitleDisplayMode(.inline)
     .navigationBarBackButtonHidden(!model.canGoBack)
     .onDisappear { model.leave() }
   }
