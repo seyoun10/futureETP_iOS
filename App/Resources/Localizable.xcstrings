@@ -3520,6 +3520,23 @@
         }
       }
     },
+    "settings.appVersion" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iOS {{variant}}: {{version}} (build {{build}})"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iOS {{variant}}: {{version}} (빌드 {{build}})"
+          }
+        }
+      }
+    },
     "settings.basis" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -3611,13 +3628,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "App bundle: built in · runtime {{runtime}}"
+            "value" : "RN {{variant}}: built in · runtime {{runtime}}"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "앱 번들: 빌드에 내장 · 런타임 {{runtime}}"
+            "value" : "RN {{variant}}: 빌드에 내장 · 런타임 {{runtime}}"
           }
         }
       }
@@ -3628,13 +3645,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "App bundle: update {{time}} ({{id}}) · runtime {{runtime}}"
+            "value" : "RN {{variant}}: update {{time}} ({{id}}) · runtime {{runtime}}"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "앱 번들: 업데이트 {{time}} ({{id}}) · 런타임 {{runtime}}"
+            "value" : "RN {{variant}}: 업데이트 {{time}} ({{id}}) · 런타임 {{runtime}}"
           }
         }
       }

@@ -85,7 +85,7 @@ struct RootView: View {
               }))
           case .settings:
             SettingsView(
-              store: settings, hasKey: keys.hasKey,
+              store: settings, hasKey: keys.hasKey, variant: environment.variant,
               onOpenAlerts: { path.append(.alertSettings) },
               onOpenAccessKey: { path.append(.accessKey) },
               onOpenDataSources: { path.append(.dataSources) })

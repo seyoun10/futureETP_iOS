@@ -1,0 +1,6 @@
+{
+  "settings.appVersion": {
+    "ko": "iOS {{variant}}: {{version}} (빌드 {{build}})",
+    "en": "iOS {{variant}}: {{version}} (build {{build}})"
+  }
+}
