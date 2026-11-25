@@ -35,6 +35,7 @@ Swift/SwiftUI로 만드는 futureETP 앱(iOS). 기능·화면·동작은 RN 앱(
 - `docs/tech-stack.md`: 스택 후보와 확정 결과(버전·출처 날짜)
 - `docs/architecture.md`: 디렉터리 구조, 레이어, RN 구조 대응, D-번호 적용표
 - `docs/decisions.md`: 이 저장소 결정 IOS-xxx. D-xxx(공통)와 번호가 겹치지 않는다
+- `docs/ops.md`: prod 앱 실기기 설치(`scripts/install-prod.sh`)·RN/Flutter 앱과 바꿔 설치할 때 할 일
 
 ## Domain Context
 

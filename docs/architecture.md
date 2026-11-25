@@ -28,7 +28,7 @@ Core/                           framework 타깃 Core. 다른 타깃에 의존�
 └─ Resources/                   Assets
 */Tests/                        타깃별 Swift Testing 테스트 타깃. Core/Tests/Fixtures는 계약 예시(dev 서버 응답, IOS-007)
 FutureETPUITests/               XCUITest
-docs/                           tech-stack, architecture, decisions
+docs/                           tech-stack, architecture, decisions, ops
 ```
 
 규칙

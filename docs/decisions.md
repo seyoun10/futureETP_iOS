@@ -95,4 +95,12 @@
 - 맥락: RN B 맨 아래 앱 번들 줄은 OTA(EAS Update)를 받았는지와 런타임 fingerprint로 새 빌드가 필요한지를 보인다(screens.md B). iOS 앱은 OTA가 없고 재설치로만 바뀐다(`docs/tech-stack.md`).
 - 결정: 늘 `settings.bundleEmbedded`(`앱 번들: 빌드에 내장 · 런타임 …`) 문구를 쓰고, 런타임 자리에 `CFBundleShortVersionString (CFBundleVersion)`을 넣는다(`AppBundleText`). 문구는 RN 리소스를 그대로 쓴다.
 - 근거: 어느 빌드가 깔렸는지 기기에서 바로 보려는 목적은 같고, 문구 카탈로그를 iOS만 따로 고치지 않아도 된다.
-- 영향: 버전을 올릴 때 `Config/Base.xcconfig`의 `MARKETING_VERSION`·`CURRENT_PROJECT_VERSION`을 바꿔야 줄이 달라진다. 업데이트 배포 방식(TODO 6단계)이 정해지면 다시 본다.
+- 영향: `MARKETING_VERSION`은 `Config/Base.xcconfig`에서 손으로 올린다. 기기 설치 빌드의 빌드 번호는 커밋 수다(IOS-010).
+
+## IOS-010: prod 앱은 Mac에서 Personal Team으로 직접 설치하고, 업데이트도 재설치로 한다
+- 날짜: 2026-11-25
+- 상태: 확정
+- 맥락: 스토어에 배포하지 않는 개인용 앱이고(D-011), Apple Developer 가입 전이라 TestFlight를 쓸 수 없다. 무료 서명은 7일 뒤 만료된다. RN은 EAS Update로 OTA를 받지만 네이티브 Swift 앱에는 같은 수단이 없다.
+- 결정: `scripts/install-prod.sh <기기>...`로 HEAD를 Release 빌드해 `devicectl`로 설치한다. 업데이트·만료 대응 모두 같은 재설치다. 빌드 번호는 커밋 수(`git rev-list --count HEAD`)를 명령줄로 넣고, 앱 경로에 커밋 안 한 변경이 있으면 멈춘다. 절차는 `docs/ops.md`.
+- 근거: RN `ios:prod-install`과 같은 흐름이라 기기 등록·신뢰 안내가 그대로 통한다. 커밋 수 빌드 번호로 B 맨 아래 줄(IOS-009)만 보고 깔린 커밋을 안다. iOS 프로젝트는 prebuild가 없어 임시 worktree 없이 작업 트리에서 빌드해도 dev 설정을 건드리지 않는다.
+- 영향: Apple 가입 뒤 TestFlight로 바꿀지는 그때 다시 본다. `MARKETING_VERSION`은 손으로 올린다.
