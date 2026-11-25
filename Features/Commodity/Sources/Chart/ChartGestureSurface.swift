@@ -36,11 +36,14 @@ struct ChartGestureSurface: UIViewRepresentable {
 
   func makeCoordinator() -> Coordinator { Coordinator(onEvent: onEvent) }
 
+  @MainActor
   final class Coordinator: NSObject, UIGestureRecognizerDelegate {
     var onEvent: (Event) -> Void
     private weak var view: UIView?
     private var pinchStartFocalX = 0.0
     private var active = Set<ObjectIdentifier>()
+    /// 길게 누르기(십자선 끌기)·끌기·핀치 동안 120Hz를 요청한다
+    let frameRate = FrameRateBoost()
 
     init(onEvent: @escaping (Event) -> Void) { self.onEvent = onEvent }
 
@@ -67,6 +70,7 @@ struct ChartGestureSurface: UIViewRepresentable {
     }
 
     @objc private func handlePress(_ recognizer: UILongPressGestureRecognizer) {
+      boost(recognizer)
       guard recognizer.state == .began || recognizer.state == .changed else { return }
       onEvent(.pressed(x: recognizer.location(in: view).x))
     }
@@ -96,7 +100,16 @@ struct ChartGestureSurface: UIViewRepresentable {
       }
     }
 
+    private func boost(_ recognizer: UIGestureRecognizer) {
+      switch recognizer.state {
+      case .began: frameRate.hold(ObjectIdentifier(recognizer))
+      case .ended, .cancelled, .failed: frameRate.release(ObjectIdentifier(recognizer))
+      default: break
+      }
+    }
+
     private func track(_ recognizer: UIGestureRecognizer) {
+      boost(recognizer)
       let wasActive = !active.isEmpty
       switch recognizer.state {
       case .began: active.insert(ObjectIdentifier(recognizer))
