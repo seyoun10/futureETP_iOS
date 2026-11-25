@@ -17,23 +17,14 @@
 - [ ] (선택) 원격 저장소·CI(GitHub Actions에서 check): `.github/workflows/check.yml`(러너 `xcode-27`, Xcode 27.2, futureETP main을 함께 받아 `FUTUREETP_DIR`로 넘김) 작성(2026-11-24). 첫 실행 통과 확인이 남음
 
 ## 3. 공통 기반
-- [ ] 접근 키 B-b: 붙여넣기·QR(`futureetp-key:v1:` 접두사), `GET /v1/settings`로 확인 뒤 저장, 키 없으면 첫 화면이 B-b, `UNAUTHORIZED`면 어느 화면에서든 B-b + 거절 줄 (D-044, D-077~D-079)
-  - 코드 완료(a4da4d4~ba01dfd). 시뮬레이터에서 dev 서버 키 붙여넣기·Keychain 저장·재실행 유지 확인(2026-11-24). 14P prod에서 RN 앱을 덮어쓴 뒤 첫 화면 B-b·키 재입력 뒤 A 표시 확인(2026-11-25, iPhone 미러링 창에서 ⌘V 붙여넣기는 안 됨). 시뮬레이터에서 dev 서버 `API_TOKEN`을 바꿔 띄운 뒤 A·C 요청 거절 → B-b(거절 줄), 재실행 때도 B-b, 새 키 붙여넣기 → A, 원래 키로 되돌리기 확인(2026-11-25). 이때 형식 오류 줄이 `accessKey.badFormat` 키 이름으로 보이던 것과, A에서 바로 B-b로 올 때 큰 제목 모드를 이어받아 카드가 구분선에 붙던 것(`.inline`으로 고정)을 고침. 14P prod에서 [QR 읽기] → 카메라 화면, 키가 아닌 QR → `notKeyQr` 줄, 카메라 권한 끔 → `cameraUnavailable` 줄 확인(2026-11-25, 깔린 빌드가 b3c1c24 전이라 줄이 키 이름으로 보임. 시뮬레이터 최신 빌드에서 문구로 보임). 이때 가운데 정렬 [QR 읽기]·[취소] 아래 구분선이 글자 앞에서 시작해 짧던 것을 고침. 남은 확인: 실기기에서 키 QR로 저장. 확인되면 이 항목을 `docs/history.md`로 옮긴다
-- [ ] 앱 실행 때 시간대 PATCH (D-084), 세로 잠금·[⟲] 가로 전환 (D-076)
-  - 시간대·언어 PATCH 코드 완료(2026-11-24): `SettingsStore`(설정 조회·낙관적 PATCH 줄 세우기)·`.deviceSettingsSync`(루트, 키 있을 때). dev 서버 확인 완료(2026-11-25): `TZ=America/Chicago`·영어로 실행하면 `device` 행이 `en`·`America/Chicago`로, 서울로 다시 실행하면 시간대가 되돌아감. 언어는 앱 설정 저장값이 기기 언어보다 앞서므로(D-033) B에서 [한국어]를 누를 때 `ko`로 PATCH됨
-  - 세로 잠금 기반 완료(2026-11-24): `OrientationLock`(시작 세로, `lockPortrait`·`lockLandscape`·[⟲]용 `toggle(isLandscape:)`, `AppDelegate`가 허용 방향 반환)·`\.isLandscape`(창 모양, 루트 `providesIsLandscape`)
-  - C [⟲] 완료(2026-11-24): ETP 탭 밖에서만 보임, ETP 탭 진입·C를 떠날 때 `lockPortrait`, 가로에서 tab-bar·기준 시각 줄 숨김. 시뮬레이터에서 가로 전환·가로에서 [←]로 A 세로 복귀 확인. 14P 미러링에서 [⟲] 가로 전환·세로 복귀 확인(2026-11-25). 남음: 기기를 직접 돌릴 때 동작
 
 ## 4. 화면 수직 슬라이스 (RN 순서)
 - [ ] C-a 차트 스파이크: 봉 756개 + 이평선·rare-level 밴드, 핀치·드래그·십자선, 가장 과거 봉이 보이면 이전 3년 이어 받기에서 범위 유지, 60fps 이상 (D-056, D-087, D-104, D-106) → 차트 방식 결정
   - 1단계 렌더링 완료(2026-11-24): `CandleViewport`·`PriceScale`·`LineSample`·`CanvasCandleChart`, 측정 화면 `ChartSpikeView`(dev, `-chartSpike`). Canvas로 결정(IOS-008)
   - 2단계 제스처 완료(2026-11-24): `ChartInteraction`(십자선 유지·탭으로 지우기·십자선이 있으면 끌기가 십자선을 옮김·핀치한 터치에서 십자선 막기·핀치 가운데 따라가기), `ChartGestureSurface`(UIKit 인식기: 길게 누르기 0.3초·탭·한 손가락 끌기·핀치), `DetailCorner`(상세 박스 귀퉁이), 봉 스냅 햅틱(`sensoryFeedback(.selection)`). 시뮬레이터에서 동작 확인
   - 3단계 과거 봉 붙이기 완료(2026-11-24): `CandleViewport.rebased`·`showsFirstBar`, `ChartInteraction.dataChanged(barCount:prepended:)`(보던 범위 유지·십자선 지우기·핀치 중이면 시작 범위도 옮김). 스파이크는 가장 과거 봉이 보이면 0.5초 뒤 756봉을 앞에 붙인다(3,024봉까지). C-a 화면은 RN `prependedBars`처럼 첫 날짜가 앞당겨지고 마지막 날짜가 같을 때만 앞에 붙은 봉으로 센다
-  - 14P prod 미러링 확인(2026-11-25): GC C-a 12M 칩·끌기·[↻]·가장 과거 봉에서 이전 3년 받기(표시·범위 유지), C-b [<]·기준일 시트·되돌리기, C-d 순자산 정렬·C-d-a 상세. 길게 눌러 십자선 상세·탭으로 지우기도 확인. 미러링으로 못 본 것: 핀치·A 당겨서 새로고침(마우스 끌기·휠 모두 당겨지지 않음)
+  - 14P prod 미러링 확인(2026-11-25): GC C-a 12M 칩·끌기·[↻]·가장 과거 봉에서 이전 3년 받기(표시·범위 유지), C-b [<]·기준일 시트·되돌리기, C-d 순자산 정렬·C-d-a 상세. 길게 눌러 십자선 상세·탭으로 지우기도 확인. 미러링으로 못 본 핀치·A 당겨서 새로고침은 14P에서 직접 확인(2026-11-25)
   - 남음: 실기기 120Hz·Release 측정(십자선을 끄는 동안 상세 박스 다시 그리기 비용 포함. 시뮬레이터 짧은 끌기에서 43~54fps)
-- [ ] B 설정·B-a 알림 설정: 낙관적 PATCH, rare-level 입력 검증, 알림 대상 없음 빨간 점 (D-081~D-083, D-124)
-  - 완료(2026-11-24): `SettingsView`(일반·이격도차트·기타 묶음, `SegmentedRow`, rare-level 5칸 `RareLevelsInput`·`RareLevelsDraft`는 키패드가 닫힐 때 `RareLevels`로 검증·정렬 저장, [초기화] 확인 뒤 표시 설정·`SettingsPatch.disparityDefaults`+언어 PATCH, 저장 실패 줄은 이 화면의 마지막 변경만, 앱 번들 줄 IOS-009·키패드가 보이면 뺌), `AlertSettingsView`(권한 배너 `PushPermission`·대상 원자재·현재 적용 기준·`QuietTimeSection` 30분 48칸 시트), `DataSourcesView`, 공용 `backTitleBar`. `SegmentedRow`는 한 줄에 안 들어가면 쌓는다. 시뮬레이터에서 dev 서버로 언어 전환·rare-level 중복 오류·저장·초기화·알림 대상·알림 거부 시간·데이터 출처 확인
-  - 14P prod 미러링 확인(2026-11-25): 권한 배너 [허용] → iOS 알림 권한 창, [허용 안 함] 뒤 배너가 [설정 열기]로 바뀌고 누르면 iOS 설정의 futureETP 알림 화면이 열림, 돌아오면 배너 유지. 14P는 알림 거부 상태로 둠(Apple 가입 뒤 설정에서 켠다). 키패드 [완료]가 rare-level 칸을 덮는지는 확인하지 않기로 함(사용자 결정, 2026-11-25)
 
 ## 5. 푸시
 - [ ] APNs 기기 토큰 등록(Apple 가입 뒤), 가입 전에는 등록하지 않음
