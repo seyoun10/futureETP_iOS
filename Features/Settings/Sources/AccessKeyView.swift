@@ -49,7 +49,7 @@ public struct AccessKeyView: View {
         .disabled(!model.canSubmit)
       }
       if let message = model.message {
-        Text(message.key)
+        Text(LocalizedStringKey(message.key))
           .foregroundStyle(Theme.Colors.error)
           .frame(maxWidth: .infinity)
           .accessibilityAddTraits(.isStaticText)
@@ -98,12 +98,13 @@ public struct AccessKeyView: View {
 }
 
 extension AccessKeyModel.Message {
-  /// i18n 키. App/Resources/Localizable.xcstrings(RN 리소스에서 생성)에 있다
-  var key: LocalizedStringKey {
+  /// i18n 키. App/Resources/Localizable.xcstrings(RN 리소스에서 생성)에 있다.
+  /// `String`으로 둔다: `LocalizedStringKey("a.\(b)")`처럼 보간하면 키가 `a.%@`가 되어 문구를 못 찾는다
+  var key: String {
     switch self {
-    case .notice(let notice): LocalizedStringKey("accessKey.\(notice.rawValue)")
+    case .notice(let notice): "accessKey.\(notice.rawValue)"
     case .rejected: "accessKey.rejected"
-    case .error(let code): LocalizedStringKey("errors.\(code.rawValue)")
+    case .error(let code): "errors.\(code.rawValue)"
     }
   }
 }
