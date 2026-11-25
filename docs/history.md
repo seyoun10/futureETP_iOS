@@ -81,6 +81,8 @@ TODO.md에서 끝난 항목을 같은 절 이름 아래로 옮겨 둔다.
 - [x] C-d ETP 목록(필터·정렬은 앱에서)·C-d-a 상세 (D-017)
   - 완료(2026-11-24): `ETPRepository`·`QueryCache.etpList`·`etpDetail`(키 `QueryKeys.etps`·`etp`), `ETPListModel`(필터 4개·기본/순자산/거래대금 정렬·있는 배수만 선택지), 공용 `SegmentedRow`(Core, B 설정에서도 쓴다), `ETPListTabView`(행 둘째 줄 정렬 값·수집 시각은 기준 시각 줄), `ETPDetailView`(Route `.etp`, [←]만, 시리즈 줄·운용사 페이지는 http(s)만). 시뮬레이터에서 GC 목록·정렬·상세·복귀 확인
 
+- [x] B 끝까지 스크롤하면 마지막 [데이터 출처] 행이 앱 번들 줄·홈 인디케이터 여백에 가려졌다(14P prod 미러링에서 휠 스크롤, 2026-11-25). 시뮬레이터(iPhone 18 Pro, iOS 27.2, 14P와 같은 27.2)에서 손가락 끌기로 끝까지 내리면 행 전체가 줄 위에 보여 재현 안 됨. 14P에서 손가락으로 끝까지 내리면 정상(2026-11-25). 미러링 휠 스크롤에서만 생김, 코드 변경 없음
+  - 같이 본 것: 미러링(Mac 키보드)에서 rare-level을 누르면 [완료] 막대가 뜨고 앱 번들 줄이 남아 접근 키 행에 겹친다. 시뮬레이터 하드웨어 키보드에서는 막대가 뜨지 않아 재현 안 됨. 기기 키패드에서는 줄을 뺀다(`keyboardWillShow`)
 ## 6. 기기 설치·운영
 - [x] prod 변형 release 빌드를 개인 기기에 설치하는 절차를 `docs/ops.md`에 기록, `scripts/install-prod.sh`(2026-11-25, 14P 대상 `--build-only` 서명 빌드 확인. 실제 설치는 RN prod 앱을 덮어써서 아직 안 함)
 - [x] RN 앱과 같은 앱 ID라 바꿔 설치할 때 할 일 기록(`docs/ops.md`)
