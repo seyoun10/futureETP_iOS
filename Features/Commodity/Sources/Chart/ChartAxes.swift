@@ -1,6 +1,7 @@
 import Core
 import Foundation
 import SwiftUI
+import Synchronization
 import UIKit
 
 /// 우측 y축 눈금(D-056). d3 `scaleLog().ticks(6)`과 같은 값을 고른다: 범위 안 `k·10^n`(k = 1…9)이 3개 이상이면 그것을,
@@ -186,7 +187,14 @@ enum ChartText {
   static let dateBoxWidth = width("0000-00-00") + 2 * Double(ChartLayout.labelPad)
 
   /// 1월(연도)을 포함한 모든 월 라벨 중 가장 넓은 너비. 월 눈금 겹침 판정은 이 너비로 한다
+  /// 차트 본문이 프레임마다 부르므로 locale별로 한 번만 잰다(IOS-008)
   static func widestMonthLabel(locale: Locale) -> Double {
-    (1...12).map { width(MonthTicks.label(year: 2000, month: $0, locale: locale)) }.max() ?? 0
+    if let cached = widestMonthLabels.withLock({ $0[locale.identifier] }) { return cached }
+    let widest =
+      (1...12).map { width(MonthTicks.label(year: 2000, month: $0, locale: locale)) }.max() ?? 0
+    widestMonthLabels.withLock { $0[locale.identifier] = widest }
+    return widest
   }
+
+  private static let widestMonthLabels = Mutex<[String: Double]>([:])
 }
