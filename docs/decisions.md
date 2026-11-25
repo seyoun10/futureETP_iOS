@@ -89,13 +89,13 @@
 - 근거: 같은 가짜 봉·같은 4초 자동 시나리오(1년 범위로 끝→처음 이동 뒤 20봉→전체 축소)를 iPhone 18 Pro 시뮬레이터(60Hz, Debug-Dev)에서 잰 결과, Canvas는 756봉 60.0fps(최악 16.7ms, 끊김 0)·3,024봉 59.5fps(최악 33.5ms, 끊김 2), Swift Charts는 보이는 봉만 넘겨도 756봉 23.0fps(최악 161ms)·3,024봉 18.9fps(최악 261ms)였다. Swift Charts는 프레임마다 마크 수천 개를 다시 만들어 목표에 한참 못 미친다. Canvas는 색별로 `Path` 하나에 모아 4~11번만 그린다.
 - 영향: 축·라벨·십자선·롤 음영도 직접 그린다(RN도 라이브러리 축을 끄고 레이어로 그렸다). ProMotion 120Hz를 위해 Info.plist에 `CADisableMinimumFrameDurationOnPhone`을 켰다. 실기기(iPhone 14 Pro, 120Hz)와 Release 빌드 측정은 남았다(TODO). 스파이크 화면(`ChartSpikeView`, dev 빌드 실행 인자 `-chartSpike`)과 비교용 `SwiftChartsCandleChart`는 C-a 화면을 만들 때 지운다.
 
-## IOS-009: B 앱 번들 줄은 앱 버전(빌드 번호)을 쓴다
-- 날짜: 2026-11-24
+## IOS-009: B 맨 아래 줄은 `iOS <변형>: 앱 버전 (빌드 번호)`를 쓴다
+- 날짜: 2026-11-24, 2026-11-25 갱신(futureETP D-141 줄 머리 클라이언트·변형)
 - 상태: 확정
-- 맥락: RN B 맨 아래 앱 번들 줄은 OTA(EAS Update)를 받았는지와 런타임 fingerprint로 새 빌드가 필요한지를 보인다(screens.md B). iOS 앱은 OTA가 없고 재설치로만 바뀐다(`docs/tech-stack.md`).
-- 결정: 늘 `settings.bundleEmbedded`(`앱 번들: 빌드에 내장 · 런타임 …`) 문구를 쓰고, 런타임 자리에 `CFBundleShortVersionString (CFBundleVersion)`을 넣는다(`AppBundleText`). 문구는 RN 리소스를 그대로 쓴다.
-- 근거: 어느 빌드가 깔렸는지 기기에서 바로 보려는 목적은 같고, 문구 카탈로그를 iOS만 따로 고치지 않아도 된다.
-- 영향: `MARKETING_VERSION`은 `Config/Base.xcconfig`에서 손으로 올린다. 기기 설치 빌드의 빌드 번호는 커밋 수다(IOS-010).
+- 맥락: RN B 맨 아래 줄은 OTA(EAS Update)를 받았는지와 런타임 fingerprint로 새 빌드가 필요한지를 보이고, 줄 머리에 클라이언트와 변형(`RN prod`·`RN dev`)을 써서 같은 앱 ID를 쓰는 형제 앱 중 무엇이 떠 있는지 보인다(screens.md B). iOS 앱은 OTA가 없고 재설치로만 바뀐다(`docs/tech-stack.md`).
+- 결정: `settings.appVersion`(`iOS {{variant}}: {{version}} (빌드 {{build}})`, en `(build …)`)에 변형 `dev`·`prod`, `CFBundleShortVersionString`, `CFBundleVersion`을 넣는다(`AppBundleText`, 예: `iOS prod: 1.0.0 (빌드 1)`). RN 문구는 머리에 `RN`이 박혀 있어 쓰지 못하므로 iOS 전용 문구를 `scripts/ios-strings.json`에 두고 `scripts/gen-strings.mjs`가 RN 리소스와 합친다(RN 키와 겹치면 실패).
+- 근거: 어느 앱·변형·빌드가 깔렸는지 기기에서 바로 보려는 목적은 같고, Flutter(`Flutter prod: 1.0.0 (빌드 1)`)와 같은 모양이다. iOS 전용 문구는 이 한 줄뿐이라 나머지 문구가 RN 리소스를 그대로 따르는 규칙(D-033)은 유지된다.
+- 영향: `MARKETING_VERSION`은 `Config/Base.xcconfig`에서 손으로 올린다. 기기 설치 빌드의 빌드 번호는 커밋 수다(IOS-010). iOS 전용 문구가 늘면 `scripts/ios-strings.json`에 넣는다.
 
 ## IOS-010: prod 앱은 Mac에서 Personal Team으로 직접 설치하고, 업데이트도 재설치로 한다
 - 날짜: 2026-11-25

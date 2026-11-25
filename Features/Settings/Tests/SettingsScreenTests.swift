@@ -185,3 +185,36 @@ private func waitUntil(_ condition: () async -> Bool) async {
     defaults.removePersistentDomain(forName: suite)
   }
 }
+
+// RN `SettingsScreen.test.tsx` "B 앱 번들 정보", Flutter `Flutter prod: 1.0.0 (빌드 1)`
+struct AppBundleTextTests {
+  private let template = "iOS {{variant}}: {{version}} (빌드 {{build}})"
+
+  @Test func showsVariantVersionAndBuild() {
+    let info: [String: Any] = ["CFBundleShortVersionString": "1.0.0", "CFBundleVersion": "1"]
+    #expect(
+      L10n.fill(template, AppBundleText.values(variant: .production, info: info))
+        == "iOS prod: 1.0.0 (빌드 1)")
+    #expect(
+      L10n.fill(template, AppBundleText.values(variant: .development, info: info))
+        == "iOS dev: 1.0.0 (빌드 1)")
+  }
+
+  @Test func showsDashWithoutVersion() {
+    #expect(
+      L10n.fill(template, AppBundleText.values(variant: .production, info: [:]))
+        == "iOS prod: - (빌드 -)")
+  }
+}
+
+// RN `useKeepFocusedInputVisible.test`의 `overlapToScroll`
+struct KeyboardAvoidanceTests {
+  @Test func scrollsByHiddenAmountIncludingGap() {
+    #expect(KeyboardAvoidance.overlap(inputBottom: 500, visibleBottom: 520) == 28)
+  }
+
+  @Test func staysWhenVisible() {
+    #expect(KeyboardAvoidance.overlap(inputBottom: 400, visibleBottom: 520) == 0)
+    #expect(KeyboardAvoidance.overlap(inputBottom: 472, visibleBottom: 520) == 0)
+  }
+}

@@ -7,21 +7,29 @@ import UIKit
 public struct SettingsView: View {
   @State private var model: SettingsScreenModel
   private let hasKey: Bool
+  private let variant: AppEnvironment.Variant
   private let onOpenAlerts: () -> Void
   private let onOpenAccessKey: () -> Void
   private let onOpenDataSources: () -> Void
   @State private var confirmsReset = false
   @State private var resetTaps = 0
   @State private var keyboardShown = false
+  @State private var scrollPosition = ScrollPosition()
+  /// 키패드에 가리는지 볼 값(전역 좌표). 스크롤 위치·ScrollView 아래 끝·rare-level 칸 아래 끝
+  @State private var scrollOffset: CGFloat = 0
+  @State private var scrollBottom: CGFloat = .infinity
+  @State private var fieldsBottom: CGFloat = 0
   @Environment(DisplaySettings.self) private var display
   @Environment(\.locale) private var locale
 
   public init(
-    store: SettingsStore, hasKey: Bool, onOpenAlerts: @escaping () -> Void,
+    store: SettingsStore, hasKey: Bool, variant: AppEnvironment.Variant,
+    onOpenAlerts: @escaping () -> Void,
     onOpenAccessKey: @escaping () -> Void, onOpenDataSources: @escaping () -> Void
   ) {
     _model = State(initialValue: SettingsScreenModel(store: store))
     self.hasKey = hasKey
+    self.variant = variant
     self.onOpenAlerts = onOpenAlerts
     self.onOpenAccessKey = onOpenAccessKey
     self.onOpenDataSources = onOpenDataSources
@@ -44,11 +52,24 @@ public struct SettingsView: View {
           identifier: "openDataSources", action: onOpenDataSources)
       }
     }
-    .scrollDismissesKeyboard(.interactively)
+    // 키패드는 [완료]로만 닫는다. 끌거나 빈 곳을 눌러도 닫지 않고, 열린 채 다른 행을 누르면 그 행이 눌린다 (D-083)
+    .scrollDismissesKeyboard(.never)
+    .scrollPosition($scrollPosition)
+    .onScrollGeometryChange(for: CGFloat.self) {
+      // `scrollTo(y:)`는 위쪽 inset(제목 줄)을 뺀 좌표라 맞춰 둔다
+      $0.contentOffset.y + $0.contentInsets.top
+    } action: { _, y in
+      scrollOffset = y
+    }
+    .onGeometryChange(for: CGFloat.self) {
+      $0.frame(in: .global).maxY
+    } action: {
+      scrollBottom = $0
+    }
     // 앱 번들 줄은 키패드가 덮는다. 화면이 키패드만큼 줄어(rare-level 칸이 가려지지 않게) 줄이 키패드 위로
     // 따라 올라오므로, 키패드가 보이는 동안은 빼서 덮인 것처럼 둔다
     .safeAreaInset(edge: .bottom, spacing: 0) {
-      if !keyboardShown { FooterLine(AppBundleText.text(locale: locale)) }
+      if !keyboardShown { FooterLine(AppBundleText.text(locale: locale, variant: variant)) }
     }
     .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillShowNotification))
     {
@@ -57,6 +78,14 @@ public struct SettingsView: View {
     .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification))
     {
       _ in keyboardShown = false
+    }
+    .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardDidShowNotification)) {
+      keepFieldsVisible($0)
+    }
+    .onReceive(
+      NotificationCenter.default.publisher(for: UIResponder.keyboardDidChangeFrameNotification)
+    ) {
+      keepFieldsVisible($0)
     }
     .queryLifecycle(model.store.query)
     .background(Theme.Colors.background)
@@ -127,9 +156,9 @@ public struct SettingsView: View {
         },
         value: settings?.window, description: t("settings.windowDesc")
       ) { model.save(SettingsPatch(window: $0)) }
-      RareLevelsInput(levels: settings?.rareLevels) {
-        model.save(SettingsPatch(rareLevels: $0))
-      }
+      RareLevelsInput(
+        levels: settings?.rareLevels, onFieldsBottom: { fieldsBottom = $0 },
+        onSave: { model.save(SettingsPatch(rareLevels: $0)) })
       LinkRow(
         label: t("settings.alerts"),
         value: settings.map {
@@ -139,19 +168,39 @@ public struct SettingsView: View {
     }
   }
 
+  /// 키패드가 올라오면 rare-level 칸과 그 아래 안내 줄이 키패드·[완료] 줄에 가리지 않게 끌어올린다
+  /// (RN `useKeepFocusedInputVisible`). B의 입력칸은 rare-level 칸뿐이다. 키패드 높이에는 [완료] 줄이 들어 있다
+  private func keepFieldsVisible(_ notification: Notification) {
+    guard keyboardShown,
+      let frame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect
+    else { return }
+    let overlap = KeyboardAvoidance.overlap(
+      inputBottom: fieldsBottom, visibleBottom: min(scrollBottom, frame.minY))
+    guard overlap > 0 else { return }
+    withAnimation { scrollPosition.scrollTo(y: scrollOffset + overlap) }
+  }
+
   private func t(_ key: String, _ values: [String: String] = [:]) -> String {
     L10n.string(key, values, locale: locale)
   }
 }
 
-/// B 맨 아래 앱 번들 줄. iOS는 OTA가 없어(재설치) 늘 빌드에 내장이고, 런타임 자리에 앱 버전(빌드 번호)을 쓴다
+/// B 맨 아래 줄 `iOS prod: 1.0.0 (빌드 1)`. 같은 앱 ID를 쓰는 형제 앱(D-141) 중 어느 것이, dev·prod 중 어느
+/// 변형이 떠 있는지와 깔린 빌드를 보인다. OTA가 없어 RN 번들 정보 대신 앱 버전·빌드 번호를 쓴다 (IOS-009)
 enum AppBundleText {
-  static func text(locale: Locale, info: [String: Any] = Bundle.main.infoDictionary ?? [:])
-    -> String
-  {
-    let version = info["CFBundleShortVersionString"] as? String ?? "-"
-    let build = info["CFBundleVersion"] as? String ?? "-"
-    return L10n.string(
-      "settings.bundleEmbedded", ["runtime": "\(version) (\(build))"], locale: locale)
+  static func text(
+    locale: Locale, variant: AppEnvironment.Variant,
+    info: [String: Any] = Bundle.main.infoDictionary ?? [:]
+  ) -> String {
+    L10n.string("settings.appVersion", values(variant: variant, info: info), locale: locale)
+  }
+
+  /// `settings.appVersion`(`iOS {{variant}}: {{version}} (빌드 {{build}})`) 자리 값
+  static func values(variant: AppEnvironment.Variant, info: [String: Any]) -> [String: String] {
+    [
+      "variant": variant == .development ? "dev" : "prod",
+      "version": info["CFBundleShortVersionString"] as? String ?? "-",
+      "build": info["CFBundleVersion"] as? String ?? "-",
+    ]
   }
 }

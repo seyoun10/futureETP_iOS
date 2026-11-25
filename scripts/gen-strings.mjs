@@ -1,4 +1,5 @@
 // RN 번역 리소스(futureETP apps/mobile/src/i18n/locales/{ko,en}.ts)에서 App/Resources/Localizable.xcstrings를 만든다 (D-033).
+// RN에 없는 iOS 전용 문구는 scripts/ios-strings.json(`{ 키: { ko, en } }`)에서 합친다. RN 키와 겹치면 실패한다 (IOS-009).
 // 키는 RN과 같은 점 경로(`accessKey.guide`), 값의 자리 표시자 `{{name}}`은 그대로 둔다(Swift가 이름으로 바꾼다).
 // 실행: node scripts/gen-strings.mjs            파일을 다시 쓴다
 //       node scripts/gen-strings.mjs --check    파일이 최신인지, Swift가 쓰는 키가 모두 있는지 본다(check.sh)
@@ -10,6 +11,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const futureETP = path.resolve(root, process.env.FUTUREETP_DIR ?? '../futureETP_ReactNative');
 const output = path.join(root, 'App/Resources/Localizable.xcstrings');
+const iosOnlyFile = path.join(root, 'scripts/ios-strings.json');
 const locale = async (lang) => {
   const file = path.join(futureETP, 'apps/mobile/src/i18n/locales', `${lang}.ts`);
   return (await import(pathToFileURL(file).href))[lang];
@@ -28,6 +30,14 @@ const ko = flatten(await locale('ko'));
 const en = flatten(await locale('en'));
 const missing = Object.keys(ko).filter((key) => !(key in en));
 if (missing.length > 0) throw new Error(`en에 없는 키: ${missing.join(', ')}`);
+const iosOnly = JSON.parse(await readFile(iosOnlyFile, 'utf8'));
+for (const [key, value] of Object.entries(iosOnly)) {
+  if (key in ko) throw new Error(`ios-strings.json 키가 RN 리소스와 겹친다: ${key}`);
+  if (typeof value.ko !== 'string' || typeof value.en !== 'string')
+    throw new Error(`ios-strings.json 키에 ko·en이 없다: ${key}`);
+  ko[key] = value.ko;
+  en[key] = value.en;
+}
 
 const unit = (value) => ({ stringUnit: { state: 'translated', value } });
 const strings = {};

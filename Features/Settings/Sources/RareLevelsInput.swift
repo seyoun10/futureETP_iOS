@@ -2,11 +2,13 @@ import Core
 import SwiftUI
 import UIKit
 
-/// rare-level 5칸 (screens.md B). 숫자 키패드는 화면을 끌거나 키패드 위 [완료]로 닫고, 닫힐 때 검증·저장한다.
+/// rare-level 5칸 (screens.md B). 숫자 키패드는 키패드 위 [완료]로만 닫고, 닫힐 때 검증·저장한다 (D-083).
 /// 키패드가 열린 채 다른 칸을 눌러도 저장하지 않는다
 struct RareLevelsInput: View {
   /// 조회 중이면 nil(입력 막음)
   let levels: [Double]?
+  /// 칸 줄 아래 끝(전역 좌표). 키패드에 가리는지 볼 때 쓴다
+  let onFieldsBottom: (CGFloat) -> Void
   let onSave: (RareLevels) -> Void
   @State private var draft = RareLevelsDraft()
   @FocusState private var focused: Int?
@@ -42,6 +44,11 @@ struct RareLevelsInput: View {
           )
           .accessibilityIdentifier("rareLevel\(index)")
         }
+      }
+      .onGeometryChange(for: CGFloat.self) {
+        $0.frame(in: .global).maxY
+      } action: {
+        onFieldsBottom($0)
       }
       Text(verbatim: hint)
         .font(.system(size: Theme.FontSize.caption))

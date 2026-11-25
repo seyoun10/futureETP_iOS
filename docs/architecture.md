@@ -36,7 +36,7 @@ docs/                           tech-stack, architecture, decisions, ops
 - 화면 전용 코드는 해당 feature 안에, 두 곳 이상에서 쓰면 공용 계층(`core`)으로 옮긴다.
 - import 방향(RN D-041, 2026-11-19 lint로 강제): feature끼리 import하지 않는다(컴포넌트·헬퍼·조회도 다른 feature가 쓰면 `Core`로 옮긴다). `Core`는 features·`App`을 import하지 않고, features는 `App`(라우트)을 import하지 않는다. Tuist 타깃 의존성(App → features → Core)만 선언하고, 선언 밖 import(implicit)와 import하지 않는 선언(redundant)은 `tuist inspect dependencies`가 실패로 잡는다(컴파일러는 같은 빌드 폴더의 framework를 막지 못한다, IOS-003).
 - RN에서 공용으로 옮긴 것: `SectionHeader`·`SettingsHeaderButton`(공용 UI), 에러 code → 사용자 문구 함수 `errorText`(API의 `AppError` 옆), ETP 정렬 기준 `ETP_SORTS`(util).
-- 문구는 RN과 같은 점 경로 키(`accessKey.guide`)로 `Text("…")`에 넘긴다. 카탈로그는 앱 번들(main)에 있어 features의 기본 조회가 그대로 찾는다. 직접 고치지 않고 RN 리소스를 바꾼 뒤 `node scripts/gen-strings.mjs`로 다시 만든다(`check.sh`가 최신 여부와 Swift가 쓰는 키가 있는지 본다). 값의 자리 표시자는 RN 그대로 `{{name}}`이라 이름으로 바꿔 넣는다.
+- 문구는 RN과 같은 점 경로 키(`accessKey.guide`)로 `Text("…")`에 넘긴다. 카탈로그는 앱 번들(main)에 있어 features의 기본 조회가 그대로 찾는다. 직접 고치지 않고 RN 리소스를 바꾼 뒤 `node scripts/gen-strings.mjs`로 다시 만든다(`check.sh`가 최신 여부와 Swift가 쓰는 키가 있는지 본다). RN에 없는 iOS 전용 문구(B 맨 아래 줄 `settings.appVersion`, IOS-009)만 `scripts/ios-strings.json`에 두고 생성 때 합친다. 값의 자리 표시자는 RN 그대로 `{{name}}`이라 이름으로 바꿔 넣는다.
 - 월물 심볼은 서버 표준형(`CLZ26`)만 쓴다. 표시 표기(`DEC26`)는 포맷 함수가 만든다.
 
 ## 레이어
