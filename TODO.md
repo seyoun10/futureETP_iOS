@@ -29,11 +29,13 @@
   - 1단계 렌더링 완료(2026-11-24): `CandleViewport`·`PriceScale`·`LineSample`·`CanvasCandleChart`, 측정 화면 `ChartSpikeView`(dev, `-chartSpike`). Canvas로 결정(IOS-008)
   - 2단계 제스처 완료(2026-11-24): `ChartInteraction`(십자선 유지·탭으로 지우기·십자선이 있으면 끌기가 십자선을 옮김·핀치한 터치에서 십자선 막기·핀치 가운데 따라가기), `ChartGestureSurface`(UIKit 인식기: 길게 누르기 0.3초·탭·한 손가락 끌기·핀치), `DetailCorner`(상세 박스 귀퉁이), 봉 스냅 햅틱(`sensoryFeedback(.selection)`). 시뮬레이터에서 동작 확인
   - 3단계 과거 봉 붙이기 완료(2026-11-24): `CandleViewport.rebased`·`showsFirstBar`, `ChartInteraction.dataChanged(barCount:prepended:)`(보던 범위 유지·십자선 지우기·핀치 중이면 시작 범위도 옮김). 스파이크는 가장 과거 봉이 보이면 0.5초 뒤 756봉을 앞에 붙인다(3,024봉까지). C-a 화면은 RN `prependedBars`처럼 첫 날짜가 앞당겨지고 마지막 날짜가 같을 때만 앞에 붙은 봉으로 센다
-  - 14P prod 미러링 확인(2026-11-25): GC C-a 12M 칩·끌기·[↻]·가장 과거 봉에서 이전 3년 받기(표시·범위 유지), C-b [<]·기준일 시트·되돌리기, C-d 순자산 정렬·C-d-a 상세. 미러링으로 못 본 것: 길게 눌러 십자선·핀치·B 스크롤·A 당겨서 새로고침
+  - 14P prod 미러링 확인(2026-11-25): GC C-a 12M 칩·끌기·[↻]·가장 과거 봉에서 이전 3년 받기(표시·범위 유지), C-b [<]·기준일 시트·되돌리기, C-d 순자산 정렬·C-d-a 상세. 길게 눌러 십자선 상세·탭으로 지우기도 확인. 미러링으로 못 본 것: 핀치·A 당겨서 새로고침(마우스 끌기·휠 모두 당겨지지 않음)
   - 남음: 실기기 120Hz·Release 측정(십자선을 끄는 동안 상세 박스 다시 그리기 비용 포함. 시뮬레이터 짧은 끌기에서 43~54fps)
 - [ ] B 설정·B-a 알림 설정: 낙관적 PATCH, rare-level 입력 검증, 알림 대상 없음 빨간 점 (D-081~D-083, D-124)
   - 완료(2026-11-24): `SettingsView`(일반·이격도차트·기타 묶음, `SegmentedRow`, rare-level 5칸 `RareLevelsInput`·`RareLevelsDraft`는 키패드가 닫힐 때 `RareLevels`로 검증·정렬 저장, [초기화] 확인 뒤 표시 설정·`SettingsPatch.disparityDefaults`+언어 PATCH, 저장 실패 줄은 이 화면의 마지막 변경만, 앱 번들 줄 IOS-009·키패드가 보이면 뺌), `AlertSettingsView`(권한 배너 `PushPermission`·대상 원자재·현재 적용 기준·`QuietTimeSection` 30분 48칸 시트), `DataSourcesView`, 공용 `backTitleBar`. `SegmentedRow`는 한 줄에 안 들어가면 쌓는다. 시뮬레이터에서 dev 서버로 언어 전환·rare-level 중복 오류·저장·초기화·알림 대상·알림 거부 시간·데이터 출처 확인
   - 남음: [허용](권한 창)·[설정 열기] 누르기. 14P에서 권한 배너 표시 확인(2026-11-25). 키패드 [완료]가 rare-level 칸을 덮는지는 미러링(하드웨어 키보드라 키패드가 안 뜸)으로 못 봄. 미러링에서는 [완료] 막대가 뜨고 앱 번들 줄이 남아 접근 키 행 위에 겹쳐 보임
+
+- [ ] B 끝까지 스크롤하면 마지막 [데이터 출처] 행이 앱 번들 줄·홈 인디케이터 여백에 가려진다(14P prod 미러링, 2026-11-25). `FooterLine`이 겹침만큼 높이를 줄여 `safeAreaInset`이 스크롤 끝 여백을 덜 주는 것으로 추정(c63b068 이후)
 
 ## 5. 푸시
 - [ ] APNs 기기 토큰 등록(Apple 가입 뒤), 가입 전에는 등록하지 않음
