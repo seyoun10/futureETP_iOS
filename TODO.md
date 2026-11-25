@@ -33,7 +33,7 @@
   - 남음: 실기기 120Hz·Release 측정(십자선을 끄는 동안 상세 박스 다시 그리기 비용 포함. 시뮬레이터 짧은 끌기에서 43~54fps)
 - [ ] B 설정·B-a 알림 설정: 낙관적 PATCH, rare-level 입력 검증, 알림 대상 없음 빨간 점 (D-081~D-083, D-124)
   - 완료(2026-11-24): `SettingsView`(일반·이격도차트·기타 묶음, `SegmentedRow`, rare-level 5칸 `RareLevelsInput`·`RareLevelsDraft`는 키패드가 닫힐 때 `RareLevels`로 검증·정렬 저장, [초기화] 확인 뒤 표시 설정·`SettingsPatch.disparityDefaults`+언어 PATCH, 저장 실패 줄은 이 화면의 마지막 변경만, 앱 번들 줄 IOS-009·키패드가 보이면 뺌), `AlertSettingsView`(권한 배너 `PushPermission`·대상 원자재·현재 적용 기준·`QuietTimeSection` 30분 48칸 시트), `DataSourcesView`, 공용 `backTitleBar`. `SegmentedRow`는 한 줄에 안 들어가면 쌓는다. 시뮬레이터에서 dev 서버로 언어 전환·rare-level 중복 오류·저장·초기화·알림 대상·알림 거부 시간·데이터 출처 확인
-  - 14P에서 권한 배너 표시·[허용]으로 iOS 알림 권한 창 확인(2026-11-25). 남음: 거부한 뒤 [설정 열기], 키패드 [완료]가 rare-level 칸을 덮는지(미러링은 하드웨어 키보드라 키패드가 안 뜸)
+  - 14P prod 미러링 확인(2026-11-25): 권한 배너 [허용] → iOS 알림 권한 창, [허용 안 함] 뒤 배너가 [설정 열기]로 바뀌고 누르면 iOS 설정의 futureETP 알림 화면이 열림, 돌아오면 배너 유지. 14P는 알림 거부 상태로 둠(Apple 가입 뒤 설정에서 켠다). 남음: 키패드 [완료]가 rare-level 칸을 덮는지(미러링은 하드웨어 키보드라 키패드가 안 뜸)
 
 ## 5. 푸시
 - [ ] APNs 기기 토큰 등록(Apple 가입 뒤), 가입 전에는 등록하지 않음
