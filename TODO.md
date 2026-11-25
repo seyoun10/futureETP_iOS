@@ -18,7 +18,7 @@
 
 ## 3. 공통 기반
 - [ ] 접근 키 B-b: 붙여넣기·QR(`futureetp-key:v1:` 접두사), `GET /v1/settings`로 확인 뒤 저장, 키 없으면 첫 화면이 B-b, `UNAUTHORIZED`면 어느 화면에서든 B-b + 거절 줄 (D-044, D-077~D-079)
-  - 코드 완료(a4da4d4~ba01dfd). 시뮬레이터에서 dev 서버 키 붙여넣기·Keychain 저장·재실행 유지 확인(2026-11-24). 14P prod에서 RN 앱을 덮어쓴 뒤 첫 화면 B-b·키 재입력 뒤 A 표시 확인(2026-11-25, iPhone 미러링 창에서 ⌘V 붙여넣기는 안 됨). 남은 확인: 키 교체 뒤 거절 시 B-b 이동, 실기기 QR 스캔. 확인되면 이 항목을 `docs/history.md`로 옮긴다
+  - 코드 완료(a4da4d4~ba01dfd). 시뮬레이터에서 dev 서버 키 붙여넣기·Keychain 저장·재실행 유지 확인(2026-11-24). 14P prod에서 RN 앱을 덮어쓴 뒤 첫 화면 B-b·키 재입력 뒤 A 표시 확인(2026-11-25, iPhone 미러링 창에서 ⌘V 붙여넣기는 안 됨). 시뮬레이터에서 dev 서버 `API_TOKEN`을 바꿔 띄운 뒤 A·C 요청 거절 → B-b(거절 줄), 재실행 때도 B-b, 새 키 붙여넣기 → A, 원래 키로 되돌리기 확인(2026-11-25). 이때 형식 오류 줄이 `accessKey.badFormat` 키 이름으로 보이던 것을 고침. 남은 확인: 실기기 QR 스캔. 확인되면 이 항목을 `docs/history.md`로 옮긴다
 - [ ] 앱 실행 때 시간대 PATCH (D-084), 세로 잠금·[⟲] 가로 전환 (D-076)
   - 시간대·언어 PATCH 코드 완료(2026-11-24): `SettingsStore`(설정 조회·낙관적 PATCH 줄 세우기)·`.deviceSettingsSync`(루트, 키 있을 때). dev 서버 확인 완료(2026-11-25): `TZ=America/Chicago`·영어로 실행하면 `device` 행이 `en`·`America/Chicago`로, 서울로 다시 실행하면 시간대가 되돌아감. 언어는 앱 설정 저장값이 기기 언어보다 앞서므로(D-033) B에서 [한국어]를 누를 때 `ko`로 PATCH됨
   - 세로 잠금 기반 완료(2026-11-24): `OrientationLock`(시작 세로, `lockPortrait`·`lockLandscape`·[⟲]용 `toggle(isLandscape:)`, `AppDelegate`가 허용 방향 반환)·`\.isLandscape`(창 모양, 루트 `providesIsLandscape`)
