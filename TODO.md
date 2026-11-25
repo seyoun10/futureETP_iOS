@@ -37,6 +37,7 @@
   - 완료(2026-11-24): `CommodityView`(title-bar [←]·`원자재명 (심볼)`·🔔·[⟲]·[⚙], 시스템 뒤로 버튼 숨김으로 쓸어서 뒤로 가기 막음 D-105, 탭 4개는 처음 열 때 만들고 숨겨도 유지, 탭 화면이 `tabFooterTime`으로 보이는 탭의 기준 시각 줄을 올림), `ChartPeriods`(C-a·C-c 기간, C에 들어올 때마다 6M)·`ChartPeriod.nearest`, [⚙]는 A와 공용 `SettingsButton`. 시뮬레이터에서 탭 전환·문구 확인
   - title-bar 아래 1pt `barSeparator` 완료(2026-11-25): Core `titleBarSeparator()`를 `backTitleBar`·A·B-b·C·C-d-a에 붙임. 시뮬레이터에서 A·B·C·C-d-a 확인
   - ETP 상세 기간 유지 확인(2026-11-25): C-d-a는 C 위에 쌓이므로 C의 `ChartPeriods`가 그대로 남는다. 시뮬레이터에서 12M → C-d-a → 뒤로 12M 유지, A로 나갔다 다시 들어오면 6M 확인(D-107). 코드 변경 없음
+  - title-bar 합치기 완료(2026-11-25): Core `backTitleBar`가 조각 제목·[←] 동작(`onBack`)·제목 최대 폭·오른쪽 버튼 여러 개를 받아 C·C-d-a도 같은 title-bar를 쓴다. 시뮬레이터에서 C·C-d-a 긴 이름·B·[←] 복귀 확인
   - 남음: C 탭 화면 채우기(아래 항목들)
 - [ ] C-a 이격도차트: `GET /v1/commodities/:code/disparity`, 기간 버튼 6개(D-102), 롤 음영, 십자선 상세, 가로 모드, 이전 3년 받기 중 화면 터치 차단·5초 시간 초과·실패 Alert (D-086, D-103, D-108, D-139)
   - 1단계 조회 완료(2026-11-24): `DisparityRepository`·`QueryCache.disparityChart`(키 `QueryKeys.disparity`, 설정 값별)
@@ -62,7 +63,7 @@
   - 완료(2026-11-24): `ETPRepository`·`QueryCache.etpList`·`etpDetail`(키 `QueryKeys.etps`·`etp`), `ETPListModel`(필터 4개·기본/순자산/거래대금 정렬·있는 배수만 선택지), 공용 `SegmentedRow`(Core, B 설정에서도 쓴다), `ETPListTabView`(행 둘째 줄 정렬 값·수집 시각은 기준 시각 줄), `ETPDetailView`(Route `.etp`, [←]만, 시리즈 줄·운용사 페이지는 http(s)만). 시뮬레이터에서 GC 목록·정렬·상세·복귀 확인
 - [ ] B 설정·B-a 알림 설정: 낙관적 PATCH, rare-level 입력 검증, 알림 대상 없음 빨간 점 (D-081~D-083, D-124)
   - 완료(2026-11-24): `SettingsView`(일반·이격도차트·기타 묶음, `SegmentedRow`, rare-level 5칸 `RareLevelsInput`·`RareLevelsDraft`는 키패드가 닫힐 때 `RareLevels`로 검증·정렬 저장, [초기화] 확인 뒤 표시 설정·`SettingsPatch.disparityDefaults`+언어 PATCH, 저장 실패 줄은 이 화면의 마지막 변경만, 앱 번들 줄 IOS-009·키패드가 보이면 뺌), `AlertSettingsView`(권한 배너 `PushPermission`·대상 원자재·현재 적용 기준·`QuietTimeSection` 30분 48칸 시트), `DataSourcesView`, 공용 `backTitleBar`. `SegmentedRow`는 한 줄에 안 들어가면 쌓는다. 시뮬레이터에서 dev 서버로 언어 전환·rare-level 중복 오류·저장·초기화·알림 대상·알림 거부 시간·데이터 출처 확인
-  - 남음: 실기기에서 권한 배너 [허용](권한 창)·[설정 열기] 확인. iOS 26 키패드 [완료]가 rare-level 칸 일부를 덮는다(누를 수는 있음, 실기기에서 다시 본다). ETP 상세·C title-bar를 `backTitleBar`로 합칠지 검토
+  - 남음: 실기기에서 권한 배너 [허용](권한 창)·[설정 열기] 확인. iOS 26 키패드 [완료]가 rare-level 칸 일부를 덮는다(누를 수는 있음, 실기기에서 다시 본다)
 - [ ] 화면별 세부 동작은 `../futureETP_ReactNative/docs/wireframes/screens.md`와 하나씩 대조
 
 ## 5. 푸시
