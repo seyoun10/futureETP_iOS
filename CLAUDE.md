@@ -79,7 +79,7 @@ Swift/SwiftUI로 만드는 futureETP 앱(iOS). 기능·화면·동작은 RN 앱(
 
 ## Commands
 
-`mise install`로 Tuist를 받은 뒤 `mise exec -- tuist …`(또는 mise activate한 셸에서 `tuist …`)로 쓴다. 시뮬레이터 기기는 `iPhone 18 Pro`(iOS 27.2).
+`mise install`로 Tuist를 받은 뒤 `mise exec -- tuist …`(또는 mise activate한 셸에서 `tuist …`)로 쓴다. 전용 시뮬레이터는 `iPhone 18 Pro`(iOS 27.2). 다른 저장소 기기에는 설치하지 않는다(앱 ID가 같아 덮어쓴다). 전체 배정은 `../CLAUDE.md`.
 
 - `tuist generate --no-open`: 프로젝트 생성(빌드·테스트 전, `Project.swift` 변경 뒤 먼저)
 - `xcodebuild build -workspace FutureETP.xcworkspace -scheme FutureETP-Dev -destination 'platform=iOS Simulator,name=iPhone 18 Pro' -derivedDataPath build/dd`: dev 변형 빌드. prod는 `-scheme FutureETP`(Release)
