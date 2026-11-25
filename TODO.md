@@ -27,7 +27,10 @@
   - 14P prod 빌드 97 Animation Hitches 120초(2026-11-25, 끌기→핀치→십자선 순): 세 동작 모두 vsync가 8.3ms(120Hz)로 오르고 손을 떼면 100ms로 내려감(`FrameRateBoost` 동작 확인). 앱이 실제로 보낸 프레임은 끌기 평균 약 55/s(35~79), 핀치 약 45/s(4~69), 십자선 약 98/s(82~109). 끊김 121번은 모두 한 프레임(8.3ms, 12.5ms 두 번)이고 대부분 "Potentially expensive app update(s)"
   - 14P prod 빌드 97 Time Profiler 120초(2026-11-25): 제스처 중 메인 스레드 샘플의 약 25%가 `L10n.string`(그중 10~12%는 `{{…}}` 정규식 리터럴을 호출마다 다시 해석), 18%가 `ChartText.widestMonthLabel`(월 라벨 12개 너비를 매 프레임 측정). 자리 표시자 없는 문구는 정규식 건너뛰기·정규식과 언어 번들 한 번만 만들기·월 라벨 최대 너비 locale별 기억으로 고침
   - 14P prod 빌드 99 Time Profiler 120초(2026-11-25, 빌드 97과 같은 launch 방식, 끌기→핀치→십자선 순): 메인 스레드 샘플 중 `L10n.string` 25%→5%, 정규식 16%→1%, `widestMonthLabel` 18%→0%, `DisparityInfoLines` 9%→3%. 메인 스레드 사용률은 끌기 29%→25%, 핀치 약 29%, 십자선 42%. 남은 큰 몫은 렌더 커밋(RenderBox·QuartzCore) 약 60%, `CanvasCandleChart` 그리기 약 42%(그중 `drawLabels` 27%, `drawExtremeTags` 11%). 사용률이 30% 안팎이라 CPU가 꽉 찬 상태는 아니다. 같은 날 launch 방식 Animation Hitches(빌드 99)는 끌기 약 28/s·핀치 약 35/s로 빌드 97(실행 중인 앱에 붙여 잼)보다 낮았지만 방식·손동작 차이를 가를 수 없음
-  - 남음: Canvas 자체 비용과 C-a 화면 상태 갱신 비용을 가르려면 14P dev 빌드 스파이크 화면(`-chartSpike`, 자동 시나리오)으로 프레임 수를 잰다. RN 87~107fps는 `perf:collect` UI 스레드 fps라 Animation Hitches 프레임 수와 바로 비교하지 않는다
+  - [ ] (선택, 2026-11-25 보류) 끌기·핀치 프레임 수 더 올리기. 눈으로 끊김이 보이면 진행한다. RN 87~107fps는 `perf:collect` UI 스레드 fps라 Animation Hitches 프레임 수와 바로 비교하지 않는다
+    - 14P dev 빌드 스파이크 화면(`-chartSpike`, 자동 시나리오)을 Animation Hitches로 재서 Canvas 자체 비용과 C-a 화면 상태 갱신 비용을 가른다. 스파이크가 120fps 가까이면 C-a 화면에서 제스처 상태를 읽는 범위를 좁히고, 거기서도 낮으면 그리기 범위 나누기를 검토한다
+    - `CanvasCandleChart.drawLabels`(27%)·`drawExtremeTags`(11%)가 매 프레임 글자를 다시 만드는 부분 줄이기
+    - 측정 방법: `xcrun devicectl device info ddiServices --device <UDID>`로 기기를 xctrace에 올린 뒤 `xcrun xctrace record --template 'Animation Hitches'`(또는 `'Time Profiler'`) `--device <UDID> --time-limit 120s --launch -- <bundle ID>`. 실행 중인 앱에 붙이는 것과 결과가 달라 같은 방식끼리만 비교한다
 
 ## 5. 푸시
 - [ ] APNs 기기 토큰 등록(Apple 가입 뒤), 가입 전에는 등록하지 않음
