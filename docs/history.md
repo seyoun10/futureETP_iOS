@@ -22,6 +22,7 @@ TODO.md에서 끝난 항목을 같은 절 이름 아래로 옮겨 둔다.
 - [x] `brew install mise` → `mise install`(Tuist), `Project.swift`로 프로젝트 생성, 앱 ID `io.github.seyoon.futureetp`·dev `.dev` 두 변형(scheme `FutureETP-Dev`·`FutureETP`), 앱 이름(`futureETP`·`futureETP Dev`)·아이콘(RN `icon.png`를 검정 배경으로 알파 제거)(2026-11-24)
 - [x] lint·format·test 설정과 검사 명령 `scripts/check.sh`(lint → generate → `tuist inspect dependencies --only implicit` → Release 빌드 → Debug-Dev 테스트), `.swift-format` 기본값·2칸, CLAUDE.md Commands 갱신(2026-11-24)
 - [x] dev 변형이 로컬 dev 서버 `GET /v1/health`를 부르는 최소 화면으로 연결 확인: Core `HealthRepository`, A 자리에 dev 전용 `server: ok` 줄(4단계 A 구현 때 지운다), 시뮬레이터에서 확인(2026-11-24)
+- [x] (선택) 원격 저장소·CI(GitHub Actions에서 check): `.github/workflows/check.yml`(러너 `xcode-27`, Xcode 27.2, futureETP main을 함께 받아 `FUTUREETP_DIR`로 넘김) 작성(2026-11-24). PR #1에서 첫 실행 통과(check 7분 28초, 2026-11-25)
 
 
 ## 3. 공통 기반

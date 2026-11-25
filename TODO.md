@@ -14,7 +14,6 @@
 - [x] 차트는 SwiftUI `Canvas` 직접 구현 (IOS-008, 2026-11-24)
 
 ## 2. 스캐폴딩
-- [ ] (선택) 원격 저장소·CI(GitHub Actions에서 check): `.github/workflows/check.yml`(러너 `xcode-27`, Xcode 27.2, futureETP main을 함께 받아 `FUTUREETP_DIR`로 넘김) 작성(2026-11-24). 첫 실행 통과 확인이 남음
 
 ## 3. 공통 기반
 
