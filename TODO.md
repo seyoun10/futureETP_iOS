@@ -26,7 +26,8 @@
   - 14P prod 빌드 93 Animation Hitches 30초(2026-11-25): 차트 끌기·핀치·십자선 동안 화면 갱신이 16.7ms(60Hz)에 머묾(883프레임 중 772), 끊김 21번 모두 한 프레임. 기기 vsync에 8.3ms가 있어 기기 설정(저전력·프레임 속도 제한) 제한은 아님. 앱이 차트 제스처 동안 높은 프레임 속도를 요청하지 않는 것으로 보임(`CAFrameRateRange`를 쓰는 곳은 dev 측정기뿐). 제스처 동안 120Hz 요청을 넣음(`FrameRateBoost`: 길게 누르기·끌기·핀치 동안 `CADisplayLink` 80~120Hz, 2026-11-25)
   - 14P prod 빌드 97 Animation Hitches 120초(2026-11-25, 끌기→핀치→십자선 순): 세 동작 모두 vsync가 8.3ms(120Hz)로 오르고 손을 떼면 100ms로 내려감(`FrameRateBoost` 동작 확인). 앱이 실제로 보낸 프레임은 끌기 평균 약 55/s(35~79), 핀치 약 45/s(4~69), 십자선 약 98/s(82~109). 끊김 121번은 모두 한 프레임(8.3ms, 12.5ms 두 번)이고 대부분 "Potentially expensive app update(s)"
   - 14P prod 빌드 97 Time Profiler 120초(2026-11-25): 제스처 중 메인 스레드 샘플의 약 25%가 `L10n.string`(그중 10~12%는 `{{…}}` 정규식 리터럴을 호출마다 다시 해석), 18%가 `ChartText.widestMonthLabel`(월 라벨 12개 너비를 매 프레임 측정). 자리 표시자 없는 문구는 정규식 건너뛰기·정규식과 언어 번들 한 번만 만들기·월 라벨 최대 너비 locale별 기억으로 고침
-  - 남음: 고친 빌드를 14P에 깔아 Animation Hitches로 끌기·핀치 프레임 수 다시 측정. 남는 비용은 `CanvasCandleChart.drawLabels`·`DisparityInfoLines`(정보 줄 문구를 매 프레임 다시 만듦)
+  - 14P prod 빌드 99 Time Profiler 120초(2026-11-25, 빌드 97과 같은 launch 방식, 끌기→핀치→십자선 순): 메인 스레드 샘플 중 `L10n.string` 25%→5%, 정규식 16%→1%, `widestMonthLabel` 18%→0%, `DisparityInfoLines` 9%→3%. 메인 스레드 사용률은 끌기 29%→25%, 핀치 약 29%, 십자선 42%. 남은 큰 몫은 렌더 커밋(RenderBox·QuartzCore) 약 60%, `CanvasCandleChart` 그리기 약 42%(그중 `drawLabels` 27%, `drawExtremeTags` 11%). 사용률이 30% 안팎이라 CPU가 꽉 찬 상태는 아니다. 같은 날 launch 방식 Animation Hitches(빌드 99)는 끌기 약 28/s·핀치 약 35/s로 빌드 97(실행 중인 앱에 붙여 잼)보다 낮았지만 방식·손동작 차이를 가를 수 없음
+  - 남음: Canvas 자체 비용과 C-a 화면 상태 갱신 비용을 가르려면 14P dev 빌드 스파이크 화면(`-chartSpike`, 자동 시나리오)으로 프레임 수를 잰다. RN 87~107fps는 `perf:collect` UI 스레드 fps라 Animation Hitches 프레임 수와 바로 비교하지 않는다
 
 ## 5. 푸시
 - [ ] APNs 기기 토큰 등록(Apple 가입 뒤), 가입 전에는 등록하지 않음
