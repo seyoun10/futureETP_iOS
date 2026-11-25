@@ -5,7 +5,7 @@
 원본 변경 따라가기: `../futureETP_ReactNative`에서 API·shared 스키마·화면 동작이 바뀌면 그쪽에서 이 파일의 "원본 변경 반영"에 항목을 적는다
 
 ## 원본 변경 반영
-마지막 대조: futureETP `271b148`(2026-11-25, 앱 코드를 쓰기 전이라 그 전 RN 앱 코드 수정은 현재 RN 코드를 보고 구현할 때 들어간다). 적힌 항목 밖에 빠진 것이 있는지는 `git -C ../futureETP_ReactNative log --oneline 17a2dfa..HEAD -- apps/mobile packages/shared`로 그 뒤 커밋만 이 저장소 구현과 맞춰 본다. 다 보면 이 줄의 커밋을 그 HEAD로 바꾼다
+마지막 대조: futureETP `271b148`(2026-11-25, 앱 코드를 쓰기 전이라 그 전 RN 앱 코드 수정은 현재 RN 코드를 보고 구현할 때 들어간다). 적힌 항목 밖에 빠진 것이 있는지는 `git -C ../futureETP_ReactNative log --oneline 271b148..HEAD -- apps/mobile packages/shared docs/wireframes`로 그 뒤 커밋만 이 저장소 구현과 맞춰 본다. 다 보면 이 줄의 커밋을 그 HEAD로 바꾼다
 
 ## 0. 환경
 - [ ] Apple Developer 가입 전에는 시뮬레이터와 개인 무료 서명(7일) 실기기만 가능. APNs는 가입 뒤 (D-039, futureETP TODO 5-10)
@@ -61,7 +61,6 @@
 - [ ] B 설정·B-a 알림 설정: 낙관적 PATCH, rare-level 입력 검증, 알림 대상 없음 빨간 점 (D-081~D-083, D-124)
   - 완료(2026-11-24): `SettingsView`(일반·이격도차트·기타 묶음, `SegmentedRow`, rare-level 5칸 `RareLevelsInput`·`RareLevelsDraft`는 키패드가 닫힐 때 `RareLevels`로 검증·정렬 저장, [초기화] 확인 뒤 표시 설정·`SettingsPatch.disparityDefaults`+언어 PATCH, 저장 실패 줄은 이 화면의 마지막 변경만, 앱 번들 줄 IOS-009·키패드가 보이면 뺌), `AlertSettingsView`(권한 배너 `PushPermission`·대상 원자재·현재 적용 기준·`QuietTimeSection` 30분 48칸 시트), `DataSourcesView`, 공용 `backTitleBar`. `SegmentedRow`는 한 줄에 안 들어가면 쌓는다. 시뮬레이터에서 dev 서버로 언어 전환·rare-level 중복 오류·저장·초기화·알림 대상·알림 거부 시간·데이터 출처 확인
   - 남음: 실기기에서 권한 배너 [허용](권한 창)·[설정 열기] 확인. iOS 26 키패드 [완료]가 rare-level 칸 일부를 덮는다(누를 수는 있음, 실기기에서 다시 본다)
-- [ ] 화면별 세부 동작은 `../futureETP_ReactNative/docs/wireframes/screens.md`와 하나씩 대조
 
 ## 5. 푸시
 - [ ] APNs 기기 토큰 등록(Apple 가입 뒤), 가입 전에는 등록하지 않음

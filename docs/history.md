@@ -48,3 +48,7 @@ TODO.md에서 끝난 항목을 같은 절 이름 아래로 옮겨 둔다.
 - [x] A 원자재 목록: `GET /v1/commodities`, 대표월물 ●·알림 🔔·거래 없음, 당겨서 새로고침(햅틱·터치 차단·5초 시간 초과 Alert, D-138), C-a 이동·미리 조회 (D-085)
   - 완료(2026-11-24): `CommoditiesRepository`·`QueryCache.commodityList`, `CommodityListView`(행·등락 색·●·🔔·거래 없음·기준 시각 줄·[⚙] 알림 꺼짐 점), `PullRefresh`(5초 시간 초과·실패 Alert, 늦은 조회는 그대로 반영, 새로고침 중 `.blocksTouches`·루트 `.touchBlocker()`로 title-bar까지 터치 차단. 서버를 끈 시뮬레이터에서 [⚙] 차단·실패 Alert 확인), C·B 이동. 시뮬레이터에서 dev 서버 목록 표시 확인
   - 행 누를 때 C-a 미리 조회 완료(2026-11-25): `CommodityQueries.prefetchDisparity`를 RootView `onSelect`에서 기다리지 않고 시작
+- [x] 화면별 세부 동작은 `../futureETP_ReactNative/docs/wireframes/screens.md`와 하나씩 대조
+  - 완료(2026-11-25, RN `271b148` 기준): 공통 규칙·A·A-a·B·B-b·B-a·C·C-a(십자선·가로)·C-b·C-c·C-d·C-d-a 항목을 구현과 맞춰 봄. 문구는 RN `locales/ko.ts`·`en.ts`와 String Catalog를 스크립트로 비교해 키 243개·값 모두 같음. 자동 새로고침은 A·C-a~C-c만(ETP 응답에는 `freshness`가 없어 걸리지 않음)
+  - 고친 것: B [초기화] 아이콘을 RN처럼 차트 [↻]와 같은 되돌리기 아이콘(`clock.arrow.circlepath`)으로. SF Symbols 대응표를 `docs/tech-stack.md`에 적음
+  - X 푸시는 5단계, 실기기에서만 볼 수 있는 동작(120Hz·권한 배너·회전·QR)은 각 항목에 남음

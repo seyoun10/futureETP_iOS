@@ -20,6 +20,7 @@
 | i18n | String Catalog | 앱 안 언어 설정(D-073)이 기기 언어와 다를 수 있어 `Locale`을 환경으로 주입 |
 | 푸시 | APNs 직접(`UNUserNotificationCenter`, 기기 토큰) | Apple 가입 뒤 |
 | 햅틱 | SwiftUI `sensoryFeedback` (IOS-006) | D-109·D-138·D-139. iOS 17+ |
+| 아이콘 | SF Symbols(`Image(systemName:)`) | RN Material Community Icons 대응: 뒤로 `arrow-left`→`chevron.left`(iOS 관례), 설정 `cog-outline`→`gearshape`, 휴장 달력 `calendar-month-outline`→`calendar`, 회전 `phone-rotate-*`→`iphone.landscape`·`iphone`(바뀔 방향), 되돌리기 `restore`(차트 [↻]·B [초기화])→`clock.arrow.circlepath`, 이동·행 `chevron-*`→`chevron.*` |
 | 테스트 / lint | Swift Testing · XCUITest / swift-format 6.4.4(Xcode 동봉, 기본 설정·2칸) | 계약 예시는 futureETP 원본 zod 스키마를 Node로 실행해 검증한다(`scripts/validate-fixtures.mjs`, IOS-007) |
 | 외부 패키지 | 없음(SPM으로 꼭 필요할 때만) |  |
 | 프로젝트 생성 | Tuist 4.218.4(`mise.toml` 고정, GitHub 릴리스 2026-11-23) | IOS-003 |

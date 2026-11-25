@@ -65,7 +65,7 @@ public struct SettingsView: View {
         resetTaps += 1
         confirmsReset = true
       } label: {
-        Image(systemName: "arrow.counterclockwise")
+        Image(systemName: "clock.arrow.circlepath")
           .foregroundStyle(Theme.Colors.text)
       }
       .accessibilityLabel(Text("settings.reset"))
