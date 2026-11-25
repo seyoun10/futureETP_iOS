@@ -52,3 +52,37 @@ TODO.md에서 끝난 항목을 같은 절 이름 아래로 옮겨 둔다.
   - 완료(2026-11-25, RN `271b148` 기준): 공통 규칙·A·A-a·B·B-b·B-a·C·C-a(십자선·가로)·C-b·C-c·C-d·C-d-a 항목을 구현과 맞춰 봄. 문구는 RN `locales/ko.ts`·`en.ts`와 String Catalog를 스크립트로 비교해 키 243개·값 모두 같음. 자동 새로고침은 A·C-a~C-c만(ETP 응답에는 `freshness`가 없어 걸리지 않음)
   - 고친 것: B [초기화] 아이콘을 RN처럼 차트 [↻]와 같은 되돌리기 아이콘(`clock.arrow.circlepath`)으로. SF Symbols 대응표를 `docs/tech-stack.md`에 적음
   - X 푸시는 5단계, 실기기에서만 볼 수 있는 동작(120Hz·권한 배너·회전·QR)은 각 항목에 남음
+- [x] C 화면 뼈대 (screens.md C, D-047, D-107, D-111)
+  - 완료(2026-11-24): `CommodityView`(title-bar [←]·`원자재명 (심볼)`·🔔·[⟲]·[⚙], 시스템 뒤로 버튼 숨김으로 쓸어서 뒤로 가기 막음 D-105, 탭 4개는 처음 열 때 만들고 숨겨도 유지, 탭 화면이 `tabFooterTime`으로 보이는 탭의 기준 시각 줄을 올림), `ChartPeriods`(C-a·C-c 기간, C에 들어올 때마다 6M)·`ChartPeriod.nearest`, [⚙]는 A와 공용 `SettingsButton`. 시뮬레이터에서 탭 전환·문구 확인
+  - title-bar 아래 1pt `barSeparator` 완료(2026-11-25): Core `titleBarSeparator()`를 `backTitleBar`·A·B-b·C·C-d-a에 붙임. 시뮬레이터에서 A·B·C·C-d-a 확인
+  - ETP 상세 기간 유지 확인(2026-11-25): C-d-a는 C 위에 쌓이므로 C의 `ChartPeriods`가 그대로 남는다. 시뮬레이터에서 12M → C-d-a → 뒤로 12M 유지, A로 나갔다 다시 들어오면 6M 확인(D-107). 코드 변경 없음
+  - title-bar 합치기 완료(2026-11-25): Core `backTitleBar`가 조각 제목·[←] 동작(`onBack`)·제목 최대 폭·오른쪽 버튼 여러 개를 받아 C·C-d-a도 같은 title-bar를 쓴다. 시뮬레이터에서 C·C-d-a 긴 이름·B·[←] 복귀 확인
+  - C 탭 화면 채우기 완료(2026-11-25): 아래 C-a·C-c·C-b·C-d. 14P prod에서 GC 네 탭 표시 확인
+- [x] C-a 이격도차트: `GET /v1/commodities/:code/disparity`, 기간 버튼 6개(D-102), 롤 음영, 십자선 상세, 가로 모드, 이전 3년 받기 중 화면 터치 차단·5초 시간 초과·실패 Alert (D-086, D-103, D-108, D-139)
+  - 1단계 조회 완료(2026-11-24): `DisparityRepository`·`QueryCache.disparityChart`(키 `QueryKeys.disparity`, 설정 값별)
+  - 2단계 계열 모델 완료(2026-11-24): `DisparityChartModel`(산출 불가일 제외·rare-level 밴드 순위 색·이평선 위·롤 음영/전환일·보이는 구간 최고·최저와 LC·HC·y축 특수 라벨·월물 구성·꼬리 백분위 표기)
+  - 3단계 화면 뼈대 완료(2026-11-24): `DisparityTabView`(설정 → 조회, 설정 오류·스켈레톤)·`DisparityScreenModel`(같은 데이터면 그대로, 과거 봉이 앞에 붙으면 범위 유지)·`ChartViewState`(기간 홈·드래그/핀치로 벗어남·[↻]·가까운 기간 테두리)·`PeriodChips`·`ChartResetButton`·`ChartSkeleton`. 시뮬레이터에서 dev 서버 차트·드래그·[↻]·칩 확인
+  - 4단계 정보 줄 완료(2026-11-24): `DisparityInfo`(기준값 이름·대체·롤 중·OHLC·안내·이격도 꼬리·LC·HC), 차트 위 반투명 두 줄과 기준값 안내 상자, 봉·선은 정보 줄 높이만큼 비켜 그림(`CanvasCandleChart.insetTop`). 시뮬레이터 확인
+  - 5단계 축 완료(2026-11-24): `CandleAxes`(우측 y축 log 눈금 d3 `ticks(6)` 규칙·특수 라벨 밀기·눈금 글자 숨김, 현재가·마지막 종가 점선, x축 월 눈금, 십자선 가격·날짜 라벨과 겹치는 글자 숨김), `ChartAxes.swift`(`AxisTicks`·`PriceLabelLayout`·`MonthTicks`·`ChartText`). 제스처는 y축 자리를 뺀 폭으로 봉을 센다. 시뮬레이터 확인
+  - 6단계 꼬리표·롤 표시 완료(2026-11-24): `ExtremeTagLayout`(가운데가 화면 안인 봉의 최고·최저 꼬리표, 회색 점선 비켜 가기·차트 끝에서 화살표 반대쪽), `CandleViewport.centerIndices`, `ChartRollMarks` 음영·전환일 점선(봉 뒤). 시뮬레이터에서 대표월물 전환일·꼬리표 확인(한국형·미국형 음영은 화면 확인 전)
+  - 7단계 십자선 상세 완료(2026-11-24): `DisparityDetail`(날짜·월물 구성·전환일 `→ 새 월물`·시고저종·전일 대비·이격도 등락 색·선 값 가격순), 공용 `DetailBox`·`PlacedDetailBox`(정보 줄 아래 귀퉁이). 시뮬레이터 확인
+  - 8단계 이전 3년 받기 완료(2026-11-24): `OlderPages`(첫 봉이 보이면 받기·햅틱·5초 시간 초과·실패 Alert·늦은 응답은 데이터만), `ChartViewState.rangeReports`(범위가 바뀌거나 드래그·핀치가 끝날 때 알림)·`locked`(받는 중 차트 제스처 무시), `OlderDataIndicator`, 받는 동안 `.blocksTouches`. 시뮬레이터에서 과거 봉 붙이기·범위 유지·서버를 끈 실패 Alert 확인
+  - 9단계 A 행 누를 때 미리 조회 완료(2026-11-25): `CommodityQueries.prefetchDisparity`(캐시 설정을 그대로 쓰고 없을 때만 받음, 실패 무시, RN `prefetchDisparityChart`), RootView `onSelect`에서 기다리지 않고 시작
+- [x] C-c 월물차트: `GET /v1/commodities/:code/contracts`, log y축, 끝값 라벨 (D-092, D-093, D-113, D-118)
+  - 1단계 조회 완료(2026-11-24): `ContractsRepository`·`QueryCache.contractsChart`(키 `QueryKeys.contracts`)·`ChartPages.merged`(이전 페이지에 없는 월물은 nil로 채움, RN `mergeContractPages`)·`CommodityQueries.contracts`
+  - 2단계 계열 모델 완료(2026-11-24): `ContractChartModel`(만기순 선 색·날짜별 위·아래 끝·너비용 라벨·범례 ●·보이는 범위 끝값 라벨 D-093·양끝 월물 연환산 롤 수익률), `LocalDate.days(to:)`
+  - 3단계 선 차트·탭 화면 완료(2026-11-24): `CandleSeries(lines:high:low:)`(봉 없는 선 계열, 십자선 가격은 그날 값이 있는 첫 선)·`PriceScale` 선형 축(0 이하 값, D-113)을 `CanvasCandleChart`로 그림, `ContractTabView`·`ContractScreenModel`(기간 C-a와 따로·이전 3년 받기·과거 날짜가 앞에 붙으면 범위 유지), 범례 오버레이(`LegendLine`·`CenteredFlowLayout`, 대표월물 ● 회색), y축 끝값 라벨(보이는 범위 끝값, 선 색). 시뮬레이터에서 NG 선·범례·끝값·십자선 확인
+  - 4단계 십자선 상세 박스 완료(2026-11-24): `ContractDetail`(날짜·마지막 날 잠정·값이 있는 월물별 가격 선 색·대표월물 ●·양끝 롤 수익률 `/년`), `DetailRow.Cell.mark`(이름 뒤 회색 표식), `PlacedDetailBox`로 범례 아래 덜 가리는 귀퉁이. 시뮬레이터에서 NG 상세 박스 확인
+  - 선형 축 화면 확인 완료(2026-11-24): C-c는 지금 월물 5개만 그려 CLK20 음수(2020-04)는 나오지 않는다. 대신 CLH27·CLJ27·CLK27의 2018-11-05 정산가 0이 든 페이지를 받으면 받은 전체 값 기준으로 선형 축(0~60)이 된다(RN `LinesChart`와 같다). 같이 고침: 상세 박스를 범례·정보 줄·최신 버튼 위에 그린다(C-a·C-c, RN 순서)
+- [x] C-b 월물커브: `GET /v1/commodities/:code/curve?baseDate`, 기준일 OS 날짜 피커, 이전·다음 기준일, 변화율 라벨 배치, 롤 수익률 (D-090, D-091, D-114~D-123)
+  - 1단계 조회 완료(2026-11-24): `CurveRepository`·`QueryCache.curve`(키 `QueryKeys.curve`, 기준일마다, nil은 `"latest"`, 차트 캐시 1시간·`nextUpdateAt`까지 새것)·`CommodityQueries.curve`. 기준일을 옮기는 동안 이전 커브 유지(RN `keepPreviousData`)는 화면 모델에서
+  - 2단계 좌표·표기 완료(2026-11-24): `CurveLayout`(월물 라벨 간격·가까운 칸·변화율 라벨 겹침 없이 배치·선 피하기, RN `curveLayout.ts`)·`CurveFormat`(기준일 `YYYY/MM/DD`·범례 날짜·요일·변화율 소수 첫째 자리·롤 수익률 줄). 눈금은 `AxisTicks.linear`(RN `niceTicks`와 같은 값)
+  - 3단계 차트·탭 화면 완료(2026-11-24): `CurveChartLayout`(log·0 이하면 선형 y축, 8% 여백, 눈금 5개, 정보 줄 아래 선·점, 변화율 라벨 위·아래, 상세 박스 귀퉁이용 표시 구간)·`CurveChart`(Canvas, 기준일 실선+빈 점·비교일 점선+찬 점, 길게 눌러 월물에 붙는 십자선·햅틱·탭으로 지움, 덜 가리는 귀퉁이 상세 박스)·`CurveDetail`·`CurveScreenModel`(기준일, 이전 커브 유지, D-1은 기본 key, 휴장일 안내 3초)·`CurveTabView`(범례+롤 수익률 한 줄, 과거 기준일이면 되돌리기 D-115, `[<] 기준일 [>]` 줄은 가로 모드에서 숨김)·`BaseDateSheet`(휠 피커 시트, 확인을 눌러야 바뀜). 시뮬레이터에서 CL 2025/11/22(토) 선택→11/21로 옮김 안내·차트·십자선 상세 박스·되돌리기 확인. dev 서버 최근 기준일(11/19~20)은 월물이 없어 "표시할 월물이 없습니다"
+- [x] C-d ETP 목록(필터·정렬은 앱에서)·C-d-a 상세 (D-017)
+  - 완료(2026-11-24): `ETPRepository`·`QueryCache.etpList`·`etpDetail`(키 `QueryKeys.etps`·`etp`), `ETPListModel`(필터 4개·기본/순자산/거래대금 정렬·있는 배수만 선택지), 공용 `SegmentedRow`(Core, B 설정에서도 쓴다), `ETPListTabView`(행 둘째 줄 정렬 값·수집 시각은 기준 시각 줄), `ETPDetailView`(Route `.etp`, [←]만, 시리즈 줄·운용사 페이지는 http(s)만). 시뮬레이터에서 GC 목록·정렬·상세·복귀 확인
+
+## 6. 기기 설치·운영
+- [x] prod 변형 release 빌드를 개인 기기에 설치하는 절차를 `docs/ops.md`에 기록, `scripts/install-prod.sh`(2026-11-25, 14P 대상 `--build-only` 서명 빌드 확인. 실제 설치는 RN prod 앱을 덮어써서 아직 안 함)
+- [x] RN 앱과 같은 앱 ID라 바꿔 설치할 때 할 일 기록(`docs/ops.md`)
+- [x] 업데이트 배포 방식: OTA 없음, 같은 스크립트로 재설치, 빌드 번호는 커밋 수 (IOS-010)
+- [x] 14P에 실제 설치해 B 맨 아래 빌드 번호·접근 키 재입력 흐름 확인(2026-11-25, 빌드 83 `eddcbd2`, B 맨 아래 `런타임 1.0.0 (83)`)

@@ -18,11 +18,11 @@
 
 ## 3. 공통 기반
 - [ ] 접근 키 B-b: 붙여넣기·QR(`futureetp-key:v1:` 접두사), `GET /v1/settings`로 확인 뒤 저장, 키 없으면 첫 화면이 B-b, `UNAUTHORIZED`면 어느 화면에서든 B-b + 거절 줄 (D-044, D-077~D-079)
-  - 코드 완료(a4da4d4~ba01dfd). 시뮬레이터에서 dev 서버 키 붙여넣기·Keychain 저장·재실행 유지 확인(2026-11-24). 남은 확인: 키 교체 뒤 거절 시 B-b 이동, 실기기 QR 스캔. 확인되면 이 항목을 `docs/history.md`로 옮긴다
+  - 코드 완료(a4da4d4~ba01dfd). 시뮬레이터에서 dev 서버 키 붙여넣기·Keychain 저장·재실행 유지 확인(2026-11-24). 14P prod에서 RN 앱을 덮어쓴 뒤 첫 화면 B-b·키 재입력 뒤 A 표시 확인(2026-11-25, iPhone 미러링 창에서 ⌘V 붙여넣기는 안 됨). 남은 확인: 키 교체 뒤 거절 시 B-b 이동, 실기기 QR 스캔. 확인되면 이 항목을 `docs/history.md`로 옮긴다
 - [ ] 앱 실행 때 시간대 PATCH (D-084), 세로 잠금·[⟲] 가로 전환 (D-076)
   - 시간대·언어 PATCH 코드 완료(2026-11-24): `SettingsStore`(설정 조회·낙관적 PATCH 줄 세우기)·`.deviceSettingsSync`(루트, 키 있을 때). dev 서버 확인 완료(2026-11-25): `TZ=America/Chicago`·영어로 실행하면 `device` 행이 `en`·`America/Chicago`로, 서울로 다시 실행하면 시간대가 되돌아감. 언어는 앱 설정 저장값이 기기 언어보다 앞서므로(D-033) B에서 [한국어]를 누를 때 `ko`로 PATCH됨
   - 세로 잠금 기반 완료(2026-11-24): `OrientationLock`(시작 세로, `lockPortrait`·`lockLandscape`·[⟲]용 `toggle(isLandscape:)`, `AppDelegate`가 허용 방향 반환)·`\.isLandscape`(창 모양, 루트 `providesIsLandscape`)
-  - C [⟲] 완료(2026-11-24): ETP 탭 밖에서만 보임, ETP 탭 진입·C를 떠날 때 `lockPortrait`, 가로에서 tab-bar·기준 시각 줄 숨김. 시뮬레이터에서 가로 전환·가로에서 [←]로 A 세로 복귀 확인. 남음: 실기기 확인
+  - C [⟲] 완료(2026-11-24): ETP 탭 밖에서만 보임, ETP 탭 진입·C를 떠날 때 `lockPortrait`, 가로에서 tab-bar·기준 시각 줄 숨김. 시뮬레이터에서 가로 전환·가로에서 [←]로 A 세로 복귀 확인. 14P 미러링에서 [⟲] 가로 전환·세로 복귀 확인(2026-11-25). 남음: 기기를 직접 돌릴 때 동작
 
 ## 4. 화면 수직 슬라이스 (RN 순서)
 - [ ] C-a 차트 스파이크: 봉 756개 + 이평선·rare-level 밴드, 핀치·드래그·십자선, 가장 과거 봉이 보이면 이전 3년 이어 받기에서 범위 유지, 60fps 이상 (D-056, D-087, D-104, D-106) → 차트 방식 결정
@@ -30,44 +30,10 @@
   - 2단계 제스처 완료(2026-11-24): `ChartInteraction`(십자선 유지·탭으로 지우기·십자선이 있으면 끌기가 십자선을 옮김·핀치한 터치에서 십자선 막기·핀치 가운데 따라가기), `ChartGestureSurface`(UIKit 인식기: 길게 누르기 0.3초·탭·한 손가락 끌기·핀치), `DetailCorner`(상세 박스 귀퉁이), 봉 스냅 햅틱(`sensoryFeedback(.selection)`). 시뮬레이터에서 동작 확인
   - 3단계 과거 봉 붙이기 완료(2026-11-24): `CandleViewport.rebased`·`showsFirstBar`, `ChartInteraction.dataChanged(barCount:prepended:)`(보던 범위 유지·십자선 지우기·핀치 중이면 시작 범위도 옮김). 스파이크는 가장 과거 봉이 보이면 0.5초 뒤 756봉을 앞에 붙인다(3,024봉까지). C-a 화면은 RN `prependedBars`처럼 첫 날짜가 앞당겨지고 마지막 날짜가 같을 때만 앞에 붙은 봉으로 센다
   - 남음: 실기기 120Hz·Release 측정(십자선을 끄는 동안 상세 박스 다시 그리기 비용 포함. 시뮬레이터 짧은 끌기에서 43~54fps)
-- [ ] C 화면 뼈대 (screens.md C, D-047, D-107, D-111)
-  - 완료(2026-11-24): `CommodityView`(title-bar [←]·`원자재명 (심볼)`·🔔·[⟲]·[⚙], 시스템 뒤로 버튼 숨김으로 쓸어서 뒤로 가기 막음 D-105, 탭 4개는 처음 열 때 만들고 숨겨도 유지, 탭 화면이 `tabFooterTime`으로 보이는 탭의 기준 시각 줄을 올림), `ChartPeriods`(C-a·C-c 기간, C에 들어올 때마다 6M)·`ChartPeriod.nearest`, [⚙]는 A와 공용 `SettingsButton`. 시뮬레이터에서 탭 전환·문구 확인
-  - title-bar 아래 1pt `barSeparator` 완료(2026-11-25): Core `titleBarSeparator()`를 `backTitleBar`·A·B-b·C·C-d-a에 붙임. 시뮬레이터에서 A·B·C·C-d-a 확인
-  - ETP 상세 기간 유지 확인(2026-11-25): C-d-a는 C 위에 쌓이므로 C의 `ChartPeriods`가 그대로 남는다. 시뮬레이터에서 12M → C-d-a → 뒤로 12M 유지, A로 나갔다 다시 들어오면 6M 확인(D-107). 코드 변경 없음
-  - title-bar 합치기 완료(2026-11-25): Core `backTitleBar`가 조각 제목·[←] 동작(`onBack`)·제목 최대 폭·오른쪽 버튼 여러 개를 받아 C·C-d-a도 같은 title-bar를 쓴다. 시뮬레이터에서 C·C-d-a 긴 이름·B·[←] 복귀 확인
-  - 남음: C 탭 화면 채우기(아래 항목들)
-- [ ] C-a 이격도차트: `GET /v1/commodities/:code/disparity`, 기간 버튼 6개(D-102), 롤 음영, 십자선 상세, 가로 모드, 이전 3년 받기 중 화면 터치 차단·5초 시간 초과·실패 Alert (D-086, D-103, D-108, D-139)
-  - 1단계 조회 완료(2026-11-24): `DisparityRepository`·`QueryCache.disparityChart`(키 `QueryKeys.disparity`, 설정 값별)
-  - 2단계 계열 모델 완료(2026-11-24): `DisparityChartModel`(산출 불가일 제외·rare-level 밴드 순위 색·이평선 위·롤 음영/전환일·보이는 구간 최고·최저와 LC·HC·y축 특수 라벨·월물 구성·꼬리 백분위 표기)
-  - 3단계 화면 뼈대 완료(2026-11-24): `DisparityTabView`(설정 → 조회, 설정 오류·스켈레톤)·`DisparityScreenModel`(같은 데이터면 그대로, 과거 봉이 앞에 붙으면 범위 유지)·`ChartViewState`(기간 홈·드래그/핀치로 벗어남·[↻]·가까운 기간 테두리)·`PeriodChips`·`ChartResetButton`·`ChartSkeleton`. 시뮬레이터에서 dev 서버 차트·드래그·[↻]·칩 확인
-  - 4단계 정보 줄 완료(2026-11-24): `DisparityInfo`(기준값 이름·대체·롤 중·OHLC·안내·이격도 꼬리·LC·HC), 차트 위 반투명 두 줄과 기준값 안내 상자, 봉·선은 정보 줄 높이만큼 비켜 그림(`CanvasCandleChart.insetTop`). 시뮬레이터 확인
-  - 5단계 축 완료(2026-11-24): `CandleAxes`(우측 y축 log 눈금 d3 `ticks(6)` 규칙·특수 라벨 밀기·눈금 글자 숨김, 현재가·마지막 종가 점선, x축 월 눈금, 십자선 가격·날짜 라벨과 겹치는 글자 숨김), `ChartAxes.swift`(`AxisTicks`·`PriceLabelLayout`·`MonthTicks`·`ChartText`). 제스처는 y축 자리를 뺀 폭으로 봉을 센다. 시뮬레이터 확인
-  - 6단계 꼬리표·롤 표시 완료(2026-11-24): `ExtremeTagLayout`(가운데가 화면 안인 봉의 최고·최저 꼬리표, 회색 점선 비켜 가기·차트 끝에서 화살표 반대쪽), `CandleViewport.centerIndices`, `ChartRollMarks` 음영·전환일 점선(봉 뒤). 시뮬레이터에서 대표월물 전환일·꼬리표 확인(한국형·미국형 음영은 화면 확인 전)
-  - 7단계 십자선 상세 완료(2026-11-24): `DisparityDetail`(날짜·월물 구성·전환일 `→ 새 월물`·시고저종·전일 대비·이격도 등락 색·선 값 가격순), 공용 `DetailBox`·`PlacedDetailBox`(정보 줄 아래 귀퉁이). 시뮬레이터 확인
-  - 8단계 이전 3년 받기 완료(2026-11-24): `OlderPages`(첫 봉이 보이면 받기·햅틱·5초 시간 초과·실패 Alert·늦은 응답은 데이터만), `ChartViewState.rangeReports`(범위가 바뀌거나 드래그·핀치가 끝날 때 알림)·`locked`(받는 중 차트 제스처 무시), `OlderDataIndicator`, 받는 동안 `.blocksTouches`. 시뮬레이터에서 과거 봉 붙이기·범위 유지·서버를 끈 실패 Alert 확인
-  - 9단계 A 행 누를 때 미리 조회 완료(2026-11-25): `CommodityQueries.prefetchDisparity`(캐시 설정을 그대로 쓰고 없을 때만 받음, 실패 무시, RN `prefetchDisparityChart`), RootView `onSelect`에서 기다리지 않고 시작
-- [ ] C-c 월물차트: `GET /v1/commodities/:code/contracts`, log y축, 끝값 라벨 (D-092, D-093, D-113, D-118)
-  - 1단계 조회 완료(2026-11-24): `ContractsRepository`·`QueryCache.contractsChart`(키 `QueryKeys.contracts`)·`ChartPages.merged`(이전 페이지에 없는 월물은 nil로 채움, RN `mergeContractPages`)·`CommodityQueries.contracts`
-  - 2단계 계열 모델 완료(2026-11-24): `ContractChartModel`(만기순 선 색·날짜별 위·아래 끝·너비용 라벨·범례 ●·보이는 범위 끝값 라벨 D-093·양끝 월물 연환산 롤 수익률), `LocalDate.days(to:)`
-  - 3단계 선 차트·탭 화면 완료(2026-11-24): `CandleSeries(lines:high:low:)`(봉 없는 선 계열, 십자선 가격은 그날 값이 있는 첫 선)·`PriceScale` 선형 축(0 이하 값, D-113)을 `CanvasCandleChart`로 그림, `ContractTabView`·`ContractScreenModel`(기간 C-a와 따로·이전 3년 받기·과거 날짜가 앞에 붙으면 범위 유지), 범례 오버레이(`LegendLine`·`CenteredFlowLayout`, 대표월물 ● 회색), y축 끝값 라벨(보이는 범위 끝값, 선 색). 시뮬레이터에서 NG 선·범례·끝값·십자선 확인
-  - 4단계 십자선 상세 박스 완료(2026-11-24): `ContractDetail`(날짜·마지막 날 잠정·값이 있는 월물별 가격 선 색·대표월물 ●·양끝 롤 수익률 `/년`), `DetailRow.Cell.mark`(이름 뒤 회색 표식), `PlacedDetailBox`로 범례 아래 덜 가리는 귀퉁이. 시뮬레이터에서 NG 상세 박스 확인
-  - 선형 축 화면 확인 완료(2026-11-24): C-c는 지금 월물 5개만 그려 CLK20 음수(2020-04)는 나오지 않는다. 대신 CLH27·CLJ27·CLK27의 2018-11-05 정산가 0이 든 페이지를 받으면 받은 전체 값 기준으로 선형 축(0~60)이 된다(RN `LinesChart`와 같다). 같이 고침: 상세 박스를 범례·정보 줄·최신 버튼 위에 그린다(C-a·C-c, RN 순서)
-- [x] C-b 월물커브: `GET /v1/commodities/:code/curve?baseDate`, 기준일 OS 날짜 피커, 이전·다음 기준일, 변화율 라벨 배치, 롤 수익률 (D-090, D-091, D-114~D-123)
-  - 1단계 조회 완료(2026-11-24): `CurveRepository`·`QueryCache.curve`(키 `QueryKeys.curve`, 기준일마다, nil은 `"latest"`, 차트 캐시 1시간·`nextUpdateAt`까지 새것)·`CommodityQueries.curve`. 기준일을 옮기는 동안 이전 커브 유지(RN `keepPreviousData`)는 화면 모델에서
-  - 2단계 좌표·표기 완료(2026-11-24): `CurveLayout`(월물 라벨 간격·가까운 칸·변화율 라벨 겹침 없이 배치·선 피하기, RN `curveLayout.ts`)·`CurveFormat`(기준일 `YYYY/MM/DD`·범례 날짜·요일·변화율 소수 첫째 자리·롤 수익률 줄). 눈금은 `AxisTicks.linear`(RN `niceTicks`와 같은 값)
-  - 3단계 차트·탭 화면 완료(2026-11-24): `CurveChartLayout`(log·0 이하면 선형 y축, 8% 여백, 눈금 5개, 정보 줄 아래 선·점, 변화율 라벨 위·아래, 상세 박스 귀퉁이용 표시 구간)·`CurveChart`(Canvas, 기준일 실선+빈 점·비교일 점선+찬 점, 길게 눌러 월물에 붙는 십자선·햅틱·탭으로 지움, 덜 가리는 귀퉁이 상세 박스)·`CurveDetail`·`CurveScreenModel`(기준일, 이전 커브 유지, D-1은 기본 key, 휴장일 안내 3초)·`CurveTabView`(범례+롤 수익률 한 줄, 과거 기준일이면 되돌리기 D-115, `[<] 기준일 [>]` 줄은 가로 모드에서 숨김)·`BaseDateSheet`(휠 피커 시트, 확인을 눌러야 바뀜). 시뮬레이터에서 CL 2025/11/22(토) 선택→11/21로 옮김 안내·차트·십자선 상세 박스·되돌리기 확인. dev 서버 최근 기준일(11/19~20)은 월물이 없어 "표시할 월물이 없습니다"
-- [x] C-d ETP 목록(필터·정렬은 앱에서)·C-d-a 상세 (D-017)
-  - 완료(2026-11-24): `ETPRepository`·`QueryCache.etpList`·`etpDetail`(키 `QueryKeys.etps`·`etp`), `ETPListModel`(필터 4개·기본/순자산/거래대금 정렬·있는 배수만 선택지), 공용 `SegmentedRow`(Core, B 설정에서도 쓴다), `ETPListTabView`(행 둘째 줄 정렬 값·수집 시각은 기준 시각 줄), `ETPDetailView`(Route `.etp`, [←]만, 시리즈 줄·운용사 페이지는 http(s)만). 시뮬레이터에서 GC 목록·정렬·상세·복귀 확인
 - [ ] B 설정·B-a 알림 설정: 낙관적 PATCH, rare-level 입력 검증, 알림 대상 없음 빨간 점 (D-081~D-083, D-124)
   - 완료(2026-11-24): `SettingsView`(일반·이격도차트·기타 묶음, `SegmentedRow`, rare-level 5칸 `RareLevelsInput`·`RareLevelsDraft`는 키패드가 닫힐 때 `RareLevels`로 검증·정렬 저장, [초기화] 확인 뒤 표시 설정·`SettingsPatch.disparityDefaults`+언어 PATCH, 저장 실패 줄은 이 화면의 마지막 변경만, 앱 번들 줄 IOS-009·키패드가 보이면 뺌), `AlertSettingsView`(권한 배너 `PushPermission`·대상 원자재·현재 적용 기준·`QuietTimeSection` 30분 48칸 시트), `DataSourcesView`, 공용 `backTitleBar`. `SegmentedRow`는 한 줄에 안 들어가면 쌓는다. 시뮬레이터에서 dev 서버로 언어 전환·rare-level 중복 오류·저장·초기화·알림 대상·알림 거부 시간·데이터 출처 확인
-  - 남음: 실기기에서 권한 배너 [허용](권한 창)·[설정 열기] 확인. iOS 26 키패드 [완료]가 rare-level 칸 일부를 덮는다(누를 수는 있음, 실기기에서 다시 본다)
+  - 남음: [허용](권한 창)·[설정 열기] 누르기. 14P에서 권한 배너 표시 확인(2026-11-25). 키패드 [완료]가 rare-level 칸을 덮는지는 미러링(하드웨어 키보드라 키패드가 안 뜸)으로 못 봄. 미러링에서는 [완료] 막대가 뜨고 앱 번들 줄이 남아 접근 키 행 위에 겹쳐 보임
 
 ## 5. 푸시
 - [ ] APNs 기기 토큰 등록(Apple 가입 뒤), 가입 전에는 등록하지 않음
 - [ ] `PUT /v1/devices`(토큰·플랫폼·`appVersion` `ios-<버전>`), 알림 탭으로 해당 C 화면 이동, 앱 사용 중 알림 표시 (D-037, D-120)
-
-## 6. 기기 설치·운영
-- [x] prod 변형 release 빌드를 개인 기기에 설치하는 절차를 `docs/ops.md`에 기록, `scripts/install-prod.sh`(2026-11-25, 14P 대상 `--build-only` 서명 빌드 확인. 실제 설치는 RN prod 앱을 덮어써서 아직 안 함)
-- [x] RN 앱과 같은 앱 ID라 바꿔 설치할 때 할 일 기록(`docs/ops.md`)
-- [x] 업데이트 배포 방식: OTA 없음, 같은 스크립트로 재설치, 빌드 번호는 커밋 수 (IOS-010)
-- [ ] 14P에 실제 설치해 B 맨 아래 빌드 번호·접근 키 재입력 흐름 확인
