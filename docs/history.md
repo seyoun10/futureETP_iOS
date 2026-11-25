@@ -39,6 +39,10 @@ TODO.md에서 끝난 항목을 같은 절 이름 아래로 옮겨 둔다.
   - 문구 카탈로그는 RN 리소스에서 생성(`scripts/gen-strings.mjs`), `{{name}}` 자리 표시자 helper `L10n`, 앱 언어를 루트 `\.locale`로 주입(`DisplaySettings.locale`, 언어만 바꾸고 기기 지역 유지, 시뮬레이터에서 ko/en 전환 확인) (2026-11-24). B 설정 언어 선택은 4단계 B에서(2026-11-24)
   - 서버 기기 설정과 맞춤은 `DeviceSettingsSync`로 완료(2026-11-24, D-137)
 - [x] import redundant 검사 켜기(2026-11-25): `scripts/check.sh`에서 `--only implicit`을 지우고, Core를 import하지 않는 `CommodityListTests`는 Core 의존을 빼서 redundant 검사 통과 (IOS-003 보충)
+- [x] 공용 조회 UI: 기준 시각 줄(freshness)·로딩/오류/빈 상태 분기·`nextUpdateAt` + 1분 자동 새로고침·앱 복귀 재조회·접근 키 저장 뒤 전체 재조회(`AccessKeyView` `onSaved`, 기다리지 않음) (D-048, D-075, D-044)
+  - View 완료(2026-11-24): `FooterLine`·`FreshnessLine`(`FooterTime`)·`QueryStateView`(`QueryState.phase`)·`LoadingView`·`CenterSpinner`·`ErrorView`
+  - 조회 캐시 완료(2026-11-24): `QueryCache`(키 접두사 무효화·`keepFor` 5분/차트 1시간)·`Query`(진행 중 조회 합류·`StalePolicy.untilNextUpdate`)·`.queryLifecycle`(진입·앱 복귀 재조회·`nextUpdateAt` + 1분 자동 새로고침)·키 저장 뒤 전체 무효화. 무한 조회는 `ChartPages`·`PagedQuery`(`QueryCache.pagedQuery`, 받은 페이지 수만큼 다시 조회·`fetchOlder` 실패는 Alert용으로 돌려줌·늦은 응답도 붙음, 2026-11-24)
+  - 최하단 줄 배치 완료(2026-11-25): `FooterLine`이 홈 인디케이터 여백 위쪽에 겹친다(루트 `providesHomeIndicatorInset`, 겹친 만큼 음수 아래 패딩, RN `FooterLine`). 줄 자리에서 여백을 읽으면 C에서 레이아웃이 끝없이 되풀이돼 루트에서 읽는다. 시뮬레이터에서 A·B·C 줄 위치(840~856pt)·C tab-bar가 여백 바로 위로 내려옴 확인
 
 ## 4. 화면 수직 슬라이스 (RN 순서)
 - [x] A 원자재 목록: `GET /v1/commodities`, 대표월물 ●·알림 🔔·거래 없음, 당겨서 새로고침(햅틱·터치 차단·5초 시간 초과 Alert, D-138), C-a 이동·미리 조회 (D-085)
