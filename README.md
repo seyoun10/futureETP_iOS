@@ -3,7 +3,34 @@
 원자재 선물 기반 ETP(ETF/ETN)에 투자할 때 필요한데 기존 시세 서비스에는 없는 정보를 보여 주는 개인용 모바일 앱 futureETP의 Swift/SwiftUI 클라이언트입니다.
 iOS 전용, 사용자 본인 1명용(스토어 미배포)이고, React Native 원본 앱([futureETP_ReactNative](https://github.com/seyoun10/futureETP_ReactNative))과 기능·화면·동작을 똑같이 맞춰 만들었습니다.
 
-화면 구성과 스크린샷은 원본 저장소의 [README](https://github.com/seyoun10/futureETP_ReactNative#readme)에 있습니다. 이 앱은 같은 화면을 SwiftUI로 다시 그립니다.
+<table>
+  <tr>
+    <th>원자재 목록</th>
+    <th>이격도차트</th>
+    <th>월물차트</th>
+    <th>월물커브</th>
+  </tr>
+  <tr>
+    <td><img src="docs/images/home.png" width="160" alt="원자재 목록"></td>
+    <td><img src="docs/images/disparity-chart.png" width="160" alt="이격도차트"></td>
+    <td><img src="docs/images/contract-chart.png" width="160" alt="월물차트"></td>
+    <td><img src="docs/images/curve.png" width="160" alt="월물커브"></td>
+  </tr>
+  <tr>
+    <th>ETP 목록</th>
+    <th>휴장 달력</th>
+    <th>설정</th>
+    <th>알림 설정</th>
+  </tr>
+  <tr>
+    <td><img src="docs/images/etp-list.png" width="160" alt="ETP 목록"></td>
+    <td><img src="docs/images/calendar.png" width="160" alt="휴장 달력"></td>
+    <td><img src="docs/images/settings.png" width="160" alt="설정"></td>
+    <td><img src="docs/images/alert-settings.png" width="160" alt="알림 설정"></td>
+  </tr>
+</table>
+
+iOS 시뮬레이터(iPhone 18 Pro)에서 prod 서버에 붙어 찍은 화면입니다. 같은 화면의 RN 앱 모습은 원본 저장소의 [README](https://github.com/seyoun10/futureETP_ReactNative#readme)에 있습니다.
 
 ## 왜 만들었나
 
