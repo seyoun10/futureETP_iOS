@@ -18,7 +18,7 @@
 
 ## 3. 공통 기반
 - [ ] 접근 키 B-b: 붙여넣기·QR(`futureetp-key:v1:` 접두사), `GET /v1/settings`로 확인 뒤 저장, 키 없으면 첫 화면이 B-b, `UNAUTHORIZED`면 어느 화면에서든 B-b + 거절 줄 (D-044, D-077~D-079)
-  - 코드 완료(a4da4d4~ba01dfd). 시뮬레이터에서 dev 서버 키 붙여넣기·Keychain 저장·재실행 유지 확인(2026-11-24). 14P prod에서 RN 앱을 덮어쓴 뒤 첫 화면 B-b·키 재입력 뒤 A 표시 확인(2026-11-25, iPhone 미러링 창에서 ⌘V 붙여넣기는 안 됨). 시뮬레이터에서 dev 서버 `API_TOKEN`을 바꿔 띄운 뒤 A·C 요청 거절 → B-b(거절 줄), 재실행 때도 B-b, 새 키 붙여넣기 → A, 원래 키로 되돌리기 확인(2026-11-25). 이때 형식 오류 줄이 `accessKey.badFormat` 키 이름으로 보이던 것과, A에서 바로 B-b로 올 때 큰 제목 모드를 이어받아 카드가 구분선에 붙던 것(`.inline`으로 고정)을 고침. 남은 확인: 실기기 QR 스캔. 확인되면 이 항목을 `docs/history.md`로 옮긴다
+  - 코드 완료(a4da4d4~ba01dfd). 시뮬레이터에서 dev 서버 키 붙여넣기·Keychain 저장·재실행 유지 확인(2026-11-24). 14P prod에서 RN 앱을 덮어쓴 뒤 첫 화면 B-b·키 재입력 뒤 A 표시 확인(2026-11-25, iPhone 미러링 창에서 ⌘V 붙여넣기는 안 됨). 시뮬레이터에서 dev 서버 `API_TOKEN`을 바꿔 띄운 뒤 A·C 요청 거절 → B-b(거절 줄), 재실행 때도 B-b, 새 키 붙여넣기 → A, 원래 키로 되돌리기 확인(2026-11-25). 이때 형식 오류 줄이 `accessKey.badFormat` 키 이름으로 보이던 것과, A에서 바로 B-b로 올 때 큰 제목 모드를 이어받아 카드가 구분선에 붙던 것(`.inline`으로 고정)을 고침. 14P prod에서 [QR 읽기] → 카메라 화면, 키가 아닌 QR → `notKeyQr` 줄, 카메라 권한 끔 → `cameraUnavailable` 줄 확인(2026-11-25, 깔린 빌드가 b3c1c24 전이라 줄이 키 이름으로 보임. 시뮬레이터 최신 빌드에서 문구로 보임). 이때 가운데 정렬 [QR 읽기]·[취소] 아래 구분선이 글자 앞에서 시작해 짧던 것을 고침. 남은 확인: 실기기에서 키 QR로 저장. 확인되면 이 항목을 `docs/history.md`로 옮긴다
 - [ ] 앱 실행 때 시간대 PATCH (D-084), 세로 잠금·[⟲] 가로 전환 (D-076)
   - 시간대·언어 PATCH 코드 완료(2026-11-24): `SettingsStore`(설정 조회·낙관적 PATCH 줄 세우기)·`.deviceSettingsSync`(루트, 키 있을 때). dev 서버 확인 완료(2026-11-25): `TZ=America/Chicago`·영어로 실행하면 `device` 행이 `en`·`America/Chicago`로, 서울로 다시 실행하면 시간대가 되돌아감. 언어는 앱 설정 저장값이 기기 언어보다 앞서므로(D-033) B에서 [한국어]를 누를 때 `ko`로 PATCH됨
   - 세로 잠금 기반 완료(2026-11-24): `OrientationLock`(시작 세로, `lockPortrait`·`lockLandscape`·[⟲]용 `toggle(isLandscape:)`, `AppDelegate`가 허용 방향 반환)·`\.isLandscape`(창 모양, 루트 `providesIsLandscape`)
@@ -33,7 +33,7 @@
   - 남음: 실기기 120Hz·Release 측정(십자선을 끄는 동안 상세 박스 다시 그리기 비용 포함. 시뮬레이터 짧은 끌기에서 43~54fps)
 - [ ] B 설정·B-a 알림 설정: 낙관적 PATCH, rare-level 입력 검증, 알림 대상 없음 빨간 점 (D-081~D-083, D-124)
   - 완료(2026-11-24): `SettingsView`(일반·이격도차트·기타 묶음, `SegmentedRow`, rare-level 5칸 `RareLevelsInput`·`RareLevelsDraft`는 키패드가 닫힐 때 `RareLevels`로 검증·정렬 저장, [초기화] 확인 뒤 표시 설정·`SettingsPatch.disparityDefaults`+언어 PATCH, 저장 실패 줄은 이 화면의 마지막 변경만, 앱 번들 줄 IOS-009·키패드가 보이면 뺌), `AlertSettingsView`(권한 배너 `PushPermission`·대상 원자재·현재 적용 기준·`QuietTimeSection` 30분 48칸 시트), `DataSourcesView`, 공용 `backTitleBar`. `SegmentedRow`는 한 줄에 안 들어가면 쌓는다. 시뮬레이터에서 dev 서버로 언어 전환·rare-level 중복 오류·저장·초기화·알림 대상·알림 거부 시간·데이터 출처 확인
-  - 14P prod 미러링 확인(2026-11-25): 권한 배너 [허용] → iOS 알림 권한 창, [허용 안 함] 뒤 배너가 [설정 열기]로 바뀌고 누르면 iOS 설정의 futureETP 알림 화면이 열림, 돌아오면 배너 유지. 14P는 알림 거부 상태로 둠(Apple 가입 뒤 설정에서 켠다). 남음: 키패드 [완료]가 rare-level 칸을 덮는지(미러링은 하드웨어 키보드라 키패드가 안 뜸)
+  - 14P prod 미러링 확인(2026-11-25): 권한 배너 [허용] → iOS 알림 권한 창, [허용 안 함] 뒤 배너가 [설정 열기]로 바뀌고 누르면 iOS 설정의 futureETP 알림 화면이 열림, 돌아오면 배너 유지. 14P는 알림 거부 상태로 둠(Apple 가입 뒤 설정에서 켠다). 키패드 [완료]가 rare-level 칸을 덮는지는 확인하지 않기로 함(사용자 결정, 2026-11-25)
 
 ## 5. 푸시
 - [ ] APNs 기기 토큰 등록(Apple 가입 뒤), 가입 전에는 등록하지 않음

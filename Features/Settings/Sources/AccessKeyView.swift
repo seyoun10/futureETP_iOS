@@ -28,9 +28,11 @@ public struct AccessKeyView: View {
             .accessibilityLabel(Text("accessKey.scannerLabel"))
           Button("common.cancel") { isScanning = false }
             .frame(maxWidth: .infinity)
+            .separatorFromRowLeading()
         } else {
           Button("accessKey.scanQr", action: startScan)
             .frame(maxWidth: .infinity)
+            .separatorFromRowLeading()
             .disabled(model.isSaving)
         }
         SecureField("accessKey.pastePlaceholder", text: $model.input)
@@ -96,6 +98,13 @@ public struct AccessKeyView: View {
     Task {
       if await save(), canGoBack { dismiss() }
     }
+  }
+}
+
+extension View {
+  /// 아래 구분선을 다른 행처럼 행 앞에서 시작한다. 가운데 정렬 버튼은 구분선이 글자 앞에서 시작해 짧아진다
+  fileprivate func separatorFromRowLeading() -> some View {
+    alignmentGuide(.listRowSeparatorLeading) { _ in 0 }
   }
 }
 
