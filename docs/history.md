@@ -38,6 +38,7 @@ TODO.md에서 끝난 항목을 같은 절 이름 아래로 옮겨 둔다.
 - [x] i18n ko/en, 앱 안 언어 설정을 서버 기기 설정과 맞춤 (D-033, D-073, D-137)
   - 문구 카탈로그는 RN 리소스에서 생성(`scripts/gen-strings.mjs`), `{{name}}` 자리 표시자 helper `L10n`, 앱 언어를 루트 `\.locale`로 주입(`DisplaySettings.locale`, 언어만 바꾸고 기기 지역 유지, 시뮬레이터에서 ko/en 전환 확인) (2026-11-24). B 설정 언어 선택은 4단계 B에서(2026-11-24)
   - 서버 기기 설정과 맞춤은 `DeviceSettingsSync`로 완료(2026-11-24, D-137)
+- [x] import redundant 검사 켜기(2026-11-25): `scripts/check.sh`에서 `--only implicit`을 지우고, Core를 import하지 않는 `CommodityListTests`는 Core 의존을 빼서 redundant 검사 통과 (IOS-003 보충)
 
 ## 4. 화면 수직 슬라이스 (RN 순서)
 - [x] A 원자재 목록: `GET /v1/commodities`, 대표월물 ●·알림 🔔·거래 없음, 당겨서 새로고침(햅틱·터치 차단·5초 시간 초과 Alert, D-138), C-a 이동·미리 조회 (D-085)
