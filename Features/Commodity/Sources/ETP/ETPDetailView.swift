@@ -5,8 +5,6 @@ import SwiftUI
 /// 값은 자동 수집 정보라 원문 언어 그대로 보여 준다
 public struct ETPDetailView: View {
   private let query: Query<ETPDetail>
-  @State private var backTaps = 0
-  @Environment(\.dismiss) private var dismiss
 
   public init(query: Query<ETPDetail>) {
     self.query = query
@@ -19,44 +17,18 @@ public struct ETPDetailView: View {
     .queryLifecycle(query)
     .frame(maxWidth: .infinity, maxHeight: .infinity)
     .background(Theme.Colors.background)
-    // 뒤로 가기는 [←]로만 한다(D-105)
-    .navigationBarBackButtonHidden()
-    .toolbar {
-      ToolbarItem(placement: .topBarLeading) { titleBar }
+    .backTitleBar(titleMaxWidth: Self.titleMaxWidth) {
+      if let name = query.state.data?.name {
+        Text(verbatim: name)
+      } else {
+        Text("etp.detailTitle")
+      }
     }
-    .sensoryFeedback(.selection, trigger: backTaps)
     .accessibilityIdentifier("etpDetail")
   }
 
+  /// 긴 ETP 이름은 [←] 옆 이 폭 안에서 줄인다
   static let titleMaxWidth: CGFloat = 280
-
-  private var titleBar: some View {
-    HStack(spacing: Theme.Spacing.sm) {
-      Button {
-        backTaps += 1
-        dismiss()
-      } label: {
-        Image(systemName: "chevron.left")
-          .foregroundStyle(Theme.Colors.text)
-      }
-      .accessibilityLabel(Text("common.back"))
-      .accessibilityIdentifier("back")
-      Group {
-        if let name = query.state.data?.name {
-          Text(verbatim: name)
-        } else {
-          Text("etp.detailTitle")
-        }
-      }
-      .font(.system(size: Theme.FontSize.title, weight: .semibold))
-      .foregroundStyle(Theme.Colors.text)
-      .lineLimit(1)
-      // 툴바는 제목에 폭을 주지 않아 글자 폭만큼 쓰되, 긴 이름은 [←] 옆 남은 폭 안에서 줄인다
-      .frame(maxWidth: Self.titleMaxWidth, alignment: .leading)
-      .fixedSize()
-      .accessibilityAddTraits(.isHeader)
-    }
-  }
 }
 
 private struct ETPFields: View {

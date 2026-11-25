@@ -134,3 +134,27 @@ struct AccessKeyModelTests {
     #expect(some.canGoBack)
   }
 }
+
+/// 오류 줄 문구 키가 앱 카탈로그에 그대로 있어야 한다.
+/// `LocalizedStringKey("accessKey.\(…)")`로 보간하면 키가 `accessKey.%@`가 되어 키 이름이 그대로 보였다
+struct AccessKeyMessageKeyTests {
+  private static func catalogKeys() throws -> Set<String> {
+    let url = URL(filePath: #filePath)
+      .deletingLastPathComponent()
+      .appending(path: "../../../App/Resources/Localizable.xcstrings")
+    let object = try JSONSerialization.jsonObject(with: Data(contentsOf: url))
+    let strings = (object as? [String: Any])?["strings"] as? [String: Any]
+    return Set((strings ?? [:]).keys)
+  }
+
+  @Test func everyMessageKeyIsInTheCatalog() throws {
+    let keys = try Self.catalogKeys()
+    let notices: [AccessKeyModel.Notice] = [.badFormat, .notKeyQr, .cameraUnavailable]
+    let messages: [AccessKeyModel.Message] =
+      notices.map { .notice($0) } + [.rejected] + AppError.Code.allCases.map { .error($0) }
+    for message in messages {
+      #expect(keys.contains(message.key), "\(message.key)")
+    }
+    #expect(AccessKeyModel.Message.notice(.badFormat).key == "accessKey.badFormat")
+  }
+}

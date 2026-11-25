@@ -29,6 +29,8 @@ func feature(_ name: String) -> Target {
 }
 
 let features = ["CommodityList", "Commodity", "HolidayCalendar", "Settings"]
+/// Core를 import하지 않는 feature 테스트(선언하면 redundant 의존성 검사에 걸린다, IOS-003)
+let testsWithoutCore: Set<String> = ["CommodityList"]
 /// feature 화면 Model 테스트 타깃
 func featureTests(_ name: String) -> Target {
   .target(
@@ -38,7 +40,8 @@ func featureTests(_ name: String) -> Target {
     bundleId: "io.github.seyoon.futureetp.\(name.lowercased())tests",
     deploymentTargets: deploymentTargets,
     sources: ["Features/\(name)/Tests/**"],
-    dependencies: [.target(name: name), .target(name: "Core")],
+    dependencies: [.target(name: name)]
+      + (testsWithoutCore.contains(name) ? [] : [.target(name: "Core")]),
     settings: .settings(base: mainActorSettings, defaultSettings: defaultSettings)
   )
 }

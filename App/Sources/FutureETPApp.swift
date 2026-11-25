@@ -44,6 +44,8 @@ struct FutureETPApp: App {
       .environment(displaySettings)
       // 가로 레이아웃은 잠금 상태가 아니라 창 모양으로 정한다 (D-076)
       .providesIsLandscape()
+      // 최하단 줄(FooterLine)이 겹칠 홈 인디케이터 여백
+      .providesHomeIndicatorInset()
       // 앱 안 언어 설정을 화면 문구에 적용한다 (D-033, D-073)
       .environment(\.locale, displaySettings.locale)
       // 다크 전용 테마(D-031)

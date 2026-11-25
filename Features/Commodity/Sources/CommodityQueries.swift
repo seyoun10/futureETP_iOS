@@ -22,4 +22,14 @@ public struct CommodityQueries {
     self.curve = curve
     self.etps = etps
   }
+
+  /// A에서 원자재를 누르면 화면 전환 동안 C-a 조회를 먼저 시작한다. C-a 화면이 같은 캐시 항목의 조회를 이어받는다.
+  /// 설정은 캐시에 있으면 오래됐어도 그대로 쓰고, 없을 때만 받는다. 실패는 무시한다(화면이 다시 조회하고 오류를 보여 준다)
+  /// (RN `prefetchDisparityChart`)
+  @MainActor
+  public func prefetchDisparity(_ code: CommodityCode, settings: SettingsStore) async {
+    if settings.data == nil { await settings.query.refetch() }
+    guard let values = settings.data, let query = DisparityTabView.query(values) else { return }
+    await disparity(code, query).query.fetchIfStale()
+  }
 }

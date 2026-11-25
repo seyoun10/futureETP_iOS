@@ -22,7 +22,6 @@ public struct CommodityView: View {
   @State private var opened: Set<CommodityTab> = [CommodityTab.initial]
   @State private var periods = ChartPeriods()
   @State private var footerTime: FooterTime?
-  @State private var backTaps = 0
   @State private var rotateTaps = 0
   @Environment(\.isLandscape) private var isLandscape
 
@@ -70,15 +69,12 @@ public struct CommodityView: View {
     .onPreferenceChange(TabFooterTimeKey.self) { footerTime = $0 }
     .background(Theme.Colors.background)
     .environment(periods)
-    .navigationBarBackButtonHidden()
-    .toolbar {
-      ToolbarItem(placement: .topBarLeading) { titleBar }
-      ToolbarItemGroup(placement: .topBarTrailing) {
-        if selection.canRotate { rotateButton }
-        SettingsButton(alertOff: alertOff, action: onOpenSettings)
-      }
+    .backTitleBar(onBack: onBack) {
+      title
+    } trailing: {
+      if selection.canRotate { rotateButton }
+      SettingsButton(alertOff: alertOff, action: onOpenSettings)
     }
-    .sensoryFeedback(.selection, trigger: backTaps)
     .sensoryFeedback(.selection, trigger: rotateTaps)
     .onDisappear { OrientationLock.lockPortrait() }
   }
@@ -109,33 +105,17 @@ public struct CommodityView: View {
 
   private var nameKey: String { "commodities.\(code.rawValue)" }
 
-  /// [←] 원자재명 (심볼) 🔔. 제목은 [←] 바로 오른쪽에 왼쪽 정렬 (screens.md 공통 title-bar)
-  private var titleBar: some View {
-    HStack(spacing: Theme.Spacing.sm) {
-      Button {
-        backTaps += 1
-        onBack()
-      } label: {
-        Image(systemName: "chevron.left")
-          .foregroundStyle(Theme.Colors.text)
+  /// 원자재명 (심볼) 🔔. [←] 바로 오른쪽에 왼쪽 정렬 (screens.md 공통 title-bar)
+  private var title: some View {
+    HStack(spacing: Theme.Spacing.xs) {
+      // 보간한 리터럴은 `%@` 키가 되므로 문자열로 만든 뒤 키로 쓴다
+      Text(LocalizedStringKey(nameKey))
+      Text(verbatim: "(\(code.rawValue))")
+      if isAlert {
+        Text(verbatim: "🔔")
+          .font(.system(size: Theme.FontSize.caption))
+          .accessibilityLabel(Text("commodityList.alert"))
       }
-      .accessibilityLabel(Text("common.back"))
-      .accessibilityIdentifier("back")
-      HStack(spacing: Theme.Spacing.xs) {
-        // 보간한 리터럴은 `%@` 키가 되므로 문자열로 만든 뒤 키로 쓴다
-        Text(LocalizedStringKey(nameKey))
-        Text(verbatim: "(\(code.rawValue))")
-        if isAlert {
-          Text(verbatim: "🔔")
-            .font(.system(size: Theme.FontSize.caption))
-            .accessibilityLabel(Text("commodityList.alert"))
-        }
-      }
-      .font(.system(size: Theme.FontSize.title, weight: .semibold))
-      .foregroundStyle(Theme.Colors.text)
-      .lineLimit(1)
-      .fixedSize()
-      .accessibilityAddTraits(.isHeader)
     }
   }
 

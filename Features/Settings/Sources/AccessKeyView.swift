@@ -28,9 +28,11 @@ public struct AccessKeyView: View {
             .accessibilityLabel(Text("accessKey.scannerLabel"))
           Button("common.cancel") { isScanning = false }
             .frame(maxWidth: .infinity)
+            .separatorFromRowLeading()
         } else {
           Button("accessKey.scanQr", action: startScan)
             .frame(maxWidth: .infinity)
+            .separatorFromRowLeading()
             .disabled(model.isSaving)
         }
         SecureField("accessKey.pastePlaceholder", text: $model.input)
@@ -49,13 +51,16 @@ public struct AccessKeyView: View {
         .disabled(!model.canSubmit)
       }
       if let message = model.message {
-        Text(message.key)
+        Text(LocalizedStringKey(message.key))
           .foregroundStyle(Theme.Colors.error)
           .frame(maxWidth: .infinity)
           .accessibilityAddTraits(.isStaticText)
       }
     }
+    .titleBarSeparator()
     .navigationTitle(Text("settings.accessKey"))
+    // A에서 바로 올라오면(실행 때 거절) 큰 제목 모드를 이어받아 접힌 채 그려져 카드가 구분선에 붙는다
+    .navigationBarTitleDisplayMode(.inline)
     .navigationBarBackButtonHidden(!model.canGoBack)
     .onDisappear { model.leave() }
   }
@@ -96,13 +101,21 @@ public struct AccessKeyView: View {
   }
 }
 
+extension View {
+  /// 아래 구분선을 다른 행처럼 행 앞에서 시작한다. 가운데 정렬 버튼은 구분선이 글자 앞에서 시작해 짧아진다
+  fileprivate func separatorFromRowLeading() -> some View {
+    alignmentGuide(.listRowSeparatorLeading) { _ in 0 }
+  }
+}
+
 extension AccessKeyModel.Message {
-  /// i18n 키. App/Resources/Localizable.xcstrings(RN 리소스에서 생성)에 있다
-  var key: LocalizedStringKey {
+  /// i18n 키. App/Resources/Localizable.xcstrings(RN 리소스에서 생성)에 있다.
+  /// `String`으로 둔다: `LocalizedStringKey("a.\(b)")`처럼 보간하면 키가 `a.%@`가 되어 문구를 못 찾는다
+  var key: String {
     switch self {
-    case .notice(let notice): LocalizedStringKey("accessKey.\(notice.rawValue)")
+    case .notice(let notice): "accessKey.\(notice.rawValue)"
     case .rejected: "accessKey.rejected"
-    case .error(let code): LocalizedStringKey("errors.\(code.rawValue)")
+    case .error(let code): "errors.\(code.rawValue)"
     }
   }
 }

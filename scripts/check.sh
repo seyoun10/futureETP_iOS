@@ -25,7 +25,7 @@ step "generate"
 mise exec -- tuist generate --no-open >/dev/null
 
 step "import 방향 (IOS-003)"
-mise exec -- tuist inspect dependencies --only implicit
+mise exec -- tuist inspect dependencies
 
 step "Swift 6 언어 모드"
 # 모든 타깃·configuration의 SWIFT_VERSION이 6.0인지. Tuist 기본값이 xcconfig를 덮어쓰던 회귀 방지
