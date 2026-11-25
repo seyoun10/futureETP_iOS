@@ -55,6 +55,7 @@ public struct AccessKeyView: View {
           .accessibilityAddTraits(.isStaticText)
       }
     }
+    .titleBarSeparator()
     .navigationTitle(Text("settings.accessKey"))
     .navigationBarBackButtonHidden(!model.canGoBack)
     .onDisappear { model.leave() }

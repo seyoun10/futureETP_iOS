@@ -8,6 +8,16 @@ extension View {
   ) -> some View {
     modifier(BackTitleBar(title: title, trailing: trailing()))
   }
+
+  /// title-bar 아래 1pt `barSeparator` 줄. 화면 내용은 그 아래에서 시작한다(모든 화면 공통, RN `ScreenHeader` 아래 테두리)
+  public func titleBarSeparator() -> some View {
+    safeAreaInset(edge: .top, spacing: 0) {
+      Rectangle()
+        .fill(Theme.Colors.barSeparator)
+        .frame(height: 1)
+        .accessibilityHidden(true)
+    }
+  }
 }
 
 private struct BackTitleBar<Trailing: View>: ViewModifier {
@@ -18,6 +28,7 @@ private struct BackTitleBar<Trailing: View>: ViewModifier {
 
   func body(content: Content) -> some View {
     content
+      .titleBarSeparator()
       .navigationBarBackButtonHidden()
       .toolbar {
         ToolbarItem(placement: .topBarLeading) {

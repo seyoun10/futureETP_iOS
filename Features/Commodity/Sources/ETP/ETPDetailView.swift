@@ -19,6 +19,7 @@ public struct ETPDetailView: View {
     .queryLifecycle(query)
     .frame(maxWidth: .infinity, maxHeight: .infinity)
     .background(Theme.Colors.background)
+    .titleBarSeparator()
     // 뒤로 가기는 [←]로만 한다(D-105)
     .navigationBarBackButtonHidden()
     .toolbar {

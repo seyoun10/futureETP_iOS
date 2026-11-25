@@ -36,6 +36,7 @@ public struct CommodityListView: View {
     }
     .queryLifecycle(query)
     .background(Theme.Colors.background)
+    .titleBarSeparator()
     // A는 [←] 없이 제목을 왼쪽 끝에 둔다 (screens.md 공통 title-bar)
     .navigationTitle(Text(verbatim: "futureETP"))
     .toolbarTitleDisplayMode(.inlineLarge)

@@ -36,7 +36,8 @@
   - 남음: 실기기 120Hz·Release 측정(십자선을 끄는 동안 상세 박스 다시 그리기 비용 포함. 시뮬레이터 짧은 끌기에서 43~54fps)
 - [ ] C 화면 뼈대 (screens.md C, D-047, D-107, D-111)
   - 완료(2026-11-24): `CommodityView`(title-bar [←]·`원자재명 (심볼)`·🔔·[⟲]·[⚙], 시스템 뒤로 버튼 숨김으로 쓸어서 뒤로 가기 막음 D-105, 탭 4개는 처음 열 때 만들고 숨겨도 유지, 탭 화면이 `tabFooterTime`으로 보이는 탭의 기준 시각 줄을 올림), `ChartPeriods`(C-a·C-c 기간, C에 들어올 때마다 6M)·`ChartPeriod.nearest`, [⚙]는 A와 공용 `SettingsButton`. 시뮬레이터에서 탭 전환·문구 확인
-  - 남음: title-bar 아래 1px `barSeparator`(A·B·C 공통, 아직 없음), C 탭 화면 채우기(아래 항목들), ETP 상세(C-d-a)에서도 기간 유지
+  - title-bar 아래 1pt `barSeparator` 완료(2026-11-25): Core `titleBarSeparator()`를 `backTitleBar`·A·B-b·C·C-d-a에 붙임. 시뮬레이터에서 A·B 확인(C는 dev 서버 꺼져 미확인)
+  - 남음: C 탭 화면 채우기(아래 항목들), ETP 상세(C-d-a)에서도 기간 유지
 - [ ] C-a 이격도차트: `GET /v1/commodities/:code/disparity`, 기간 버튼 6개(D-102), 롤 음영, 십자선 상세, 가로 모드, 이전 3년 받기 중 화면 터치 차단·5초 시간 초과·실패 Alert (D-086, D-103, D-108, D-139)
   - 1단계 조회 완료(2026-11-24): `DisparityRepository`·`QueryCache.disparityChart`(키 `QueryKeys.disparity`, 설정 값별)
   - 2단계 계열 모델 완료(2026-11-24): `DisparityChartModel`(산출 불가일 제외·rare-level 밴드 순위 색·이평선 위·롤 음영/전환일·보이는 구간 최고·최저와 LC·HC·y축 특수 라벨·월물 구성·꼬리 백분위 표기)

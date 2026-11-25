@@ -67,6 +67,7 @@ public struct CommodityView: View {
         FreshnessLine(footerTime)
       }
     }
+    .titleBarSeparator()
     .onPreferenceChange(TabFooterTimeKey.self) { footerTime = $0 }
     .background(Theme.Colors.background)
     .environment(periods)
