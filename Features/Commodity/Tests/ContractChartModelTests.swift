@@ -1,5 +1,6 @@
 import Core
 import Foundation
+import SwiftUI
 import Testing
 
 @testable import Commodity
