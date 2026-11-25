@@ -23,7 +23,7 @@
   - View 완료(2026-11-24): `FooterLine`·`FreshnessLine`(`FooterTime`)·`QueryStateView`(`QueryState.phase`)·`LoadingView`·`CenterSpinner`·`ErrorView`
   - 조회 캐시 완료(2026-11-24): `QueryCache`(키 접두사 무효화·`keepFor` 5분/차트 1시간)·`Query`(진행 중 조회 합류·`StalePolicy.untilNextUpdate`)·`.queryLifecycle`(진입·앱 복귀 재조회·`nextUpdateAt` + 1분 자동 새로고침)·키 저장 뒤 전체 무효화. 무한 조회는 `ChartPages`·`PagedQuery`(`QueryCache.pagedQuery`, 받은 페이지 수만큼 다시 조회·`fetchOlder` 실패는 Alert용으로 돌려줌·늦은 응답도 붙음, 2026-11-24). 남음: 기준 시각 줄을 홈 인디케이터 여백에 겹치는 배치(A는 `safeAreaInset`으로 목록 아래에 둠, 시뮬레이터 확인)
 - [ ] 앱 실행 때 시간대 PATCH (D-084), 세로 잠금·[⟲] 가로 전환 (D-076)
-  - 시간대·언어 PATCH 코드 완료(2026-11-24): `SettingsStore`(설정 조회·낙관적 PATCH 줄 세우기)·`.deviceSettingsSync`(루트, 키 있을 때). 남음: dev 서버에서 기기 시간대·언어 바꿔 PATCH 확인
+  - 시간대·언어 PATCH 코드 완료(2026-11-24): `SettingsStore`(설정 조회·낙관적 PATCH 줄 세우기)·`.deviceSettingsSync`(루트, 키 있을 때). dev 서버 확인 완료(2026-11-25): `TZ=America/Chicago`·영어로 실행하면 `device` 행이 `en`·`America/Chicago`로, 서울로 다시 실행하면 시간대가 되돌아감. 언어는 앱 설정 저장값이 기기 언어보다 앞서므로(D-033) B에서 [한국어]를 누를 때 `ko`로 PATCH됨
   - 세로 잠금 기반 완료(2026-11-24): `OrientationLock`(시작 세로, `lockPortrait`·`lockLandscape`·[⟲]용 `toggle(isLandscape:)`, `AppDelegate`가 허용 방향 반환)·`\.isLandscape`(창 모양, 루트 `providesIsLandscape`)
   - C [⟲] 완료(2026-11-24): ETP 탭 밖에서만 보임, ETP 탭 진입·C를 떠날 때 `lockPortrait`, 가로에서 tab-bar·기준 시각 줄 숨김. 시뮬레이터에서 가로 전환·가로에서 [←]로 A 세로 복귀 확인. 남음: 실기기 확인
 
