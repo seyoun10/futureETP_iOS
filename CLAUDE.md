@@ -71,6 +71,7 @@ Swift/SwiftUI로 만드는 futureETP 앱(iOS). 기능·화면·동작은 RN 앱(
 ## Conventions
 
 - commit message: Conventional Commits(`feat:`, `fix:`, `chore:`, `docs:`). 관련 결정 번호를 끝에 `(D-xxx)`·`(IOS-xxx)`로 붙인다
+- PR·머지: main은 보호돼 있어 브랜치 → PR → `check` 통과 → squash 머지로만 반영한다. squash 커밋 제목이 PR 제목이므로 PR 제목을 커밋 메시지 규칙대로 쓴다 (D-145)
 - 커밋 전 `./scripts/check.sh` 통과. 문서만 바꾼 커밋은 생략
 - `fix:` 커밋은 회귀 테스트를 함께 넣는다. 시각 조정만 예외로 기기 확인으로 대신한다
 - 이름: 타입 `UpperCamelCase`, 멤버 `lowerCamelCase`, 파일 이름 = 주 타입 이름. Swift API Design Guidelines를 따른다

@@ -1,0 +1,13 @@
+# GitHub Actions 버전만 자동으로 올린다(D-134, D-145). 앱 의존성은 직접 올린다.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    # 한 달치 action 업데이트를 PR 하나로 묶는다
+    groups:
+      actions:
+        patterns: ['*']
+    commit-message:
+      prefix: ci
