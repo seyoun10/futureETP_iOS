@@ -1,0 +1,4 @@
+# actionlint 설정. check.yml의 runs-on: xcode-27은 GitHub 기본 라벨 목록에 없는 러너 라벨이라 여기에 등록한다
+self-hosted-runner:
+  labels:
+    - xcode-27
