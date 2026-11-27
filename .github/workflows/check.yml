@@ -8,9 +8,12 @@ on:
     branches: [main]
   pull_request:
   workflow_dispatch:
+  # 원본(RN)이 바뀌어도 이 저장소 커밋이 없으면 돌지 않으므로 매일 한 번 main을 원본 최신과 다시 맞춰 본다(06:00 KST)
+  schedule:
+    - cron: "0 21 * * *"
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
